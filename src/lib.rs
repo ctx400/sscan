@@ -13,5 +13,8 @@
 //! [mlua](https://crates.io/crates/mlua) crate.
 //!
 
+// Enable pedantic linting
+#![warn(clippy::pedantic)]
+
 // Modules
 pub mod lua_api;
