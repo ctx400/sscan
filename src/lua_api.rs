@@ -1,4 +1,4 @@
-//! Creates and manages the Lua virtual machine.
+//! # APIs for Lua userscripts
 //!
 //! This module is responsible for creating and managing the Lua vurtual
 //! machine, which is used for userscripts, configuration, and custom
@@ -12,7 +12,7 @@
 //!
 
 // Modules
-mod version_info;
+pub mod version_info;
 
 // Scope Imports
 use mlua::prelude::*;
