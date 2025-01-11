@@ -36,8 +36,14 @@ pub fn register_version_apis(lua: &Lua) -> LuaResult<()> {
     set_version_info(&about)?;
 
     // Create the version() and license() Lua functions.
-    let version_func: LuaFunction = lua.create_function(move |_, ()| Ok(print_version_info()))?;
-    let license_func: LuaFunction = lua.create_function(move |_, ()| Ok(print_license()))?;
+    let version_func: LuaFunction = lua.create_function(move |_, ()| {
+        print_version_info();
+        Ok(())
+    })?;
+    let license_func: LuaFunction = lua.create_function(move |_, ()| {
+        print_license();
+        Ok(())
+    })?;
 
     // Register the table and functions in the global scope.
     let globals: LuaTable = lua.globals();
