@@ -99,4 +99,38 @@ impl LuaVM {
     pub fn exec(&self, script: &str) -> LuaResult<()> {
         self.0.load(script).exec()
     }
+
+    /// Evaluates a Lua expression and returns the result.
+    ///
+    /// This function is primarily intended for `sscani` to extend the
+    /// REPL functionality. If a user enters an expression, it is sent
+    /// to the VM for evaluation and the result is returned.
+    ///
+    /// # Errors
+    ///
+    /// Errors returned from this function are Lua errors. Most likely,
+    /// the Lua code passed to the `script` argument had a syntax error
+    /// or otherwise contained logic errors. If such an error is
+    /// returned, check the Lua snippet for errors and try again.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use mlua::prelude::LuaResult;
+    /// # use sscan::lua_api::LuaVM;
+    /// # fn main() -> LuaResult<()> {
+    /// // Create a Lua VM and evaluate `5 + 6`.
+    /// let vm: LuaVM = LuaVM::init()?;
+    /// let result = vm.eval("5 + 6")?.as_i32().unwrap();
+    ///
+    /// // Print the results.
+    /// println!("5 + 6 = {}", result);
+    /// # assert_eq!(result, 11);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn eval(&self, script: &str) -> LuaResult<LuaValue> {
+        let expr: LuaValue = self.0.load(script).eval()?;
+        Ok(expr)
+    }
 }
