@@ -7,16 +7,14 @@
 
 // Scope Imports
 use anyhow::Result;
-use mlua::Lua;
-use sscan::lua_api;
+use sscan::lua_api::LuaVM;
 
 /// Entrypoint for sscan.
 fn main() -> Result<()> {
     // Initialize the Lua virtual machine.
-    let lua: Lua = lua_api::init()?;
+    let vm: LuaVM = LuaVM::init()?;
 
     // Run a test script to validate APIs
-    lua.load("version() license()").exec()?;
-
+    vm.exec("version() license()")?;
     Ok(())
 }

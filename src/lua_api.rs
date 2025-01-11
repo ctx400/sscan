@@ -18,10 +18,19 @@ pub mod version_info;
 use mlua::prelude::*;
 use version_info::register_version_apis;
 
-/// Initializes Lua and adds APIs to the global scope.
-pub fn init() -> LuaResult<Lua> {
-    let lua: Lua = Lua::new();
-    register_version_apis(&lua)?;
+pub struct LuaVM(Lua);
 
-    Ok(lua)
+impl LuaVM {
+    /// Initializes Lua and adds core APIs to the global scope.
+    pub fn init() -> LuaResult<Self> {
+        let lua: Lua = Lua::new();
+        register_version_apis(&lua)?;
+
+        Ok(Self(lua))
+    }
+
+    /// Execute a Lua code snippet in the virtual machine.
+    pub fn exec(&self, script: &str) -> LuaResult<()> {
+        self.0.load(script).exec()
+    }
 }
