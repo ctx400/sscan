@@ -14,9 +14,9 @@
 //! will execute the snippet in the context of a userscript.
 //!
 
-use std::io::{stdin, stdout, Write};
 use anyhow::Result;
 use sscan::lua_api::LuaVM;
+use std::io::{stdin, stdout, Write};
 
 fn main() -> Result<()> {
     // Initialize the Lua virtual machine.
