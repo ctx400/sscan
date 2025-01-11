@@ -8,25 +8,25 @@
 //! All functions in this module are accessible to userscripts in the
 //! global scope.
 //!
-//! | Function | Description
-//! | --- | --- |
-//! | license() | Pretty-print the license file. |
-//! | version() | Pretty-print version info about sscan. |
+//! | Function | Returns | Description
+//! | --- | :---: | --- |
+//! | `license()` | nil | Pretty-print the license file. |
+//! | `version()` | nil | Pretty-print version info about sscan. |
 //!
 //! ## Variables
 //!
 //! All variables in this module are added to a table called `about`,
 //! which is accessible by userscripts as a global variable.
 //!
-//! | Name | Description |
-//! | --- | --- |
-//! | about.app_name | The name of the crate at build time. |
-//! | about.authors | The authors of sscan. |
-//! | about.description | A short description of sscan. |
-//! | about.license | The text of the crate's license. |
-//! | about.license_spdx | The crate's SPDX license identifier. |
-//! | about.repository | The URL to sscan's Github repository. |
-//! | about.version | The build version of sscan. |
+//! | Name | Type | Description |
+//! | --- | :---: | --- |
+//! | `about.app_name` | string | The name of the crate at build time. |
+//! | `about.authors` | string | The authors of sscan. |
+//! | `about.description` | string | A short description of sscan. |
+//! | `about.license` | string | The text of the crate's license. |
+//! | `about.license_spdx` | string | The crate's SPDX license identifier. |
+//! | `about.repository` | string | The URL to sscan's Github repository. |
+//! | `about.version` | string | The build version of sscan. |
 //!
 //! ## Example
 //!
@@ -65,8 +65,19 @@ const LICENSE_SPDX: &str = env!("CARGO_PKG_LICENSE");
 /// The full text of the crate's license.
 const LICENSE: &str = include_str!("../../LICENSE.md");
 
-/// Registers the version and license info APIs.
-pub fn register_version_apis(lua: &Lua) -> LuaResult<()> {
+/// Registers the version and license info APIs with Lua.
+///
+/// This function registers the `about` table containing version and
+/// license information, as well as two global convienience functions,
+/// `version()` and `license()`, for pretty-printing version info to
+/// stdout.
+///
+/// # Errors
+///
+/// Any errors returning from this function are Lua errors. If a Lua
+/// error occurs, this is probably a bug and should be reported.
+///
+pub(super) fn register_version_apis(lua: &Lua) -> LuaResult<()> {
     // Create an `about` table with version info keys.
     let about: LuaTable = lua.create_table()?;
     set_version_info(&about)?;
@@ -102,12 +113,11 @@ fn set_version_info(table: &LuaTable) -> LuaResult<()> {
 /// Pretty-prints version information to stdout.
 fn print_version_info() {
     println!(
-        "{} v{} - {}\nRepository: {}\nAuthors: {}\nLicense: {}",
-        APP_NAME, VERSION, DESCRIPTION, REPOSITORY, AUTHORS, LICENSE_SPDX,
+        "{APP_NAME} v{VERSION} - {DESCRIPTION}\nRepository: {REPOSITORY}\nAuthors: {AUTHORS}\nLicense: {LICENSE_SPDX}"
     );
 }
 
 /// Prints the license file to stdout.
 fn print_license() {
-    println!("{}", LICENSE);
+    println!("{LICENSE}");
 }
