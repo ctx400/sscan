@@ -17,7 +17,7 @@
 use anyhow::{Error, Result};
 use mlua::Value as LuaValue;
 use sscan::lua_api::LuaVM;
-use std::io::{stdin, stdout, Write};
+use std::io::stdin;
 
 fn main() -> Result<()> {
     // Initialize the Lua virtual machine.
@@ -29,9 +29,8 @@ fn main() -> Result<()> {
 
     // Start REPL loop.
     loop {
-        // Prompt for input
-        print!("sscan> ");
-        stdout().flush()?;
+        // Display the prompt
+        vm.exec("sscani.prompt()")?;
 
         // Read a line of Lua.
         let mut buffer: String = String::with_capacity(2048);
@@ -40,8 +39,7 @@ fn main() -> Result<()> {
         // Very primitive support for line continuation.
         while !buffer.trim_end().ends_with(";") {
             // Display a continuation prompt.
-            print!("   ... ");
-            stdout().flush()?;
+            vm.exec("sscani.prompt_continue()")?;
 
             // Read a new line from the buffer.
             stdin().read_line(&mut buffer)?;
