@@ -21,7 +21,10 @@ use std::io::{stdin, stdout, Write};
 fn main() -> Result<()> {
     // Initialize the Lua virtual machine.
     let vm: LuaVM = LuaVM::init()?;
-    vm.exec("version() print()")?;
+
+    // Load and execute the sscani helper library.
+    let sscani_lib: &str = include_str!("sscani/sscani.lua");
+    vm.exec(sscani_lib)?;
 
     // Start REPL loop.
     loop {
