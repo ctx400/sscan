@@ -28,7 +28,6 @@ const LICENSE_SPDX: &str = env!("CARGO_PKG_LICENSE");
 /// The full text of the crate's license.
 const LICENSE: &str = include_str!("../../LICENSE.md");
 
-
 /// Registers the version and license info APIs.
 pub fn register_version_apis(lua: &Lua) -> LuaResult<()> {
     // Create an `about` table with version info keys.
@@ -67,12 +66,7 @@ fn set_version_info(table: &LuaTable) -> LuaResult<()> {
 fn print_version_info() {
     println!(
         "{} v{} - {}\nRepository: {}\nAuthors: {}\nLicense: {}",
-        APP_NAME,
-        VERSION,
-        DESCRIPTION,
-        REPOSITORY,
-        AUTHORS,
-        LICENSE_SPDX,
+        APP_NAME, VERSION, DESCRIPTION, REPOSITORY, AUTHORS, LICENSE_SPDX,
     );
 }
 
