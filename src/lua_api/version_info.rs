@@ -8,25 +8,25 @@
 //! All functions in this module are accessible to userscripts in the
 //! global scope.
 //!
-//! | Function | Description
-//! | --- | --- |
-//! | `license()` | Pretty-print the license file. |
-//! | `version()` | Pretty-print version info about sscan. |
+//! | Function | Returns | Description
+//! | --- | :---: | --- |
+//! | `license()` | nil | Pretty-print the license file. |
+//! | `version()` | nil | Pretty-print version info about sscan. |
 //!
 //! ## Variables
 //!
 //! All variables in this module are added to a table called `about`,
 //! which is accessible by userscripts as a global variable.
 //!
-//! | Name | Description |
-//! | --- | --- |
-//! | `about.app_name` | The name of the crate at build time. |
-//! | `about.authors` | The authors of sscan. |
-//! | `about.description` | A short description of sscan. |
-//! | `about.license` | The text of the crate's license. |
-//! | `about.license_spdx` | The crate's SPDX license identifier. |
-//! | `about.repository` | The URL to sscan's Github repository. |
-//! | `about.version` | The build version of sscan. |
+//! | Name | Type | Description |
+//! | --- | :---: | --- |
+//! | `about.app_name` | string | The name of the crate at build time. |
+//! | `about.authors` | string | The authors of sscan. |
+//! | `about.description` | string | A short description of sscan. |
+//! | `about.license` | string | The text of the crate's license. |
+//! | `about.license_spdx` | string | The crate's SPDX license identifier. |
+//! | `about.repository` | string | The URL to sscan's Github repository. |
+//! | `about.version` | string | The build version of sscan. |
 //!
 //! ## Example
 //!
@@ -72,7 +72,7 @@ const LICENSE: &str = include_str!("../../LICENSE.md");
 /// `version()` and `license()`, for pretty-printing version info to
 /// stdout.
 ///
-/// ## Errors
+/// # Errors
 ///
 /// Any errors returning from this function are Lua errors. If a Lua
 /// error occurs, this is probably a bug and should be reported.
