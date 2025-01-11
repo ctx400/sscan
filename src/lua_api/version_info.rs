@@ -77,7 +77,7 @@ const LICENSE: &str = include_str!("../../LICENSE.md");
 /// Any errors returning from this function are Lua errors. If a Lua
 /// error occurs, this is probably a bug and should be reported.
 ///
-pub fn register_version_apis(lua: &Lua) -> LuaResult<()> {
+pub(super) fn register_version_apis(lua: &Lua) -> LuaResult<()> {
     // Create an `about` table with version info keys.
     let about: LuaTable = lua.create_table()?;
     set_version_info(&about)?;
