@@ -18,9 +18,15 @@ mod lua;
 
 // Scope Imports
 use anyhow::Result;
+use mlua::Lua;
 
 /// Entrypoint for sscan.
 fn main() -> Result<()> {
-    println!("Hello, World!");
+    // Initialize the Lua virtual machine.
+    let lua: Lua = lua::init()?;
+
+    // Run a test script to validate APIs
+    lua.load("version() license()").exec()?;
+
     Ok(())
 }
