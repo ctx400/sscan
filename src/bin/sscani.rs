@@ -14,7 +14,8 @@
 //! will execute the snippet in the context of a userscript.
 //!
 
-use anyhow::Result;
+use anyhow::{Error, Result};
+use mlua::Value as LuaValue;
 use sscan::lua_api::LuaVM;
 use std::io::{stdin, stdout, Write};
 
@@ -45,9 +46,28 @@ fn main() -> Result<()> {
             // Read a new line from the buffer.
             stdin().read_line(&mut buffer)?;
         }
-
-        // Execute the Lua snippet. Trim the semicolon first.
+        // Trim the semicolon before execution.
         let snippet: &str = buffer.trim_end_matches(';');
-        vm.exec(snippet)?;
+
+        // Evaluate the Lua snippet. If a value is returned, print it.
+        match vm.eval(snippet) {
+            Ok(retval) => match retval {
+                LuaValue::Nil => {}
+                LuaValue::Boolean(b) => println!("{b}"),
+                LuaValue::Function(f) => {
+                    // Get and print the function name
+                    let func_ptr: usize = f.to_pointer() as usize;
+                    println!("<function @ {func_ptr:#x}>");
+                }
+                LuaValue::Integer(i) => println!("{i}"),
+                LuaValue::Number(f) => println!("{f}"),
+                LuaValue::String(s) => println!("{}", s.to_string_lossy()),
+                _ => println!("<{}>", retval.type_name()),
+            },
+            Err(err) => {
+                let err: Error = Error::new(err).context("unable to execute chunk");
+                eprintln!("Error: {err:?}");
+            }
+        }
     }
 }
