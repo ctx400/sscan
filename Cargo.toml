@@ -1,0 +1,35 @@
+[package]
+# Crate Information
+name = "sscan"
+version = "0.1.0"
+authors = ["ctx400"]
+description = "A scriptable file/process/network scanner"
+repository = "https://github.com/ctx400/sscan"
+readme = "README.md"
+license = "MIT"
+
+# crates.io metadata
+keywords = ["scanner", "yara", "lua", "security", "scan"]
+categories = ["command-line-utilities"]
+publish = false
+
+# Minimum supported Rust edition
+edition = "2021"
+
+[dependencies]
+# Error Handling
+anyhow = "1.0"
+thiserror = "2"
+
+# Scan engines
+yara-x = "0.12.0"
+
+# Lua scripting support
+[dependencies.mlua]
+version = "0.10.2"
+features = ["lua54", "vendored", "serialize", "anyhow"]
+
+# Serialization support
+[dependencies.serde]
+version = "1.0"
+features = ["derive"]
