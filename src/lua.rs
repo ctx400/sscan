@@ -4,6 +4,12 @@
 //! machine, which is used for userscripts, configuration, and custom
 //! scan engines.
 //!
+//! ## API Documentation
+//!
+//! For information about the various APIs sscan exposes to userscripts,
+//! see each of the various modules under this one, for example,
+//! [version_info].
+//!
 
 // Modules
 mod version_info;

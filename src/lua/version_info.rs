@@ -1,7 +1,44 @@
-//! Adds version information APIs to Lua.
+//! # Version and license info APIs
 //!
 //! This module adds API methods and data items to the Lua global scope
 //! to retrieve version information in userscripts.
+//!
+//! ## Functions
+//!
+//! All functions in this module are accessible to userscripts in the
+//! global scope.
+//!
+//! | Function | Description
+//! | --- | --- |
+//! | license() | Pretty-print the license file. |
+//! | version() | Pretty-print version info about sscan. |
+//!
+//! ## Variables
+//!
+//! All variables in this module are added to a table called `about`,
+//! which is accessible by userscripts as a global variable.
+//!
+//! | Name | Description |
+//! | --- | --- |
+//! | about.app_name | The name of the crate at build time. |
+//! | about.authors | The authors of sscan. |
+//! | about.description | A short description of sscan. |
+//! | about.license | The text of the crate's license. |
+//! | about.license_spdx | The crate's SPDX license identifier. |
+//! | about.repository | The URL to sscan's Github repository. |
+//! | about.version | The build version of sscan. |
+//!
+//! ## Example
+//!
+//! ```lua
+//! -- Print all version info and print license
+//! version()
+//! license()
+//!
+//! -- Access version and authors
+//! print(about.version)
+//! print(about.authors)
+//! ```
 //!
 
 // Scope Includes
