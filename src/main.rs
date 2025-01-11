@@ -13,6 +13,10 @@
 //! [mlua](https://crates.io/crates/mlua) crate.
 //!
 
+// Modules
+mod lua;
+
+// Scope Imports
 use anyhow::Result;
 
 /// Entrypoint for sscan.
