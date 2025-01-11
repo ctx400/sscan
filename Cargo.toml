@@ -11,7 +11,7 @@ license = "MIT"
 # crates.io metadata
 keywords = ["scanner", "yara", "lua", "security", "scan"]
 categories = ["command-line-utilities"]
-publish = false
+publish = true
 
 # Minimum supported Rust edition
 edition = "2021"
