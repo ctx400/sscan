@@ -46,3 +46,22 @@ In these versions, *anything may change at any time*!
 - Full configurability with Lua userscripts
 - YARA-X scan engine integration
 - Custom Lua userscript scan engines
+
+## Open-Source Licenses
+
+sscan is made free and open-source to the public in accordance with
+the terms of the [MIT License](LICENSE.md).
+
+sscan uses third-party open-source software. A list of dependencies and
+attribution information is available in
+[OPEN_SOURCE_LICENSES.html](OPEN_SOURCE_LICENSES.html).
+
+Finally, sscan uses an embedded Lua virtual machine through the crate
+`mlua` This ultimately uses the [Lua](https://www.lua.org/) software.
+The license for Lua can be found in [LUA_LICENSE.md](LUA_LICENSE.md).
+
+A good-faith effort is made to ensure all dependences are properly
+attributed. I use both the tools `cargo-deny` and `cargo-about` to scan
+for open-source license requirements. However, if you are a crate author
+and need to update OPEN_SOURCE_LICENSES.html, please open an issue using
+the **Attribution Issues** template.
