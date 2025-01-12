@@ -135,12 +135,50 @@ impl LuaVM {
     }
 
     /// Retrieve a table object from Lua globals.
+    ///
+    /// # Errors
+    ///
+    /// If this function fails, most likely the referenced key either
+    /// does not exist (nil), or the referenced key was not a table.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use mlua::prelude::LuaResult;
+    /// # use sscan::lua_api::LuaVM;
+    /// # fn main() -> LuaResult<()> {
+    /// let vm: LuaVM = LuaVM::init()?;
+    /// let table = vm.get_table("about")?;
+    /// table.set("mykey", "myvalue")?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn get_table(&self, key: &str) -> LuaResult<LuaTable> {
         let table: LuaTable = self.0.globals().get(key)?;
         Ok(table)
     }
 
     /// Store a Lua table object as a global with specified name.
+    ///
+    /// # Errors
+    ///
+    /// If this function fails, most likely the key name was invalid.
+    /// Check the key name to ensure it is valid for a Lua object.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use mlua::prelude::LuaResult;
+    /// # use sscan::lua_api::LuaVM;
+    /// # fn main() -> LuaResult<()> {
+    /// let vm: LuaVM = LuaVM::init()?;
+    /// let table = vm.get_table("about")?;
+    ///
+    /// table.set("mykey", "myvalue")?;
+    /// vm.commit_table("about", table)?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn commit_table(&self, key: &str, table: LuaTable) -> LuaResult<()> {
         self.0.globals().set(key, table)
     }
