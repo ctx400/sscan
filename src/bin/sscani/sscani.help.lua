@@ -123,7 +123,7 @@ function help(topic)
 
     -- Otherwise, print help on the specified topic
     local help_topic = sscani_help.topics[topic]
-    if topic == nil then
+    if help_topic == nil then
         io.write("Couldn't find that topic. List all with help('topics').\n\n")
         io.flush()
         return
