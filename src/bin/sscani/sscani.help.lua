@@ -40,8 +40,10 @@ function sscani_help.gen_table_keys_csv(table_ref, prepend)
         end
         table.insert(table_keys, key)
     end
+    table.sort(table_keys)
     return table.concat(table_keys, ', ')
 end
+
 
 -- Help for the `about` table.
 sscani_help.topics.about = string.format([[
@@ -62,14 +64,38 @@ The following items are available:
 
 ]], sscani_help.gen_table_keys_csv(about, 'about.'))
 
+
+-- Help for using the rcfile.
+sscani_help.topics.rcfile = [[
+
+SSCANI RCFILE
+=============
+
+If you'd like to customize the startup or interaction behavior of
+sscani, you can do so with an rcfile. On startup, sscani checks the
+following locations:
+
+  - ~/.sscanirc
+  - ~/.sscanirc.lua
+  - ~/.sscani.rc.lua
+  - ~/.config/sscanirc
+  - ~/.config/sscanirc.lua
+  - ~/.config/sscani.rc.lua
+
+If an rcfile is found at one of those paths, sscani runs it to apply
+any customizations the user has made.
+
+To generate a default rcfile, use sscani.mkrcfile(). This
+function will create a new rcfile at ~/.sscani.rc.lua
+
+]]
+
+
 -- Additional context for the help('topics') command.
 sscani_help.about_topics = [[
 The following topics are available. Use help('topic') to select one:
 
 ]]
-
--- Sort all the topics.
-table.sort(sscani_help.topics)
 
 -- Prints either generic help or a topic.
 function help(topic)

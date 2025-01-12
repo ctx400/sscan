@@ -133,4 +133,15 @@ impl LuaVM {
         let expr: LuaValue = self.0.load(script).eval()?;
         Ok(expr)
     }
+
+    /// Retrieve a table object from Lua globals.
+    pub fn get_table(&self, key: &str) -> LuaResult<LuaTable> {
+        let table: LuaTable = self.0.globals().get(key)?;
+        Ok(table)
+    }
+
+    /// Store a Lua table object as a global with specified name.
+    pub fn commit_table(&self, key: &str, table: LuaTable) -> LuaResult<()> {
+        self.0.globals().set(key, table)
+    }
 }

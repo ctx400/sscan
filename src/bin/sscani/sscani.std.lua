@@ -59,9 +59,19 @@ function exit()
     os.exit(0)
 end
 
+-- Tries to get the user's home directory.
+-- Returns nil if a home directory cannot be found.
+function sscani.try_get_home()
+    local home = os.getenv('HOME')
+    if home ~= nil then return home end
+
+    home = os.getenv('USERPROFILE')
+    return home
+end
+
 -- Checks for an rcfile at several locations and executes it if found.
 function sscani.check_for_rcfile()
-    local home = os.getenv('HOME')
+    local home = sscani.try_get_home()
     if home == nil then return end
 
     local test_paths = {
@@ -77,12 +87,41 @@ function sscani.check_for_rcfile()
     do
         test = io.open(path, 'r')
         if test ~= nil then
-            io.close(test)
+            test:close()
             dofile(path)
             return
         end
     end
 end
+
+-- Generates a default rcfile at $HOME/.sscani.rc.lua
+function sscani.mkrcfile()
+    local home = sscani.try_get_home()
+    if home == nil then
+        io.write('Could not generate rcfile: failed to find $HOME or $USERPROFILE.\n')
+        io.flush()
+        return
+    end
+
+    local rcfile = io.open(home .. '/.sscani.rc.lua', 'w')
+    if rcfile == nil then
+        io.write('Could not generate rcfile: access denied for ~/.sscani.rc.lua.\n')
+        io.flush()
+        return
+    end
+
+    rcfile:write(sscani.rc_default)
+    rcfile:close()
+
+    io.write('Wrote default rcfile to ~/.sscani.rc.lua\n')
+    io.write("See help('rcfile') for help on configuration.\n\n")
+    io.flush()
+end
+
+
+-- @@@@@@@@@@@@@@@
+-- Startup Routine
+-- @@@@@@@@@@@@@@@
 
 -- Run user rcfile discovery
 sscani.check_for_rcfile()
