@@ -19,13 +19,19 @@ use mlua::Value as LuaValue;
 use sscan::lua_api::LuaVM;
 use std::io::stdin;
 
+/// The sscani help subsystem. Provides help(['topic']).
+const LIB_SSCANI_HELP: &str = include_str!("sscani/sscani.help.lua");
+
+/// The main sscani helper library. Should be loaded last.
+const LIB_SSCANI_STD: &str = include_str!("sscani/sscani.std.lua");
+
 fn main() -> Result<()> {
     // Initialize the Lua virtual machine.
     let vm: LuaVM = LuaVM::init()?;
 
-    // Load and execute the sscani helper library.
-    let sscani_lib: &str = include_str!("sscani/sscani.lua");
-    vm.exec(sscani_lib)?;
+    // Load and execute scanni's helper libraries.
+    vm.exec(LIB_SSCANI_HELP)?;
+    vm.exec(LIB_SSCANI_STD)?;
 
     // Start REPL loop.
     loop {

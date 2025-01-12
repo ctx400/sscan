@@ -59,26 +59,6 @@ function exit()
     os.exit(0)
 end
 
--- Lists available commands and variables.
-function help()
-    io.write('GLOBAL FUNCTIONS\n')
-    io.write('================\n')
-    io.write('  exit()\n')
-    io.write('  help()\n')
-    io.write('  license()\n')
-    io.write('  version()\n\n')
-
-    io.write('VERSION INFORMATION\n')
-    io.write('===================\n')
-    io.write('Type\tKey\n')
-    for key, value in pairs(about)
-    do
-        io.write(type(value) .. '\tabout.' .. key .. '\n')
-    end
-    io.write('\n')
-    io.flush()
-end
-
 -- Checks for an rcfile at several locations and executes it if found.
 function sscani.check_for_rcfile()
     local home = os.getenv('HOME')
