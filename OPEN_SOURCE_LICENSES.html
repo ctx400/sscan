@@ -41,8 +41,51 @@
             <h1>Third Party Licenses</h1>
             <p>This page lists the licenses of the projects used in sscan.</p>
         </div>
+
+        <!--Manual overview section for non-autodetectable software-->
+        <h2>Overview of non-crate licenses:</h2>
+        <p>
+            Some software is included with sscan that is not auto-detected by
+            cargo-about. This section lists the licenses of such included software.
+        </p>
+        <ul class="licenses-overview">
+            <li><a href="#noncrate-MIT">MIT License</a> (1)</li>
+        </ul>
+
+        <h2>All non-crate license text:</h2>
+        <ul class="licenses-list">
+            <!--Lua 5.4 - MIT License-->
+            <li class="license">
+                <h3 id="noncrate-MIT">MIT License</h3>
+                <h4>Used by:</h4>
+                <ul class="license-used-by">
+                    <li><a href="https://www.lua.org/versions.html">Lua 5.4</a></li>
+                </ul>
+                <pre class="license-text">Copyright (c) 1994–2024 Lua.org, PUC-Rio.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+&quot;Software&quot;), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+</pre>
+            </li>
+        </ul>
     
-        <h2>Overview of licenses:</h2>
+        <h2>Overview of crate licenses:</h2>
         <ul class="licenses-overview">
             <li><a href="#Apache-2.0">Apache License 2.0</a> (214)</li>
             <li><a href="#MIT">MIT License</a> (45)</li>

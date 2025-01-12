@@ -58,10 +58,6 @@ attribution information is available in
 this file as a rendered webpage
 [here](https://htmlpreview.github.io/?https://github.com/ctx400/sscan/blob/main/OPEN_SOURCE_LICENSES.html).
 
-Finally, sscan uses an embedded Lua virtual machine through the crate
-`mlua` This ultimately uses the [Lua](https://www.lua.org/) software.
-The license for Lua can be found in [LUA_LICENSE.md](LUA_LICENSE.md).
-
 A good-faith effort is made to ensure all dependences are properly
 attributed. I use both the tools `cargo-deny` and `cargo-about` to scan
 for open-source license requirements. However, if you are a crate author
