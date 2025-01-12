@@ -1,7 +1,7 @@
 # sscan - A scriptable file/process/network scanner
 
 [![Crates.io Version](https://img.shields.io/crates/v/sscan)](https://crates.io/crates/sscan)
-[![docs.rs](https://img.shields.io/docsrs/sscan)](https://docs.rs/sscan/0.4.0/sscan/)
+[![docs.rs](https://img.shields.io/docsrs/sscan)](https://docs.rs/sscan/latest/sscan/)
 [![GitHub last commit](https://img.shields.io/github/last-commit/ctx400/sscan)](https://github.com/ctx400/sscan/commits/main/)
 
 
