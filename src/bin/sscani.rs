@@ -21,7 +21,7 @@ use mlua::Value as LuaValue;
 use sscan::lua_api::LuaVM;
 use std::io::stdin;
 
-/// The sscani help subsystem. Provides help(['topic']).
+/// The sscani help subsystem. Provides the Lua help function.
 const LIB_SSCANI_HELP: &str = include_str!("sscani/sscani.help.lua");
 
 /// The main sscani helper library. Should be loaded last.
@@ -45,7 +45,7 @@ fn main() -> Result<()> {
         stdin().read_line(&mut buffer)?;
 
         // Very primitive support for line continuation.
-        while !buffer.trim_end().ends_with(";") {
+        while !buffer.trim_end().ends_with(';') {
             // Display a continuation prompt.
             vm.exec("sscani.prompt_continue()")?;
 
