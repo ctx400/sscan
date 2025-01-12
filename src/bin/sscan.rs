@@ -5,6 +5,8 @@
 //! an embeded [Lua](https://www.lua.org/) virtual machine.
 //!
 
+#![warn(clippy::pedantic)]
+
 // Scope Imports
 use anyhow::Result;
 use sscan::lua_api::LuaVM;

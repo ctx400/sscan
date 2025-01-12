@@ -14,6 +14,8 @@
 //! will execute the snippet in the context of a userscript.
 //!
 
+#![warn(clippy::pedantic)]
+
 use anyhow::{Error, Result};
 use mlua::Value as LuaValue;
 use sscan::lua_api::LuaVM;
