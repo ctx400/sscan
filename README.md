@@ -54,7 +54,9 @@ the terms of the [MIT License](LICENSE.md).
 
 sscan uses third-party open-source software. A list of dependencies and
 attribution information is available in
-[OPEN_SOURCE_LICENSES.html](OPEN_SOURCE_LICENSES.html).
+[OPEN_SOURCE_LICENSES.html](OPEN_SOURCE_LICENSES.html). You can view
+this file as a rendered webpage
+[here](https://htmlpreview.github.io/?https://github.com/ctx400/sscan/blob/main/OPEN_SOURCE_LICENSES.html).
 
 Finally, sscan uses an embedded Lua virtual machine through the crate
 `mlua` This ultimately uses the [Lua](https://www.lua.org/) software.
