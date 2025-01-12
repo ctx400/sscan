@@ -14,18 +14,34 @@
 //! will execute the snippet in the context of a userscript.
 //!
 
+#![warn(clippy::pedantic)]
+
 use anyhow::{Error, Result};
 use mlua::Value as LuaValue;
 use sscan::lua_api::LuaVM;
 use std::io::stdin;
 
+/// The default sscani rcfile. This is loaded into Lua as a string.
+const RCFILE_DEFAULT: &str = include_str!("sscani/rc.default.lua");
+
+/// The sscani help subsystem. Provides the Lua help function.
+const LIB_SSCANI_HELP: &str = include_str!("sscani/sscani.help.lua");
+
+/// The main sscani helper library. Should be loaded last.
+const LIB_SSCANI_STD: &str = include_str!("sscani/sscani.std.lua");
+
 fn main() -> Result<()> {
     // Initialize the Lua virtual machine.
     let vm: LuaVM = LuaVM::init()?;
 
-    // Load and execute the sscani helper library.
-    let sscani_lib: &str = include_str!("sscani/sscani.lua");
-    vm.exec(sscani_lib)?;
+    // Load and execute scanni's helper libraries.
+    vm.exec(LIB_SSCANI_HELP)?;
+    vm.exec(LIB_SSCANI_STD)?;
+
+    // Load the default rcfile into Lua.
+    let sscani: mlua::Table = vm.get_table("sscani")?;
+    sscani.set("rc_default", RCFILE_DEFAULT)?;
+    vm.commit_table("sscani", sscani)?;
 
     // Start REPL loop.
     loop {
@@ -37,7 +53,7 @@ fn main() -> Result<()> {
         stdin().read_line(&mut buffer)?;
 
         // Very primitive support for line continuation.
-        while !buffer.trim_end().ends_with(";") {
+        while !buffer.trim_end().ends_with(';') {
             // Display a continuation prompt.
             vm.exec("sscani.prompt_continue()")?;
 
