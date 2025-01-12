@@ -30,6 +30,19 @@ To list all available topics, use help('topics');
 
 ]], _VERSION)
 
+-- Returns a comma-delimited string of table keys.
+function sscani_help.gen_table_keys_csv(table_ref, prepend)
+    local table_keys = {}
+    for key, _ in pairs(table_ref)
+    do
+        if prepend ~= nil then
+            key = prepend .. key
+        end
+        table.insert(table_keys, key)
+    end
+    return table.concat(table_keys, ', ')
+end
+
 -- Help for the `about` table.
 sscani_help.topics.about = string.format([[
 
@@ -43,7 +56,11 @@ For example, to access the current version of sscan, use:
 
   sscan> about.version
 
-]])
+The following items are available:
+
+%s
+
+]], sscani_help.gen_table_keys_csv(about, 'about.'))
 
 -- Additional context for the help('topics') command.
 sscani_help.about_topics = [[
@@ -53,16 +70,6 @@ The following topics are available. Use help('topic') to select one:
 
 -- Sort all the topics.
 table.sort(sscani_help.topics)
-
--- Returns a comma-delimited string of help topics.
-function sscani_help.list_topics()
-    local topics = {}
-    for key, _ in pairs(sscani_help.topics)
-    do
-        table.insert(topics, key)
-    end
-    return table.concat(topics, ',')
-end
 
 -- Prints either generic help or a topic.
 function help(topic)
@@ -83,7 +90,7 @@ function help(topic)
     -- Print a list of topics if requested.
     if topic == 'topics' then
         io.write(sscani_help.about_topics)
-        io.write(sscani_help.list_topics() .. '\n\n')
+        io.write(sscani_help.gen_table_keys_csv(sscani_help.topics) .. '\n\n')
         io.flush()
         return
     end
