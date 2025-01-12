@@ -1,5 +1,10 @@
 # sscan - A scriptable file/process/network scanner
 
+[![Crates.io Version](https://img.shields.io/crates/v/sscan)](https://crates.io/crates/sscan)
+[![docs.rs](https://img.shields.io/docsrs/sscan)](https://docs.rs/sscan/0.4.0/sscan/)
+[![GitHub last commit](https://img.shields.io/github/last-commit/ctx400/sscan)](https://github.com/ctx400/sscan/commits/main/)
+
+
 **sscan** is a scriptable file, process, and network scanner.
 Its high level of configurability is powered by userscripts which run in
 an embeded [Lua](https://www.lua.org/) virtual machine.
