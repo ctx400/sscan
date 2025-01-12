@@ -12,27 +12,45 @@ sscani.config = {}
 -- Controls whether to show the splash message or not on startup.
 sscani.config.show_splash = true
 
+-- Configures the default splash message displayed on startup.
+-- For more advanced control, override function sscani.splash().
+sscani.config.splash = string.format([[
+
+@@@ sscani v%s - Interactive REPL for sscan
+@@@ Authors: %s (%s)
+@@@ License: %s
+@@@
+@@@ Enter any valid Lua, terminated by ';'.
+@@@ Use help(); for help, exit(); to exit.
+
+]],about.version, about.authors, about.repository, about.license_spdx)
+
+-- Configures the default prompt string.
+-- For more advanced control, override function sscani.prompt()
+sscani.config.prompt = 'sscan> '
+
+-- Configures the default continuation string.
+-- For more advanced control, override function sscani.prompt_continue()
+sscani.config.prompt_continue = '   ... '
+
 -- Function to use for the prompt.
 -- Users can override this prompt if desired.
 function sscani.prompt()
-    io.write("sscan> ")
+    io.write(sscani.config.prompt)
     io.flush()
 end
 
 -- Function to print continuation lines.
 -- Users can override this prompt if desired.
 function sscani.prompt_continue()
-    io.write("   ... ")
+    io.write(sscani.config.prompt_continue)
     io.flush()
 end
 
 -- Prints a splash message with version info and basic help.
+-- Users can override this function if desired.
 function sscani.splash()
-    io.write("\n@@@ sscani v" .. about.version .. " - Interactive REPL for sscan\n")
-    io.write("@@@ Authors: " .. about.authors .. "\n")
-    io.write("@@@ License: " .. about.license_spdx .. "\n@@@\n")
-    io.write("@@@ Enter any valid Lua, terminated by ';'.\n")
-    io.write("@@@ Use exit(); to exit.\n\n")
+    io.write(sscani.config.splash)
     io.flush()
 end
 
