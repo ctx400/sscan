@@ -22,6 +22,23 @@ The embedded Lua virtual machine is made possible by the
 This crate is in *very* early development. While I expect sscan to be
 totally epic once stable, it is almost useless in its current state.
 
+## Free and Open-Source Software
+
+sscan is made free and open-source to the public in accordance with
+the terms of the [MIT License](LICENSE.md).
+
+sscan uses third-party open-source software. A list of dependencies and
+attribution information is available in
+[OPEN_SOURCE_LICENSES.html](OPEN_SOURCE_LICENSES.html). You can view
+this file as a rendered webpage
+[here](https://htmlpreview.github.io/?https://github.com/ctx400/sscan/blob/main/OPEN_SOURCE_LICENSES.html).
+
+A good-faith effort is made to ensure all dependences are properly
+attributed. I use both the tools `cargo-deny` and `cargo-about` to scan
+for open-source license requirements. However, if you are a crate author
+and need to update OPEN_SOURCE_LICENSES.html, please open an issue using
+the **Attribution Issues** template.
+
 ## Versioning
 
 sscan tries to follow SemVer 2.0:
@@ -46,20 +63,3 @@ In these versions, *anything may change at any time*!
 - Full configurability with Lua userscripts
 - YARA-X scan engine integration
 - Custom Lua userscript scan engines
-
-## Open-Source Licenses
-
-sscan is made free and open-source to the public in accordance with
-the terms of the [MIT License](LICENSE.md).
-
-sscan uses third-party open-source software. A list of dependencies and
-attribution information is available in
-[OPEN_SOURCE_LICENSES.html](OPEN_SOURCE_LICENSES.html). You can view
-this file as a rendered webpage
-[here](https://htmlpreview.github.io/?https://github.com/ctx400/sscan/blob/main/OPEN_SOURCE_LICENSES.html).
-
-A good-faith effort is made to ensure all dependences are properly
-attributed. I use both the tools `cargo-deny` and `cargo-about` to scan
-for open-source license requirements. However, if you are a crate author
-and need to update OPEN_SOURCE_LICENSES.html, please open an issue using
-the **Attribution Issues** template.
