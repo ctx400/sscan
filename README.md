@@ -2,6 +2,7 @@
 
 [![Crates.io Version](https://img.shields.io/crates/v/sscan)](https://crates.io/crates/sscan)
 [![docs.rs](https://img.shields.io/docsrs/sscan)](https://docs.rs/sscan/latest/sscan/)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ctx400/sscan/.github%2Fworkflows%2Frust.yml)](https://github.com/ctx400/sscan/actions/workflows/rust.yml)
 [![GitHub last commit](https://img.shields.io/github/last-commit/ctx400/sscan)](https://github.com/ctx400/sscan/commits/main/)
 
 
