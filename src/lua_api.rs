@@ -12,9 +12,11 @@
 //!
 
 // Modules
+pub mod messages;
 pub mod version_info;
 
 // Scope Imports
+use kameo::Actor;
 use mlua::prelude::*;
 use version_info::register_version_apis;
 
@@ -32,6 +34,7 @@ use version_info::register_version_apis;
 ///
 /// To set up a new userscript environment, see [`LuaVM::init()`].
 ///
+#[derive(Actor)]
 pub struct LuaVM(Lua);
 
 impl LuaVM {
@@ -49,11 +52,15 @@ impl LuaVM {
     ///
     /// ```
     /// # use mlua::prelude::LuaResult;
-    /// # use sscan::lua_api::LuaVM;
-    /// # fn main() -> LuaResult<()> {
+    /// # use sscan::lua_api::{LuaVM, messages::ExecuteChunk};
+    /// # #[tokio::main]
+    /// # async fn main() -> anyhow::Result<()> {
     /// // Create a Lua VM and print sscan version info.
-    /// let vm: LuaVM = LuaVM::init()?;
-    /// vm.exec("version()")?;
+    /// let vm = kameo::spawn(LuaVM::init()?);
+    ///
+    /// // Call the version() function in the virtual machine.
+    /// let exec_request = ExecuteChunk::using("version()");
+    /// vm.ask(exec_request).await?;
     /// # Ok(())
     /// # }
     /// ```
@@ -62,124 +69,5 @@ impl LuaVM {
         register_version_apis(&lua)?;
 
         Ok(Self(lua))
-    }
-
-    /// Execute a Lua code snippet in the virtual machine.
-    ///
-    /// This function takes a snippet of Lua code and executes it in the
-    /// virtual machine. It provides the core functionality of loading
-    /// and running userscripts.
-    ///
-    /// # Errors
-    ///
-    /// Errors returned from this function are Lua errors. Most likely,
-    /// the Lua code passed to the `script` argument had a syntax error
-    /// or otherwise contained logic errors. If such an error is
-    /// returned, check the Lua snippet for errors and try again.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use mlua::prelude::LuaResult;
-    /// # use sscan::lua_api::LuaVM;
-    /// # fn main() -> LuaResult<()> {
-    /// // Create a VM and load a function.
-    /// let vm: LuaVM = LuaVM::init()?;
-    /// vm.exec(r#"
-    ///     function say_hello()
-    ///         print("Hello World!")
-    ///     end
-    /// "#)?;
-    ///
-    /// // Use this function in later userscripts
-    /// vm.exec("say_hello()")?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn exec(&self, script: &str) -> LuaResult<()> {
-        self.0.load(script).exec()
-    }
-
-    /// Evaluates a Lua expression and returns the result.
-    ///
-    /// This function is primarily intended for `sscani` to extend the
-    /// REPL functionality. If a user enters an expression, it is sent
-    /// to the VM for evaluation and the result is returned.
-    ///
-    /// # Errors
-    ///
-    /// Errors returned from this function are Lua errors. Most likely,
-    /// the Lua code passed to the `script` argument had a syntax error
-    /// or otherwise contained logic errors. If such an error is
-    /// returned, check the Lua snippet for errors and try again.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use mlua::prelude::LuaResult;
-    /// # use sscan::lua_api::LuaVM;
-    /// # fn main() -> LuaResult<()> {
-    /// // Create a Lua VM and evaluate `5 + 6`.
-    /// let vm: LuaVM = LuaVM::init()?;
-    /// let result = vm.eval("5 + 6")?.as_i32().unwrap();
-    ///
-    /// // Print the results.
-    /// println!("5 + 6 = {}", result);
-    /// # assert_eq!(result, 11);
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn eval(&self, script: &str) -> LuaResult<LuaValue> {
-        let expr: LuaValue = self.0.load(script).eval()?;
-        Ok(expr)
-    }
-
-    /// Retrieve a table object from Lua globals.
-    ///
-    /// # Errors
-    ///
-    /// If this function fails, most likely the referenced key either
-    /// does not exist (nil), or the referenced key was not a table.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use mlua::prelude::LuaResult;
-    /// # use sscan::lua_api::LuaVM;
-    /// # fn main() -> LuaResult<()> {
-    /// let vm: LuaVM = LuaVM::init()?;
-    /// let table = vm.get_table("about")?;
-    /// table.set("mykey", "myvalue")?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn get_table(&self, key: &str) -> LuaResult<LuaTable> {
-        let table: LuaTable = self.0.globals().get(key)?;
-        Ok(table)
-    }
-
-    /// Store a Lua table object as a global with specified name.
-    ///
-    /// # Errors
-    ///
-    /// If this function fails, most likely the key name was invalid.
-    /// Check the key name to ensure it is valid for a Lua object.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use mlua::prelude::LuaResult;
-    /// # use sscan::lua_api::LuaVM;
-    /// # fn main() -> LuaResult<()> {
-    /// let vm: LuaVM = LuaVM::init()?;
-    /// let table = vm.get_table("about")?;
-    ///
-    /// table.set("mykey", "myvalue")?;
-    /// vm.commit_table("about", table)?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn commit_table(&self, key: &str, table: LuaTable) -> LuaResult<()> {
-        self.0.globals().set(key, table)
     }
 }
