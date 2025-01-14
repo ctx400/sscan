@@ -13,12 +13,12 @@
 
 // Modules
 pub mod messages;
-pub mod version_info;
+pub mod userscript_apis;
 
 // Scope Imports
 use kameo::Actor;
 use mlua::prelude::*;
-use version_info::register_version_apis;
+use userscript_apis::register_version_apis;
 
 /// Manages the Lua virtual machine and userscript APIs.
 ///

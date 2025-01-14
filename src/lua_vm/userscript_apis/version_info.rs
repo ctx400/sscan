@@ -63,7 +63,7 @@ const REPOSITORY: &str = env!("CARGO_PKG_REPOSITORY");
 const LICENSE_SPDX: &str = env!("CARGO_PKG_LICENSE");
 
 /// The full text of the crate's license.
-const LICENSE: &str = include_str!("../../LICENSE.md");
+const LICENSE: &str = include_str!("../../../LICENSE.md");
 
 /// Registers the version and license info APIs with Lua.
 ///
@@ -77,7 +77,7 @@ const LICENSE: &str = include_str!("../../LICENSE.md");
 /// Any errors returning from this function are Lua errors. If a Lua
 /// error occurs, this is probably a bug and should be reported.
 ///
-pub(super) fn register_version_apis(lua: &Lua) -> LuaResult<()> {
+pub(crate) fn register_version_apis(lua: &Lua) -> LuaResult<()> {
     // Create an `about` table with version info keys.
     let about: LuaTable = lua.create_table()?;
     set_version_info(&about)?;
