@@ -19,7 +19,10 @@
 use anyhow::{Error, Result};
 use kameo::actor::ActorRef;
 use mlua::Value as LuaValue;
-use sscan::lua_api::{messages::{CheckoutTable, CommitTable, EvaluateChunk, ExecuteChunk}, LuaVM};
+use sscan::lua_api::{
+    messages::{CheckoutTable, CommitTable, EvaluateChunk, ExecuteChunk},
+    LuaVM,
+};
 use std::io::stdin;
 
 /// The default sscani rcfile. This is loaded into Lua as a string.

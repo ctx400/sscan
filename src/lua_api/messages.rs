@@ -29,7 +29,11 @@ impl ExecuteChunk {
 impl Message<ExecuteChunk> for LuaVM {
     type Reply = LuaResult<()>;
 
-    async fn handle(&mut self, msg: ExecuteChunk, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+    async fn handle(
+        &mut self,
+        msg: ExecuteChunk,
+        _: Context<'_, Self, Self::Reply>,
+    ) -> Self::Reply {
         self.0.load(msg.chunk).exec()
     }
 }
@@ -54,7 +58,11 @@ impl EvaluateChunk {
 impl Message<EvaluateChunk> for LuaVM {
     type Reply = LuaResult<LuaValue>;
 
-    async fn handle(&mut self, msg: EvaluateChunk, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+    async fn handle(
+        &mut self,
+        msg: EvaluateChunk,
+        _: Context<'_, Self, Self::Reply>,
+    ) -> Self::Reply {
         self.0.load(msg.chunk).eval()
     }
 }
@@ -79,7 +87,11 @@ impl CheckoutTable {
 impl Message<CheckoutTable> for LuaVM {
     type Reply = LuaResult<LuaTable>;
 
-    async fn handle(&mut self, msg: CheckoutTable, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+    async fn handle(
+        &mut self,
+        msg: CheckoutTable,
+        _: Context<'_, Self, Self::Reply>,
+    ) -> Self::Reply {
         let table: LuaTable = self.0.globals().get(msg.name)?;
         Ok(table)
     }
@@ -100,7 +112,8 @@ impl CommitTable {
     #[must_use]
     pub fn using(table: LuaTable, name: &str) -> Self {
         Self {
-            table, name: name.to_owned(),
+            table,
+            name: name.to_owned(),
         }
     }
 }
