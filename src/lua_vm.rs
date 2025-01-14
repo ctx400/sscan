@@ -52,7 +52,7 @@ impl LuaVM {
     ///
     /// ```
     /// # use mlua::prelude::LuaResult;
-    /// # use sscan::lua_api::{LuaVM, messages::ExecuteChunk};
+    /// # use sscan::lua_vm::{LuaVM, messages::ExecuteChunk};
     /// # #[tokio::main]
     /// # async fn main() -> anyhow::Result<()> {
     /// // Create a Lua VM and print sscan version info.
