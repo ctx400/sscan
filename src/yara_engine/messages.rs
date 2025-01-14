@@ -1,8 +1,11 @@
 //! # [`YaraEngine`] Actor Messages
 
+use super::{
+    result::{Error, MatchedRule},
+    YaraEngine,
+};
 use kameo::message::{Context, Message};
 use yara_x::{Compiler, Scanner};
-use super::{result::{Error, MatchedRule}, YaraEngine};
 
 /// Add a YARA rule to the [`YaraEngine`].
 pub struct AddRule(pub String);
@@ -25,7 +28,7 @@ impl Message<CompileRules> for YaraEngine {
         let mut compiler: Compiler = Compiler::new();
         for source in &self.rules {
             if let Err(error) = compiler.add_source(source.as_str()) {
-                return Err(Error::compile_error(source, error))
+                return Err(Error::compile_error(source, error));
             }
         }
         self.compiled = Some(compiler.build());
@@ -51,12 +54,10 @@ impl Message<ScanBytes> for YaraEngine {
                         }
                         Ok(output)
                     }
-                    Err(error) => {
-                        Err(Error::scan_error(msg.0, error))
-                    }
+                    Err(error) => Err(Error::scan_error(msg.0, error)),
                 }
-            },
-            None => Err(Error::no_compiled_rules(msg.0))
+            }
+            None => Err(Error::no_compiled_rules(msg.0)),
         }
     }
 }

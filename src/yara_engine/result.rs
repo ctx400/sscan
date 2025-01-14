@@ -1,7 +1,7 @@
 //! [`Ok()`] and [`Err()`] types for YARA-X scans.
 
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use thiserror::Error;
 use yara_x::Rule;
 
@@ -54,7 +54,9 @@ impl From<Rule<'_, '_>> for MatchedRule {
 #[derive(Error, Debug)]
 #[must_use]
 pub enum Error {
-    #[error("failed to compile YARA rule(s): {code} - {title}\n\nFor Rule(s):\n{yara_src}\n\n{source}")]
+    #[error(
+        "failed to compile YARA rule(s): {code} - {title}\n\nFor Rule(s):\n{yara_src}\n\n{source}"
+    )]
     CompilationError {
         code: String,
         title: String,
@@ -67,21 +69,30 @@ pub enum Error {
         source: yara_x::errors::ScanError,
     },
     #[error("failed to launch scan: no compiled rules.\n\nFor byte(s):\n{bytes:?}\n\nHint: did you compile before launching a scan?")]
-    NoCompiledRules {
-        bytes: Vec<u8>
-    },
+    NoCompiledRules { bytes: Vec<u8> },
 }
 
 impl Error {
-    pub fn compile_error<S>(yara_src: &S, inner: yara_x::errors::CompileError) -> Self where S: ToString {
+    pub fn compile_error<S>(yara_src: &S, inner: yara_x::errors::CompileError) -> Self
+    where
+        S: ToString,
+    {
         let code: String = inner.code().to_owned();
         let title: String = inner.title().to_string();
         let yara_src: String = yara_src.to_string();
-        Self::CompilationError { code, title, yara_src, source: inner }
+        Self::CompilationError {
+            code,
+            title,
+            yara_src,
+            source: inner,
+        }
     }
 
     pub fn scan_error(bytes: Vec<u8>, inner: yara_x::errors::ScanError) -> Self {
-        Self::ScanError { bytes, source: inner }
+        Self::ScanError {
+            bytes,
+            source: inner,
+        }
     }
 
     pub fn no_compiled_rules(bytes: Vec<u8>) -> Self {

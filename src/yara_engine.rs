@@ -22,11 +22,11 @@ pub struct YaraEngine {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
+    use super::*;
     use kameo::actor::ActorRef;
     use messages::{AddRule, CompileRules, ScanBytes};
     use result::MatchedRule;
-    use super::*;
+    use std::collections::HashMap;
 
     const TEST_RULE: &str = r#"
         rule HelloWorld {
@@ -50,11 +50,15 @@ mod tests {
         let engine_ref: ActorRef<YaraEngine> = kameo::spawn(YaraEngine::default());
 
         // Load and compile a test rule.
-        engine_ref.tell(AddRule(TEST_RULE.to_string())).await.unwrap();
+        engine_ref
+            .tell(AddRule(TEST_RULE.to_string()))
+            .await
+            .unwrap();
         engine_ref.tell(CompileRules).await.unwrap();
 
         // Run a scan against some data
-        let results: Vec<MatchedRule> = engine_ref.ask(ScanBytes(TEST_DATA.to_vec())).await.unwrap();
+        let results: Vec<MatchedRule> =
+            engine_ref.ask(ScanBytes(TEST_DATA.to_vec())).await.unwrap();
 
         // Validate only one result returned
         assert_eq!(results.len(), 1);
