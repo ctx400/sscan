@@ -17,8 +17,12 @@
 #![warn(clippy::pedantic)]
 
 use anyhow::{Error, Result};
+use kameo::actor::ActorRef;
 use mlua::Value as LuaValue;
-use sscan::lua_api::LuaVM;
+use sscan::lua_vm::{
+    messages::{CheckoutTable, CommitTable, EvaluateChunk, ExecuteChunk},
+    LuaVM,
+};
 use std::io::stdin;
 
 /// The default sscani rcfile. This is loaded into Lua as a string.
@@ -30,23 +34,23 @@ const LIB_SSCANI_HELP: &str = include_str!("sscani/sscani.help.lua");
 /// The main sscani helper library. Should be loaded last.
 const LIB_SSCANI_STD: &str = include_str!("sscani/sscani.std.lua");
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
+    // Define messages to be used with the REPL.
+    let prompt_request: ExecuteChunk = ExecuteChunk::using("sscani.prompt()");
+    let continuation_request: ExecuteChunk = ExecuteChunk::using("sscani.prompt_continue()");
+
     // Initialize the Lua virtual machine.
-    let vm: LuaVM = LuaVM::init()?;
+    let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::init()?);
 
     // Load and execute scanni's helper libraries.
-    vm.exec(LIB_SSCANI_HELP)?;
-    vm.exec(LIB_SSCANI_STD)?;
-
-    // Load the default rcfile into Lua.
-    let sscani: mlua::Table = vm.get_table("sscani")?;
-    sscani.set("rc_default", RCFILE_DEFAULT)?;
-    vm.commit_table("sscani", sscani)?;
+    load_sscani_libs(&vm).await?;
+    load_default_rcfile(&vm).await?;
 
     // Start REPL loop.
     loop {
         // Display the prompt
-        vm.exec("sscani.prompt()")?;
+        vm.ask(prompt_request.clone()).await?;
 
         // Read a line of Lua.
         let mut buffer: String = String::with_capacity(2048);
@@ -55,7 +59,7 @@ fn main() -> Result<()> {
         // Very primitive support for line continuation.
         while !buffer.trim_end().ends_with(';') {
             // Display a continuation prompt.
-            vm.exec("sscani.prompt_continue()")?;
+            vm.ask(continuation_request.clone()).await?;
 
             // Read a new line from the buffer.
             stdin().read_line(&mut buffer)?;
@@ -63,8 +67,11 @@ fn main() -> Result<()> {
         // Trim the semicolon before execution.
         let snippet: &str = buffer.trim_end_matches(';');
 
+        // Convert the snippet into an EvaluateChunk request.
+        let eval_request: EvaluateChunk = EvaluateChunk::using(snippet);
+
         // Evaluate the Lua snippet. If a value is returned, print it.
-        match vm.eval(snippet) {
+        match vm.ask(eval_request).await {
             Ok(retval) => match retval {
                 LuaValue::Nil => {}
                 LuaValue::Boolean(b) => println!("{b}"),
@@ -84,4 +91,21 @@ fn main() -> Result<()> {
             }
         }
     }
+}
+
+async fn load_sscani_libs(vm: &ActorRef<LuaVM>) -> Result<()> {
+    let chunk: String = format!("{LIB_SSCANI_HELP}\n{LIB_SSCANI_STD}");
+    let exec_request: ExecuteChunk = ExecuteChunk::using(&chunk);
+    Ok(vm.ask(exec_request).await?)
+}
+
+async fn load_default_rcfile(vm: &ActorRef<LuaVM>) -> Result<()> {
+    // Checkout the sscani table from Lua globals.
+    let checkout_request: CheckoutTable = CheckoutTable::with_name("sscani");
+    let table: mlua::Table = vm.ask(checkout_request).await?;
+
+    // Add the default rcfile and commit back to Lua.
+    table.set("rc_default", RCFILE_DEFAULT)?;
+    let commit_request: CommitTable = CommitTable::using(table, "sscani");
+    Ok(vm.ask(commit_request).await?)
 }

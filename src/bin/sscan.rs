@@ -9,14 +9,17 @@
 
 // Scope Imports
 use anyhow::Result;
-use sscan::lua_api::LuaVM;
+use kameo::actor::ActorRef;
+use sscan::lua_vm::{messages::ExecuteChunk, LuaVM};
 
 /// Entrypoint for sscan.
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     // Initialize the Lua virtual machine.
-    let vm: LuaVM = LuaVM::init()?;
+    let vm_actor: ActorRef<LuaVM> = kameo::spawn(LuaVM::init()?);
 
-    // Run a test script to validate APIs
-    vm.exec("version() license()")?;
+    // Execute a test script on the virtual machine.
+    let exec_msg: ExecuteChunk = ExecuteChunk::using("version() license()");
+    vm_actor.ask(exec_msg).await?;
     Ok(())
 }

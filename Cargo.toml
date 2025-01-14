@@ -1,7 +1,7 @@
 [package]
 # Crate Information
 name = "sscan"
-version = "0.5.1"
+version = "0.6.0"
 authors = ["ctx400"]
 description = "A scriptable file/process/network scanner"
 repository = "https://github.com/ctx400/sscan"
@@ -21,13 +21,21 @@ edition = "2021"
 anyhow = "1.0"
 thiserror = "2"
 
+# Actor Frameworks
+kameo = "0.13"
+
 # Scan engines
 yara-x = "0.12.0"
+
+# Async Runtimes
+[dependencies.tokio]
+version = "1"
+features = ["full"]
 
 # Lua scripting support
 [dependencies.mlua]
 version = "0.10.2"
-features = ["lua54", "vendored", "serialize", "anyhow"]
+features = ["lua54", "vendored", "serialize", "anyhow", "send", "error-send"]
 
 # Serialization support
 [dependencies.serde]
