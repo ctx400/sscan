@@ -25,14 +25,14 @@ pub struct YaraEngine {
 /// Metadata about a YARA rule that matched during a scan operation.
 #[derive(Serialize, Deserialize, Debug)]
 #[must_use]
-pub struct ScanResult {
+pub struct MatchedRule {
     pub identifier: String,
     pub namespace: String,
     pub metadata: HashMap<String, String>,
     pub tags: Vec<String>,
 }
 
-impl From<Rule<'_, '_>> for ScanResult {
+impl From<Rule<'_, '_>> for MatchedRule {
     fn from(value: Rule) -> Self {
         // Get the identifier and namespace
         let identifier: String = value.identifier().to_owned();
@@ -139,7 +139,7 @@ mod tests {
         engine_ref.tell(CompileRules).await.unwrap();
 
         // Run a scan against some data
-        let results: Vec<ScanResult> = engine_ref.ask(ScanBytes(TEST_DATA.to_vec())).await.unwrap();
+        let results: Vec<MatchedRule> = engine_ref.ask(ScanBytes(TEST_DATA.to_vec())).await.unwrap();
 
         // Validate only one result returned
         assert_eq!(results.len(), 1);

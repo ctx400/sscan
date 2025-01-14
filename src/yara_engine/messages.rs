@@ -2,7 +2,7 @@
 
 use kameo::message::{Context, Message};
 use yara_x::{Compiler, Scanner};
-use super::{Error, ScanResult, YaraEngine};
+use super::{Error, MatchedRule, YaraEngine};
 
 /// Add a YARA rule to the [`YaraEngine`].
 pub struct AddRule(pub String);
@@ -37,7 +37,7 @@ impl Message<CompileRules> for YaraEngine {
 pub struct ScanBytes(pub Vec<u8>);
 
 impl Message<ScanBytes> for YaraEngine {
-    type Reply = Result<Vec<ScanResult>, Error>;
+    type Reply = Result<Vec<MatchedRule>, Error>;
 
     async fn handle(&mut self, msg: ScanBytes, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
         match self.compiled {
@@ -45,7 +45,7 @@ impl Message<ScanBytes> for YaraEngine {
                 let mut scanner = Scanner::new(rules);
                 match scanner.scan(msg.0.as_slice()) {
                     Ok(results) => {
-                        let mut output: Vec<ScanResult> = Vec::new();
+                        let mut output: Vec<MatchedRule> = Vec::new();
                         for rule in results.matching_rules() {
                             output.push(rule.into());
                         }
