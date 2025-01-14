@@ -30,7 +30,7 @@ yara-x = "0.12.0"
 # Lua scripting support
 [dependencies.mlua]
 version = "0.10.2"
-features = ["lua54", "vendored", "serialize", "anyhow"]
+features = ["lua54", "vendored", "serialize", "anyhow", "send", "error-send"]
 
 # Serialization support
 [dependencies.serde]
