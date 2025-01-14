@@ -1,7 +1,7 @@
 //! # Version and license info APIs
 //!
-//! This module adds API methods and data items to the Lua global scope
-//! to retrieve version information in userscripts.
+//! Userscript API methods and data items in the Lua global scope
+//! for retrieving version and license information in userscripts.
 //!
 //! ## Functions
 //!

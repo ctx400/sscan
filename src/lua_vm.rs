@@ -1,14 +1,13 @@
 //! # Lua Virtual Machine and Userscript Environment
 //!
-//! This module is responsible for creating and managing the Lua vurtual
-//! machine, which is used for userscripts, configuration, and custom
-//! scan engines.
+//! The [`LuaVM`] actor provides a userscript environment for extensive
+//! customization of sscan. Users can modify behavior, change scan
+//! engine configuration, or even register custom scan engines.
 //!
 //! ## API Documentation
 //!
 //! For information about the various APIs sscan exposes to userscripts,
-//! see each of the various modules under this one, for example,
-//! [`version_info`].
+//! see each of the various modules under [`userscript_apis`]
 //!
 
 // Modules
@@ -41,7 +40,8 @@ impl LuaVM {
     /// Initializes Lua and adds core APIs to the global scope.
     ///
     /// This function creates a new Lua virtual machine and registers
-    /// the core set of userscript APIs.
+    /// the core set of userscript APIs. This function is meant to be
+    /// called during the initialization of a [`LuaVM`] actor.
     ///
     /// # Errors
     ///
@@ -55,7 +55,7 @@ impl LuaVM {
     /// # use sscan::lua_vm::{LuaVM, messages::ExecuteChunk};
     /// # #[tokio::main]
     /// # async fn main() -> anyhow::Result<()> {
-    /// // Create a Lua VM and print sscan version info.
+    /// // Create and spawn a LuaVM actor.
     /// let vm = kameo::spawn(LuaVM::init()?);
     ///
     /// // Call the version() function in the virtual machine.

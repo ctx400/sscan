@@ -20,7 +20,7 @@
 //!
 //! The `sscani` binary is a *very* primitive interactive Lua REPL
 //! primarily intended for light testing or debugging. It can accept
-//! multiline Lua snippets terminated by semicolons, which execute in
+//! multiline Lua snippets terminated by semicolons, which evaluate in
 //! the same context as userscripts do in `sscan`.
 //!
 

@@ -1,7 +1,10 @@
 //! # Userscript APIs
 //!
-//! This module and its submodules provide the userscript environment
-//! with APIs for interacting with sscan programmatically.
+//! Each submodule exposes a certain set of sscan APIs and data items to
+//! the userscript environment to enable programmatic access and
+//! configuration of sscan.
+//!
+//! See each submodule for userscript API documentation.
 //!
 
 // Submodules containing userscript APIs
