@@ -1,6 +1,6 @@
 //! # Lua API Actor Messages
 //!
-//! This module implements message passing for the LuaVM actor. Other
+//! This module implements message passing for the [`LuaVM`] actor. Other
 //! actors can use these messages to communicate and interoperate with
 //! the userscript environment.
 //!
@@ -18,6 +18,7 @@ pub struct ExecuteChunk {
 
 impl ExecuteChunk {
     /// Create an [`ExecuteChunk`] message using the provided Lua code.
+    #[must_use]
     pub fn using(script: &str) -> Self {
         Self {
             chunk: script.to_owned(),
@@ -42,6 +43,7 @@ pub struct EvaluateChunk {
 
 impl EvaluateChunk {
     /// Create an [`EvaluateChunk`] message using the provided Lua code.
+    #[must_use]
     pub fn using(script: &str) -> Self {
         Self {
             chunk: script.to_owned(),
@@ -66,6 +68,7 @@ pub struct CheckoutTable {
 
 impl CheckoutTable {
     /// Construct a [`CheckoutTable`] request with the provided name.
+    #[must_use]
     pub fn with_name(name: &str) -> Self {
         Self {
             name: name.to_owned(),
@@ -94,6 +97,7 @@ pub struct CommitTable {
 
 impl CommitTable {
     /// Construct a [`CommitTable`] message using specified table and name.
+    #[must_use]
     pub fn using(table: LuaTable, name: &str) -> Self {
         Self {
             table, name: name.to_owned(),

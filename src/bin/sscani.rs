@@ -91,7 +91,7 @@ async fn main() -> Result<()> {
 }
 
 async fn load_sscani_libs(vm: &ActorRef<LuaVM>) -> Result<()> {
-    let chunk: String = format!("{}\n{}", LIB_SSCANI_HELP, LIB_SSCANI_STD);
+    let chunk: String = format!("{LIB_SSCANI_HELP}\n{LIB_SSCANI_STD}");
     let exec_request: ExecuteChunk = ExecuteChunk::using(&chunk);
     Ok(vm.ask(exec_request).await?)
 }
