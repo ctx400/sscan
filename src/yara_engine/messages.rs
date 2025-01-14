@@ -2,7 +2,7 @@
 
 use kameo::message::{Context, Message};
 use yara_x::{Compiler, Scanner};
-use super::{Error, MatchedRule, YaraEngine};
+use super::{result::{Error, MatchedRule}, YaraEngine};
 
 /// Add a YARA rule to the [`YaraEngine`].
 pub struct AddRule(pub String);
