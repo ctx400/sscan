@@ -27,6 +27,11 @@ kameo = "0.13"
 # Scan engines
 yara-x = "0.12.0"
 
+# Async Runtimes
+[dependencies.tokio]
+version = "1"
+features = ["full"]
+
 # Lua scripting support
 [dependencies.mlua]
 version = "0.10.2"
