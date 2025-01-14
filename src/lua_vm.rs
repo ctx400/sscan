@@ -1,4 +1,4 @@
-//! # APIs for Lua userscripts
+//! # Lua Virtual Machine and Userscript Environment
 //!
 //! This module is responsible for creating and managing the Lua vurtual
 //! machine, which is used for userscripts, configuration, and custom

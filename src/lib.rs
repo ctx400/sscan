@@ -28,4 +28,4 @@
 #![warn(clippy::pedantic)]
 
 // Modules
-pub mod lua_api;
+pub mod lua_vm;

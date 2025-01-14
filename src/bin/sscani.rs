@@ -19,7 +19,7 @@
 use anyhow::{Error, Result};
 use kameo::actor::ActorRef;
 use mlua::Value as LuaValue;
-use sscan::lua_api::{
+use sscan::lua_vm::{
     messages::{CheckoutTable, CommitTable, EvaluateChunk, ExecuteChunk},
     LuaVM,
 };

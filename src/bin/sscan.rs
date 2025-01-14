@@ -10,7 +10,7 @@
 // Scope Imports
 use anyhow::Result;
 use kameo::actor::ActorRef;
-use sscan::lua_api::{messages::ExecuteChunk, LuaVM};
+use sscan::lua_vm::{messages::ExecuteChunk, LuaVM};
 
 /// Entrypoint for sscan.
 #[tokio::main]
