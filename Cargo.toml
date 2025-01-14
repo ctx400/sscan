@@ -21,6 +21,9 @@ edition = "2021"
 anyhow = "1.0"
 thiserror = "2"
 
+# Actor Frameworks
+kameo = "0.13"
+
 # Scan engines
 yara-x = "0.12.0"
 
