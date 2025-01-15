@@ -1,16 +1,24 @@
 //! # YARA-X Scan Engine Integration
 //!
-//! This module defines the actors and messages for communicating with
-//! the YARA-X scan engine.
+//! The [`YaraEngine`] actor provides byte scanning capabilities through
+//! YARA-X. The actor accepts and compiles YARA rules, and executes scans
+//! against byte sequences using those rules.
 //!
 
+// Module Imports
 pub mod messages;
 pub mod result;
 
+// Scope Includes
 use kameo::Actor;
 use yara_x::Rules;
 
 /// Manages the lifecycle of the YARA-X scan engine.
+///
+/// YARA is an incredibly flexible, powerful tool for writing detection
+/// rules. The [`YaraEngine`] actor instantiates and manages the
+/// lifecycle of the YARA-X scanner, including the rules compiler.
+///
 #[derive(Actor, Default)]
 pub struct YaraEngine {
     /// Holds source rules for compilation.
