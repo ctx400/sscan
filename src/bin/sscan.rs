@@ -25,7 +25,7 @@ async fn main() -> Result<()> {
     if let Some(lua_vm) = system_actor.ask(GetActorLuaVM).await? {
         lua_vm
             .ask(ExecuteChunk::using("version() license()"))
-            .await?
+            .await?;
     }
 
     println!("SHUTDOWN: Initiating system shutdown...");

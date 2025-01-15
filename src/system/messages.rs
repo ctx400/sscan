@@ -21,11 +21,7 @@ impl Message<GetActorLuaVM> for System {
     type Reply = Option<ActorRef<LuaVM>>;
 
     async fn handle(&mut self, _: GetActorLuaVM, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
-        if let Some(lua_vm) = &self.lua_vm {
-            Some(lua_vm.clone())
-        } else {
-            None
-        }
+        self.lua_vm.clone()
     }
 }
 
@@ -40,10 +36,6 @@ impl Message<GetActorYaraEngine> for System {
         _: GetActorYaraEngine,
         _: Context<'_, Self, Self::Reply>,
     ) -> Self::Reply {
-        if let Some(yara_engine) = &self.scan_engines.yara {
-            Some(yara_engine.clone())
-        } else {
-            None
-        }
+        self.scan_engines.yara.clone()
     }
 }

@@ -33,10 +33,10 @@ impl Actor for System {
 
         // Register and link to all actors for health monitoring
         if let Some(ref lua_vm) = self.lua_vm {
-            system.link(lua_vm).await
+            system.link(lua_vm).await;
         }
         if let Some(ref yara_engine) = self.scan_engines.yara {
-            system.link(yara_engine).await
+            system.link(yara_engine).await;
         }
 
         Ok(())
