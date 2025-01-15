@@ -98,7 +98,7 @@ pub enum Error {
     #[error("failed to launch scan: no compiled rules.\n\nFor byte(s):\n{bytes:?}\n\nHint: did you compile before launching a scan?")]
     NoCompiledRules {
         /// The byte sequence YARA-X was attempting to scan.
-        bytes: Vec<u8>
+        bytes: Vec<u8>,
     },
 }
 
