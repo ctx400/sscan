@@ -45,7 +45,9 @@ async fn main() -> Result<()> {
 
     // Initialize the System actor and get a handle to LuaVM.
     let system: ActorRef<System> = kameo::spawn(System::default());
-    let vm: ActorRef<LuaVM> = if let Some(vm) = system.ask(GetActorLuaVM).await? { vm } else {
+    let vm: ActorRef<LuaVM> = if let Some(vm) = system.ask(GetActorLuaVM).await? {
+        vm
+    } else {
         eprintln!("Could not get a handle to the Lua userscript environment.");
         eprintln!("Shutting down now.");
         return Ok(());
