@@ -7,11 +7,13 @@
 
 #![warn(clippy::pedantic)]
 
-
 // Scope Imports
 use anyhow::Result;
 use kameo::actor::ActorRef;
-use sscan::{lua_vm::messages::ExecuteChunk, system::{messages::GetActorLuaVM, System}};
+use sscan::{
+    lua_vm::messages::ExecuteChunk,
+    system::{messages::GetActorLuaVM, System},
+};
 
 /// Entrypoint for sscan.
 #[tokio::main]
@@ -21,7 +23,9 @@ async fn main() -> Result<()> {
 
     // Get the LuaVM actor and print version and license info
     if let Some(lua_vm) = system_actor.ask(GetActorLuaVM).await? {
-        lua_vm.ask(ExecuteChunk::using("version() license()")).await?
+        lua_vm
+            .ask(ExecuteChunk::using("version() license()"))
+            .await?
     }
 
     println!("SHUTDOWN: Initiating system shutdown...");

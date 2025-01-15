@@ -19,10 +19,13 @@
 use anyhow::{Error, Result};
 use kameo::actor::ActorRef;
 use mlua::Value as LuaValue;
-use sscan::{lua_vm::{
-    messages::{CheckoutTable, CommitTable, EvaluateChunk, ExecuteChunk},
-    LuaVM,
-}, system::{messages::GetActorLuaVM, System}};
+use sscan::{
+    lua_vm::{
+        messages::{CheckoutTable, CommitTable, EvaluateChunk, ExecuteChunk},
+        LuaVM,
+    },
+    system::{messages::GetActorLuaVM, System},
+};
 use std::io::stdin;
 
 /// The default sscani rcfile. This is loaded into Lua as a string.
@@ -47,7 +50,7 @@ async fn main() -> Result<()> {
         None => {
             eprintln!("Could not get a handle to the Lua userscript environment.");
             eprintln!("Shutting down now.");
-            return Ok(())
+            return Ok(());
         }
     };
 

@@ -7,9 +7,12 @@
 //! See each message for examples and usage information.
 //!
 
-use kameo::{actor::ActorRef, message::{Context, Message}};
-use crate::{lua_vm::LuaVM, yara_engine::YaraEngine};
 use super::System;
+use crate::{lua_vm::LuaVM, yara_engine::YaraEngine};
+use kameo::{
+    actor::ActorRef,
+    message::{Context, Message},
+};
 
 /// Request for an [`ActorRef`] to the [`LuaVM`] actor.
 pub struct GetActorLuaVM;
@@ -32,7 +35,11 @@ pub struct GetActorYaraEngine;
 impl Message<GetActorYaraEngine> for System {
     type Reply = Option<ActorRef<YaraEngine>>;
 
-    async fn handle(&mut self, _: GetActorYaraEngine, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+    async fn handle(
+        &mut self,
+        _: GetActorYaraEngine,
+        _: Context<'_, Self, Self::Reply>,
+    ) -> Self::Reply {
         if let Some(yara_engine) = &self.scan_engines.yara {
             Some(yara_engine.clone())
         } else {

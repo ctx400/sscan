@@ -9,8 +9,8 @@
 
 pub mod messages;
 
-use kameo::{actor::ActorRef, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
 use crate::{lua_vm::LuaVM, yara_engine::YaraEngine};
+use kameo::{actor::ActorRef, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
 
 /// Oversees the smooth operation of sscan.
 ///
@@ -51,5 +51,5 @@ impl Actor for System {
 #[derive(Default)]
 struct ScanEngines {
     /// The YARA-X scan engine.
-    yara: Option<ActorRef<YaraEngine>>
+    yara: Option<ActorRef<YaraEngine>>,
 }

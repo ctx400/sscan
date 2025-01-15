@@ -89,7 +89,10 @@ impl LuaVM {
     /// Any errors returning from this function are Lua errors. If a Lua
     /// error occurs, this is probably a bug and should be reported.
     ///
-    #[deprecated(since = "0.8.0", note = "Initialization now happens during actor startup.")]
+    #[deprecated(
+        since = "0.8.0",
+        note = "Initialization now happens during actor startup."
+    )]
     pub fn init() -> LuaResult<Self> {
         let lua: Lua = Lua::new();
         register_version_apis(&lua)?;
