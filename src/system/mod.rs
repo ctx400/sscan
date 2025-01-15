@@ -7,6 +7,8 @@
 //! of an actor panic.
 //!
 
+pub mod messages;
+
 use kameo::{actor::ActorRef, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
 use crate::{lua_vm::LuaVM, yara_engine::YaraEngine};
 

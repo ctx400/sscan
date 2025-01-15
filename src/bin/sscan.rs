@@ -11,8 +11,7 @@
 // Scope Imports
 use anyhow::Result;
 use kameo::actor::ActorRef;
-use sscan::system::System;
-use std::time::Duration;
+use sscan::{lua_vm::messages::ExecuteChunk, system::{messages::GetActorLuaVM, System}};
 
 /// Entrypoint for sscan.
 #[tokio::main]
@@ -20,7 +19,12 @@ async fn main() -> Result<()> {
     let system_actor: ActorRef<System> = kameo::spawn(System::default());
     println!("STARTUP: Initialized system actor {}", system_actor.id());
 
-    tokio::time::sleep(Duration::from_millis(2000)).await;
-    println!("SHUTDOWN: System actor stopped. Exiting sscan.");
+    // Get the LuaVM actor and print version and license info
+    if let Some(lua_vm) = system_actor.ask(GetActorLuaVM).await? {
+        lua_vm.ask(ExecuteChunk::using("version() license()")).await?
+    }
+
+    println!("SHUTDOWN: Initiating system shutdown...");
+    system_actor.stop_gracefully().await?;
     Ok(())
 }
