@@ -27,7 +27,7 @@ use mlua::prelude::*;
 /// # use mlua::prelude::*;
 /// # use sscan::lua_vm::{LuaVM, messages::ExecuteChunk};
 /// # #[tokio::main]
-/// # async fn main() -> anyhow::Result<()> {
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// // Create and spawn a userscript environment.
 /// let vm = kameo::spawn(LuaVM::init()?);
 ///
@@ -60,10 +60,10 @@ impl Message<ExecuteChunk> for LuaVM {
 
     async fn handle(
         &mut self,
-        msg: ExecuteChunk,
+        ExecuteChunk { chunk }: ExecuteChunk,
         _: Context<'_, Self, Self::Reply>,
     ) -> Self::Reply {
-        self.0.load(msg.chunk).exec()
+        self.0.load(chunk).exec()
     }
 }
 
@@ -85,7 +85,7 @@ impl Message<ExecuteChunk> for LuaVM {
 /// # use mlua::prelude::*;
 /// # use sscan::lua_vm::{LuaVM, messages::EvaluateChunk};
 /// # #[tokio::main]
-/// # async fn main() -> anyhow::Result<()> {
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// // Create and spawn a userscript environment.
 /// let vm = kameo::spawn(LuaVM::init()?);
 ///
@@ -119,10 +119,10 @@ impl Message<EvaluateChunk> for LuaVM {
 
     async fn handle(
         &mut self,
-        msg: EvaluateChunk,
+        EvaluateChunk { chunk }: EvaluateChunk,
         _: Context<'_, Self, Self::Reply>,
     ) -> Self::Reply {
-        self.0.load(msg.chunk).eval()
+        self.0.load(chunk).eval()
     }
 }
 
@@ -146,7 +146,7 @@ impl Message<EvaluateChunk> for LuaVM {
 /// # use mlua::prelude::*;
 /// # use sscan::lua_vm::{LuaVM, messages::CheckoutTable};
 /// # #[tokio::main]
-/// # async fn main() -> anyhow::Result<()> {
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// // Create and spawn a userscript environment.
 /// let vm = kameo::spawn(LuaVM::init()?);
 ///
@@ -177,10 +177,10 @@ impl Message<CheckoutTable> for LuaVM {
 
     async fn handle(
         &mut self,
-        msg: CheckoutTable,
+        CheckoutTable { name }: CheckoutTable,
         _: Context<'_, Self, Self::Reply>,
     ) -> Self::Reply {
-        let table: LuaTable = self.0.globals().get(msg.name)?;
+        let table: LuaTable = self.0.globals().get(name)?;
         Ok(table)
     }
 }
@@ -205,7 +205,7 @@ impl Message<CheckoutTable> for LuaVM {
 /// # use mlua::prelude::*;
 /// # use sscan::lua_vm::{LuaVM, messages::{CheckoutTable, CommitTable}};
 /// # #[tokio::main]
-/// # async fn main() -> anyhow::Result<()> {
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// // Create and spawn a userscript environment.
 /// let vm = kameo::spawn(LuaVM::init()?);
 ///
@@ -245,7 +245,11 @@ impl CommitTable {
 impl Message<CommitTable> for LuaVM {
     type Reply = LuaResult<()>;
 
-    async fn handle(&mut self, msg: CommitTable, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
-        self.0.globals().set(msg.name, msg.table)
+    async fn handle(
+        &mut self,
+        CommitTable { name, table }: CommitTable,
+        _: Context<'_, Self, Self::Reply>,
+    ) -> Self::Reply {
+        self.0.globals().set(name, table)
     }
 }
