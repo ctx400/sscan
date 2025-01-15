@@ -36,7 +36,8 @@ mod tests {
     use result::MatchedRule;
     use std::collections::HashMap;
 
-    const TEST_RULE: &str = r#"
+    /// Sample YARA rule matching on any occurrence of "Hello World"
+    const HELLOWORLD_RULE: &str = r#"
         rule HelloWorld {
             meta:
                 description = "Detects `Hello World`"
@@ -50,23 +51,40 @@ mod tests {
         }
     "#;
 
-    const TEST_DATA: &[u8] = b"alksdjfhlkjashdflkjh-Hello World-laksjdfhlkjhadsf";
+    /// Should trigger a syntax error on compilation.
+    const INVALID_RULE_SYNTAX: &str = r#"
+        rule InvalidRule {
+            meta:
+                description = "Should trigger a syntax error"
+                author = "ctx400"
+            strings:
+                $a: "Hello World"
+            condition:
+                all of them
+        }
+    "#;
+
+    /// Byte sequence that should match the rule.
+    const MATCHING_DATA: &[u8] = b"alksdjfhlkjashdflkjh-Hello World-laksjdfhlkjhadsf";
+
+    /// Byte sequence that should not match the rule.
+    const NONMATCHING_DATA: &[u8] = b"alksdjfhlkajsdhfl-Goodbye World-dfhlkajsdhflkj";
 
     #[tokio::test]
-    async fn scan_hello_world() {
+    async fn should_match_helloworld_rule() {
         // Create a YARA-X engine actor.
         let engine_ref: ActorRef<YaraEngine> = kameo::spawn(YaraEngine::default());
 
         // Load and compile a test rule.
         engine_ref
-            .tell(AddRule(TEST_RULE.to_string()))
+            .tell(AddRule(HELLOWORLD_RULE.to_string()))
             .await
             .unwrap();
-        engine_ref.tell(CompileRules).await.unwrap();
+        engine_ref.ask(CompileRules).await.unwrap();
 
         // Run a scan against some data
         let results: Vec<MatchedRule> =
-            engine_ref.ask(ScanBytes(TEST_DATA.to_vec())).await.unwrap();
+            engine_ref.ask(ScanBytes(MATCHING_DATA.to_vec())).await.unwrap();
 
         // Validate only one result returned
         assert_eq!(results.len(), 1);
@@ -77,5 +95,41 @@ mod tests {
         // Validate metadata properly extracted
         let metadata: &HashMap<String, String> = &results.first().unwrap().metadata;
         assert_eq!(metadata.get("author").unwrap(), "ctx400");
+    }
+
+    #[tokio::test]
+    async fn should_not_match_helloworld_rule() {
+        // Create a YARA-X engine actor.
+        let engine_ref: ActorRef<YaraEngine> = kameo::spawn(YaraEngine::default());
+
+        // Load and compile a test rule.
+        engine_ref
+            .tell(AddRule(HELLOWORLD_RULE.to_string()))
+            .await
+            .unwrap();
+        engine_ref.ask(CompileRules).await.unwrap();
+
+        // Run a scan against some data
+        let results: Vec<MatchedRule> =
+            engine_ref.ask(ScanBytes(NONMATCHING_DATA.to_vec())).await.unwrap();
+
+        // Validate only one result returned
+        assert_eq!(results.len(), 0);
+    }
+
+    #[tokio::test]
+    #[should_panic]
+    async fn should_fail_compile_syntax() {
+        // Create a YARA-X engine actor.
+        let engine_ref: ActorRef<YaraEngine> = kameo::spawn(YaraEngine::default());
+
+        // Load and compile a test rule.
+        engine_ref
+            .tell(AddRule(INVALID_RULE_SYNTAX.to_string()))
+            .await
+            .unwrap();
+
+        // Should panic.
+        engine_ref.ask(CompileRules).await.unwrap();
     }
 }
