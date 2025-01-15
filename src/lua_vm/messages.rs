@@ -245,7 +245,11 @@ impl CommitTable {
 impl Message<CommitTable> for LuaVM {
     type Reply = LuaResult<()>;
 
-    async fn handle(&mut self, CommitTable { name, table }: CommitTable, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+    async fn handle(
+        &mut self,
+        CommitTable { name, table }: CommitTable,
+        _: Context<'_, Self, Self::Reply>,
+    ) -> Self::Reply {
         self.0.globals().set(name, table)
     }
 }

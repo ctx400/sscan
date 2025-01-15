@@ -55,7 +55,11 @@ pub struct AddRule(pub String);
 impl Message<AddRule> for YaraEngine {
     type Reply = ();
 
-    async fn handle(&mut self, AddRule(rule): AddRule, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+    async fn handle(
+        &mut self,
+        AddRule(rule): AddRule,
+        _: Context<'_, Self, Self::Reply>,
+    ) -> Self::Reply {
         self.rules.push(rule);
     }
 }
@@ -161,7 +165,11 @@ pub struct ScanBytes(pub Vec<u8>);
 impl Message<ScanBytes> for YaraEngine {
     type Reply = Result<Vec<MatchedRule>, Error>;
 
-    async fn handle(&mut self, ScanBytes(bytes): ScanBytes, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+    async fn handle(
+        &mut self,
+        ScanBytes(bytes): ScanBytes,
+        _: Context<'_, Self, Self::Reply>,
+    ) -> Self::Reply {
         match self.compiled {
             Some(ref rules) => {
                 let mut scanner = Scanner::new(rules);
