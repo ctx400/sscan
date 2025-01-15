@@ -26,13 +26,36 @@ use userscript_apis::register_version_apis;
 /// one can register custom scan engines and configure just about every
 /// aspect of sscan.
 ///
-/// This struct encapsulates the Lua virtual machine and provides APIs
+/// This actor encapsulates the Lua virtual machine and provides APIs
 /// for managing the userscript environment. Its primary job is to
 /// register Lua APIs that userscripts can use to customize sscan, and
 /// it also handles the execution of the userscripts themselves.
 ///
-/// To set up a new userscript environment, see [`LuaVM::init()`].
+/// # Usage
 ///
+/// The recommended way to use [`LuaVM`] is to first instantiate the
+/// [`System`](crate::system::System) actor, and then request an
+/// [`ActorRef`] to the virtual machine.
+///
+/// # Example
+///
+/// ```
+/// # use sscan::{lua_vm::{LuaVM, messages::ExecuteChunk}, system::{System, messages::GetActorLuaVM}};
+/// # #[tokio::main]
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// // Start the system actor. System will automatically start and manage LuaVM.
+/// let system = kameo::spawn(System::default());
+///
+/// // Get an ActorRef to LuaVM.
+/// let lua_vm = system.ask(GetActorLuaVM).await?.unwrap();
+///
+/// // Execute some Lua code in the userscript environment.
+/// lua_vm.tell(ExecuteChunk::using(r#"
+///     print("Hello, World!")
+/// "#)).await?;
+/// # Ok(())
+/// # }
+/// ```
 pub struct LuaVM(Lua);
 
 impl Actor for LuaVM {
@@ -66,22 +89,6 @@ impl LuaVM {
     /// Any errors returning from this function are Lua errors. If a Lua
     /// error occurs, this is probably a bug and should be reported.
     ///
-    /// # Example
-    ///
-    /// ```
-    /// # use mlua::prelude::LuaResult;
-    /// # use sscan::lua_vm::{LuaVM, messages::ExecuteChunk};
-    /// # #[tokio::main]
-    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// // Create and spawn a LuaVM actor.
-    /// let vm = kameo::spawn(LuaVM::init()?);
-    ///
-    /// // Call the version() function in the virtual machine.
-    /// let exec_request = ExecuteChunk::using("version()");
-    /// vm.ask(exec_request).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     #[deprecated(since = "0.8.0", note = "Initialization now happens during actor startup.")]
     pub fn init() -> LuaResult<Self> {
         let lua: Lua = Lua::new();
