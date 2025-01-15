@@ -49,7 +49,7 @@ impl Actor for System {
 
 /// Holds an [`ActorRef`] for each scan engine-type actor.
 #[derive(Default)]
-pub struct ScanEngines {
+struct ScanEngines {
     /// The YARA-X scan engine.
     yara: Option<ActorRef<YaraEngine>>
 }
