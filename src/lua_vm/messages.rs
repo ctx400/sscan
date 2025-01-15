@@ -27,7 +27,7 @@ use mlua::prelude::*;
 /// # use mlua::prelude::*;
 /// # use sscan::lua_vm::{LuaVM, messages::ExecuteChunk};
 /// # #[tokio::main]
-/// # async fn main() -> anyhow::Result<()> {
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// // Create and spawn a userscript environment.
 /// let vm = kameo::spawn(LuaVM::init()?);
 ///
@@ -85,7 +85,7 @@ impl Message<ExecuteChunk> for LuaVM {
 /// # use mlua::prelude::*;
 /// # use sscan::lua_vm::{LuaVM, messages::EvaluateChunk};
 /// # #[tokio::main]
-/// # async fn main() -> anyhow::Result<()> {
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// // Create and spawn a userscript environment.
 /// let vm = kameo::spawn(LuaVM::init()?);
 ///
@@ -146,7 +146,7 @@ impl Message<EvaluateChunk> for LuaVM {
 /// # use mlua::prelude::*;
 /// # use sscan::lua_vm::{LuaVM, messages::CheckoutTable};
 /// # #[tokio::main]
-/// # async fn main() -> anyhow::Result<()> {
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// // Create and spawn a userscript environment.
 /// let vm = kameo::spawn(LuaVM::init()?);
 ///
@@ -205,7 +205,7 @@ impl Message<CheckoutTable> for LuaVM {
 /// # use mlua::prelude::*;
 /// # use sscan::lua_vm::{LuaVM, messages::{CheckoutTable, CommitTable}};
 /// # #[tokio::main]
-/// # async fn main() -> anyhow::Result<()> {
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// // Create and spawn a userscript environment.
 /// let vm = kameo::spawn(LuaVM::init()?);
 ///

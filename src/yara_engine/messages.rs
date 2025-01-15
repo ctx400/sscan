@@ -30,7 +30,7 @@ use yara_x::{Compiler, Scanner};
 /// ```
 /// # use sscan::yara_engine::{messages::AddRule, YaraEngine};
 /// # #[tokio::main]
-/// # async fn main() -> anyhow::Result<()> {
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// // Create and span a YARA-X scan engine.
 /// let engine = kameo::spawn(YaraEngine::default());
 ///
@@ -76,7 +76,7 @@ impl Message<AddRule> for YaraEngine {
 /// ```
 /// # use sscan::yara_engine::{messages::*, YaraEngine};
 /// # #[tokio::main]
-/// # async fn main() -> anyhow::Result<()> {
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// // Create and span a YARA-X scan engine.
 /// let engine = kameo::spawn(YaraEngine::default());
 ///
@@ -93,7 +93,7 @@ impl Message<AddRule> for YaraEngine {
 ///     }
 /// "#.to_string();
 /// engine.tell(AddRule(rule)).await?;
-/// engine.tell(CompileRules).await?;
+/// engine.ask(CompileRules).await?;
 /// # Ok(())
 /// # }
 /// ```
@@ -131,7 +131,7 @@ impl Message<CompileRules> for YaraEngine {
 /// ```
 /// # use sscan::yara_engine::{messages::*, YaraEngine};
 /// # #[tokio::main]
-/// # async fn main() -> anyhow::Result<()> {
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// // Create and span a YARA-X scan engine.
 /// let engine = kameo::spawn(YaraEngine::default());
 ///
@@ -148,7 +148,7 @@ impl Message<CompileRules> for YaraEngine {
 ///     }
 /// "#.to_string();
 /// engine.tell(AddRule(rule)).await?;
-/// engine.tell(CompileRules).await?;
+/// engine.ask(CompileRules).await?;
 ///
 /// // Scan against some data
 /// let results = engine.ask(ScanBytes(b"abcHello Worldxyz".to_vec())).await?;

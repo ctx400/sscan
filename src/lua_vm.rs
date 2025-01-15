@@ -54,7 +54,7 @@ impl LuaVM {
     /// # use mlua::prelude::LuaResult;
     /// # use sscan::lua_vm::{LuaVM, messages::ExecuteChunk};
     /// # #[tokio::main]
-    /// # async fn main() -> anyhow::Result<()> {
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// // Create and spawn a LuaVM actor.
     /// let vm = kameo::spawn(LuaVM::init()?);
     ///
