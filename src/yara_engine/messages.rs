@@ -63,8 +63,8 @@ impl Message<AddRule> for YaraEngine {
 /// Compile all rules held by the [`YaraEngine`]
 ///
 /// A request for [`YaraEngine`] to compile all added rules. Before
-/// submitting this message, at lease one rule must be submitted using
-/// the [`AddRule`] message.
+/// submitting this message, at least one rule must be submitted using
+/// the [`AddRule`] message, or else this is a no-op.
 ///
 /// # Reply
 ///

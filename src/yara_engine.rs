@@ -51,11 +51,11 @@ mod tests {
         }
     "#;
 
-    /// Should trigger a syntax error on compilation.
+    /// Should trigger a compilation error.
     const INVALID_RULE_SYNTAX: &str = r#"
-        rule InvalidRule {
+        rule SyntaxError {
             meta:
-                description = "Should trigger a syntax error"
+                description = "Should trigger a compilation error"
                 author = "ctx400"
             strings:
                 $a: "Hello World"
@@ -131,5 +131,15 @@ mod tests {
 
         // Should panic.
         engine_ref.ask(CompileRules).await.unwrap();
+    }
+
+    #[tokio::test]
+    #[should_panic]
+    async fn should_fail_no_compiled_rules() {
+        // Create a YARA-X engine actor
+        let engine_ref: ActorRef<YaraEngine> = kameo::spawn(YaraEngine::default());
+
+        // Don't compile anything. Just try to scan. Should panic.
+        engine_ref.ask(ScanBytes(MATCHING_DATA.to_vec())).await.unwrap();
     }
 }
