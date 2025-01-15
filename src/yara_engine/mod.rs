@@ -10,7 +10,7 @@ pub mod messages;
 pub mod result;
 
 // Scope Includes
-use kameo::Actor;
+use kameo::{mailbox::unbounded::UnboundedMailbox, Actor};
 use yara_x::Rules;
 
 /// Manages the lifecycle of the YARA-X scan engine.
@@ -19,13 +19,55 @@ use yara_x::Rules;
 /// rules. The [`YaraEngine`] actor instantiates and manages the
 /// lifecycle of the YARA-X scanner, including the rules compiler.
 ///
-#[derive(Actor, Default)]
+/// # Usage
+///
+/// The recommended pattern is to instantiate the
+/// [`System`](crate::system::System) actor first, then request an
+/// [`ActorRef`](kameo::actor::ActorRef) to the YARA-X engine.
+///
+/// # Example
+///
+/// ```
+/// # use sscan::{yara_engine::{YaraEngine, messages::AddRule}, system::{System, messages::GetActorYaraEngine}};
+/// # #[tokio::main]
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// // Instantate the System actor.
+/// let system = kameo::spawn(System::default());
+///
+/// // Get a reference to the YaraEngine
+/// let yara_engine = system.ask(GetActorYaraEngine).await?.unwrap();
+///
+/// // Add a YARA rule to the scan engine.
+/// let rule = r#"
+///     rule HelloWorld {
+///         meta:
+///             author = "ctx400"
+///             description = "Detects `Hello World`"
+///         strings:
+///             $a = "Hello World"
+///         condition:
+///             all of them
+///     }
+/// "#.to_string();
+/// yara_engine.tell(AddRule(rule)).await?;
+/// # Ok(())
+/// # }
+/// ```
+#[derive(Default)]
 pub struct YaraEngine {
     /// Holds source rules for compilation.
     rules: Vec<String>,
 
     /// Holds compiled rules for scanning.
     compiled: Option<Rules>,
+}
+
+impl Actor for YaraEngine {
+    type Mailbox = UnboundedMailbox<Self>;
+
+    fn name() -> &'static str {
+        "scan_engine__yara_x"
+    }
 }
 
 #[cfg(test)]

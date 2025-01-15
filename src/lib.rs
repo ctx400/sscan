@@ -29,4 +29,5 @@
 
 // Modules
 pub mod lua_vm;
+pub mod system;
 pub mod yara_engine;

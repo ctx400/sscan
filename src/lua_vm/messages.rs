@@ -35,7 +35,7 @@ use mlua::prelude::*;
 /// let exec_request = ExecuteChunk::using(r#"
 ///     print("Hello, world!")
 /// "#);
-/// vm.ask(exec_request).await?;
+/// vm.tell(exec_request).await?;
 /// # Ok(())
 /// # }
 /// ```

@@ -19,9 +19,12 @@
 use anyhow::{Error, Result};
 use kameo::actor::ActorRef;
 use mlua::Value as LuaValue;
-use sscan::lua_vm::{
-    messages::{CheckoutTable, CommitTable, EvaluateChunk, ExecuteChunk},
-    LuaVM,
+use sscan::{
+    lua_vm::{
+        messages::{CheckoutTable, CommitTable, EvaluateChunk, ExecuteChunk},
+        LuaVM,
+    },
+    system::{messages::GetActorLuaVM, System},
 };
 use std::io::stdin;
 
@@ -40,8 +43,15 @@ async fn main() -> Result<()> {
     let prompt_request: ExecuteChunk = ExecuteChunk::using("sscani.prompt()");
     let continuation_request: ExecuteChunk = ExecuteChunk::using("sscani.prompt_continue()");
 
-    // Initialize the Lua virtual machine.
-    let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::init()?);
+    // Initialize the System actor and get a handle to LuaVM.
+    let system: ActorRef<System> = kameo::spawn(System::default());
+    let vm: ActorRef<LuaVM> = if let Some(vm) = system.ask(GetActorLuaVM).await? {
+        vm
+    } else {
+        eprintln!("Could not get a handle to the Lua userscript environment.");
+        eprintln!("Shutting down now.");
+        return Ok(());
+    };
 
     // Load and execute scanni's helper libraries.
     load_sscani_libs(&vm).await?;
