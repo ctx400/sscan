@@ -60,10 +60,10 @@ impl Message<ExecuteChunk> for LuaVM {
 
     async fn handle(
         &mut self,
-        msg: ExecuteChunk,
+        ExecuteChunk { chunk }: ExecuteChunk,
         _: Context<'_, Self, Self::Reply>,
     ) -> Self::Reply {
-        self.0.load(msg.chunk).exec()
+        self.0.load(chunk).exec()
     }
 }
 
@@ -119,10 +119,10 @@ impl Message<EvaluateChunk> for LuaVM {
 
     async fn handle(
         &mut self,
-        msg: EvaluateChunk,
+        EvaluateChunk { chunk }: EvaluateChunk,
         _: Context<'_, Self, Self::Reply>,
     ) -> Self::Reply {
-        self.0.load(msg.chunk).eval()
+        self.0.load(chunk).eval()
     }
 }
 
@@ -177,10 +177,10 @@ impl Message<CheckoutTable> for LuaVM {
 
     async fn handle(
         &mut self,
-        msg: CheckoutTable,
+        CheckoutTable { name }: CheckoutTable,
         _: Context<'_, Self, Self::Reply>,
     ) -> Self::Reply {
-        let table: LuaTable = self.0.globals().get(msg.name)?;
+        let table: LuaTable = self.0.globals().get(name)?;
         Ok(table)
     }
 }
@@ -245,7 +245,7 @@ impl CommitTable {
 impl Message<CommitTable> for LuaVM {
     type Reply = LuaResult<()>;
 
-    async fn handle(&mut self, msg: CommitTable, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
-        self.0.globals().set(msg.name, msg.table)
+    async fn handle(&mut self, CommitTable { name, table }: CommitTable, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+        self.0.globals().set(name, table)
     }
 }

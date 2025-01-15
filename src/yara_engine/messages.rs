@@ -55,8 +55,8 @@ pub struct AddRule(pub String);
 impl Message<AddRule> for YaraEngine {
     type Reply = ();
 
-    async fn handle(&mut self, msg: AddRule, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
-        self.rules.push(msg.0);
+    async fn handle(&mut self, AddRule(rule): AddRule, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+        self.rules.push(rule);
     }
 }
 
@@ -161,11 +161,11 @@ pub struct ScanBytes(pub Vec<u8>);
 impl Message<ScanBytes> for YaraEngine {
     type Reply = Result<Vec<MatchedRule>, Error>;
 
-    async fn handle(&mut self, msg: ScanBytes, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+    async fn handle(&mut self, ScanBytes(bytes): ScanBytes, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
         match self.compiled {
             Some(ref rules) => {
                 let mut scanner = Scanner::new(rules);
-                match scanner.scan(msg.0.as_slice()) {
+                match scanner.scan(bytes.as_slice()) {
                     Ok(results) => {
                         let mut output: Vec<MatchedRule> = Vec::new();
                         for rule in results.matching_rules() {
@@ -173,10 +173,10 @@ impl Message<ScanBytes> for YaraEngine {
                         }
                         Ok(output)
                     }
-                    Err(error) => Err(Error::scan_error(msg.0, error)),
+                    Err(error) => Err(Error::scan_error(bytes, error)),
                 }
             }
-            None => Err(Error::no_compiled_rules(msg.0)),
+            None => Err(Error::no_compiled_rules(bytes)),
         }
     }
 }
