@@ -83,8 +83,10 @@ mod tests {
         engine_ref.ask(CompileRules).await.unwrap();
 
         // Run a scan against some data
-        let results: Vec<MatchedRule> =
-            engine_ref.ask(ScanBytes(MATCHING_DATA.to_vec())).await.unwrap();
+        let results: Vec<MatchedRule> = engine_ref
+            .ask(ScanBytes(MATCHING_DATA.to_vec()))
+            .await
+            .unwrap();
 
         // Validate only one result returned
         assert_eq!(results.len(), 1);
@@ -110,8 +112,10 @@ mod tests {
         engine_ref.ask(CompileRules).await.unwrap();
 
         // Run a scan against some data
-        let results: Vec<MatchedRule> =
-            engine_ref.ask(ScanBytes(NONMATCHING_DATA.to_vec())).await.unwrap();
+        let results: Vec<MatchedRule> = engine_ref
+            .ask(ScanBytes(NONMATCHING_DATA.to_vec()))
+            .await
+            .unwrap();
 
         // Validate only one result returned
         assert_eq!(results.len(), 0);
@@ -140,6 +144,9 @@ mod tests {
         let engine_ref: ActorRef<YaraEngine> = kameo::spawn(YaraEngine::default());
 
         // Don't compile anything. Just try to scan. Should panic.
-        engine_ref.ask(ScanBytes(MATCHING_DATA.to_vec())).await.unwrap();
+        engine_ref
+            .ask(ScanBytes(MATCHING_DATA.to_vec()))
+            .await
+            .unwrap();
     }
 }
