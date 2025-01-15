@@ -41,7 +41,7 @@ async fn main() -> Result<()> {
     let continuation_request: ExecuteChunk = ExecuteChunk::using("sscani.prompt_continue()");
 
     // Initialize the Lua virtual machine.
-    let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::init()?);
+    let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
 
     // Load and execute scanni's helper libraries.
     load_sscani_libs(&vm).await?;

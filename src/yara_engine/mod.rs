@@ -10,7 +10,7 @@ pub mod messages;
 pub mod result;
 
 // Scope Includes
-use kameo::Actor;
+use kameo::{mailbox::unbounded::UnboundedMailbox, Actor};
 use yara_x::Rules;
 
 /// Manages the lifecycle of the YARA-X scan engine.
@@ -19,13 +19,21 @@ use yara_x::Rules;
 /// rules. The [`YaraEngine`] actor instantiates and manages the
 /// lifecycle of the YARA-X scanner, including the rules compiler.
 ///
-#[derive(Actor, Default)]
+#[derive(Default)]
 pub struct YaraEngine {
     /// Holds source rules for compilation.
     rules: Vec<String>,
 
     /// Holds compiled rules for scanning.
     compiled: Option<Rules>,
+}
+
+impl Actor for YaraEngine {
+    type Mailbox = UnboundedMailbox<Self>;
+
+    fn name() -> &'static str {
+        "scan_engine__yara_x"
+    }
 }
 
 #[cfg(test)]

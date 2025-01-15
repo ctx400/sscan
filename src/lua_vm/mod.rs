@@ -15,7 +15,7 @@ pub mod messages;
 pub mod userscript_apis;
 
 // Scope Imports
-use kameo::Actor;
+use kameo::{actor::ActorRef, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
 use mlua::prelude::*;
 use userscript_apis::register_version_apis;
 
@@ -33,8 +33,26 @@ use userscript_apis::register_version_apis;
 ///
 /// To set up a new userscript environment, see [`LuaVM::init()`].
 ///
-#[derive(Actor)]
 pub struct LuaVM(Lua);
+
+impl Actor for LuaVM {
+    type Mailbox = UnboundedMailbox<Self>;
+
+    async fn on_start(&mut self, _: ActorRef<Self>) -> Result<(), BoxError> {
+        register_version_apis(&self.0)?;
+        Ok(())
+    }
+
+    fn name() -> &'static str {
+        "lua_vm"
+    }
+}
+
+impl Default for LuaVM {
+    fn default() -> Self {
+        Self(Lua::new())
+    }
+}
 
 impl LuaVM {
     /// Initializes Lua and adds core APIs to the global scope.
@@ -64,6 +82,7 @@ impl LuaVM {
     /// # Ok(())
     /// # }
     /// ```
+    #[deprecated(since = "0.8.0", note = "Initialization now happens during actor startup.")]
     pub fn init() -> LuaResult<Self> {
         let lua: Lua = Lua::new();
         register_version_apis(&lua)?;
