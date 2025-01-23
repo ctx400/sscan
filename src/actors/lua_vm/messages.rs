@@ -10,7 +10,7 @@
 //!
 
 use crate::{
-    actors::lua_vm::{LuaVM, error::LuaVmResult},
+    actors::lua_vm::{error::LuaVmResult, LuaVM},
     userscript_api::ApiObject,
 };
 use kameo::message::{Context, Message};
@@ -115,7 +115,10 @@ impl Message<ExecChunk> for LuaVM {
     }
 }
 
-impl<S> From<S> for ExecChunk where S: ToString {
+impl<S> From<S> for ExecChunk
+where
+    S: ToString,
+{
     fn from(value: S) -> Self {
         Self(value.to_string())
     }
@@ -157,7 +160,10 @@ impl Message<EvalChunk> for LuaVM {
     }
 }
 
-impl<S> From<S> for EvalChunk where S: ToString {
+impl<S> From<S> for EvalChunk
+where
+    S: ToString,
+{
     fn from(value: S) -> Self {
         Self(value.to_string())
     }
@@ -166,7 +172,10 @@ impl<S> From<S> for EvalChunk where S: ToString {
 #[cfg(test)]
 mod tests {
     use crate::{
-        actors::lua_vm::{messages::{EvalChunk, ExecChunk, RegisterUserApi}, LuaVM},
+        actors::lua_vm::{
+            messages::{EvalChunk, ExecChunk, RegisterUserApi},
+            LuaVM,
+        },
         userscript_api::ApiObject,
     };
     use kameo::actor::ActorRef;
@@ -202,7 +211,8 @@ mod tests {
         // Create a chunk and execute it.
         let exec_request: ExecChunk = r#"
             assert(5 == 5)
-        "#.into();
+        "#
+        .into();
         vm.ask(exec_request).await.unwrap();
     }
 
@@ -216,7 +226,8 @@ mod tests {
         // Create a chunk and execute it.
         let exec_request: ExecChunk = r#"
             assert(5 == 4)
-        "#.into();
+        "#
+        .into();
         vm.ask(exec_request).await.unwrap();
     }
 
@@ -229,7 +240,8 @@ mod tests {
         // Create an expression and execute it.
         let expr_request: EvalChunk = r#"
             5 + 6
-        "#.into();
+        "#
+        .into();
         let result: mlua::Value = vm.ask(expr_request).await.unwrap();
         assert_eq!(result, mlua::Value::Integer(11));
     }
@@ -245,7 +257,8 @@ mod tests {
         // The table and key don't exist, so this should error.
         let expr_request: EvalChunk = r#"
             nonexistent_table.nonexistent_key
-        "#.into();
+        "#
+        .into();
         vm.ask(expr_request).await.unwrap();
     }
 }
