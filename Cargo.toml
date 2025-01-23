@@ -35,7 +35,7 @@ features = ["full"]
 # Lua scripting support
 [dependencies.mlua]
 version = "0.10.2"
-features = ["lua54", "vendored", "serialize", "anyhow", "send", "error-send"]
+features = ["lua54", "vendored", "serialize", "anyhow", "send", "error-send", "async"]
 
 # Serialization support
 [dependencies.serde]
