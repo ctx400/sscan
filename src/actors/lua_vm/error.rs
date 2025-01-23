@@ -7,6 +7,9 @@
 
 use thiserror::Error;
 
+/// Result type alias for LuaVM
+pub type LuaVmResult<T> = Result<T, LuaVmError>;
+
 /// Comprehensive error type for the Lua virtual machine.
 #[derive(Error, Debug)]
 pub enum LuaVmError {
