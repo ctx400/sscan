@@ -59,7 +59,7 @@ pub use mlua::{UserData, UserDataFields, UserDataMethods};
 ///
 /// // Finally, add the required metadata for an API object.
 /// impl ApiObject for XkcdApi {
-///     fn name() -> &'static str {
+///     fn name(&self) -> &'static str {
 ///         "xkcd"
 ///     }
 /// }
@@ -118,10 +118,10 @@ pub trait ApiObject : UserData + Send + 'static {
     /// # struct MyApi;
     /// # impl UserData for MyApi {}
     /// impl ApiObject for MyApi {
-    ///     fn name() -> &'static str {
+    ///     fn name(&self) -> &'static str {
     ///         "my_api"
     ///     }
     /// }
     /// ```
-    fn name() -> &'static str;
+    fn name(&self) -> &'static str;
 }
