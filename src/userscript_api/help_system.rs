@@ -25,10 +25,10 @@
 
 pub mod error;
 
-use std::collections::HashMap;
-use mlua::{ExternalError, UserData};
-use error::HelpError;
 use super::ApiObject;
+use error::HelpError;
+use mlua::{ExternalError, UserData};
+use std::collections::HashMap;
 
 /// # A help topic for userscript APIs.
 ///
@@ -78,7 +78,10 @@ use super::ApiObject;
 /// ```lua
 /// help:with 'my_help_topic'
 /// ```
-pub trait HelpTopic where Self: Send + 'static {
+pub trait HelpTopic
+where
+    Self: Send + 'static,
+{
     /// # The unique name of the help topic.
     ///
     /// Required. The [`HelpSystem`] looks up help topics by name. The name
@@ -144,12 +147,18 @@ pub trait HelpTopic where Self: Send + 'static {
 ///
 /// Topics can be registered with [`HelpSystem::topic()`]. To create a
 /// new custom help topic, see [`HelpTopic`].
-pub struct HelpSystem<H> where H: HelpTopic {
+pub struct HelpSystem<H>
+where
+    H: HelpTopic,
+{
     /// Holds the list of topics keyed by name.
     topics: HashMap<String, H>,
 }
 
-impl<H> HelpSystem<H> where H: HelpTopic {
+impl<H> HelpSystem<H>
+where
+    H: HelpTopic,
+{
     /// Creates a new Help System instance with no topics loaded.
     #[must_use]
     pub fn new() -> Self {
@@ -169,7 +178,7 @@ impl<H> HelpSystem<H> where H: HelpTopic {
         // Validate a reserved topic name is not being used.
         let topic_name: &str = topic.name().trim();
         if topic_name == "topics" {
-            return Err(HelpError::reserved_topic_name(topic_name))
+            return Err(HelpError::reserved_topic_name(topic_name));
         }
 
         // Add the help topic.
@@ -178,13 +187,19 @@ impl<H> HelpSystem<H> where H: HelpTopic {
     }
 }
 
-impl<H> Default for HelpSystem<H> where H: HelpTopic {
+impl<H> Default for HelpSystem<H>
+where
+    H: HelpTopic,
+{
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<H> UserData for HelpSystem<H> where H: HelpTopic {
+impl<H> UserData for HelpSystem<H>
+where
+    H: HelpTopic,
+{
     fn add_methods<M: mlua::UserDataMethods<Self>>(methods: &mut M) {
         // Print generic help
         methods.add_method("all", |_, _this: &HelpSystem<H>, ()| {
@@ -221,7 +236,10 @@ impl<H> UserData for HelpSystem<H> where H: HelpTopic {
     }
 }
 
-impl<H> ApiObject for HelpSystem<H> where H: HelpTopic {
+impl<H> ApiObject for HelpSystem<H>
+where
+    H: HelpTopic,
+{
     fn name(&self) -> &'static str {
         "help"
     }

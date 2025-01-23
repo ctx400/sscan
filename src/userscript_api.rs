@@ -86,7 +86,7 @@ use include::UserData;
 /// ```
 ///
 /// [`LuaVM`]: crate::actors::lua_vm::LuaVM
-pub trait ApiObject : UserData + Send + 'static {
+pub trait ApiObject: UserData + Send + 'static {
     /// # The name of the API object, as visible from Lua
     ///
     /// `name` must be a valid Lua identifier. Valid Lua identifiers

@@ -29,7 +29,7 @@ use mlua::prelude::*;
 /// customization, configuration, and defining custom scan engines.
 pub struct LuaVM {
     /// The inner Lua 5.4 Virtual Machine
-    vm: Lua
+    vm: Lua,
 }
 
 /// # [`LuaVM`] is an actor.
@@ -58,8 +58,6 @@ impl Default for LuaVM {
     /// # }
     /// ```
     fn default() -> Self {
-        Self {
-            vm: Lua::new(),
-        }
+        Self { vm: Lua::new() }
     }
 }
