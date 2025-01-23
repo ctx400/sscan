@@ -23,7 +23,19 @@
 //! the [`ApiObject`] trait.
 //!
 
-pub use mlua::{UserData, UserDataFields, UserDataMethods};
+pub mod help_system;
+pub mod include {
+    //! # Useful re-exports from other crates.
+    //!
+    //! This module provides re-exported types, traits, and functions
+    //! from third-party crates where neccesary to implement the
+    //! functionality of the userscript API.
+
+    /// Exported from crate [`mlua`].
+    pub use mlua::{UserData, UserDataFields, UserDataMethods};
+}
+
+use include::*;
 
 /// # A userscript API object.
 ///
