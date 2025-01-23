@@ -10,12 +10,13 @@
 //! The root of this module defines the traits necessary to expose
 //! an API to the userscript environment, as well as the traits
 //! necessary to register help topics with the userscript help system.
-//! To learn how to add custom APIs to the userscript environment, see
-//! the [`ApiObject`] trait.
 //!
 //! The submodules of this module contain implementations of these
 //! traits for each userscript API, along with both the Rust and Lua
 //! documentation for those APIs.
+//!
+//! To learn how to add custom APIs to the userscript environment, see
+//! the [`ApiObject`] trait.
 //!
 
 pub use mlua::{UserData, UserDataFields, UserDataMethods};
