@@ -8,10 +8,6 @@
 //! - Call into the API from within Lua,
 //! - Access help from Lua.
 //!
-//! ## KNOWN UNINTENDED BEHAVIOR
-//!
-//! - The [`HelpSystem`] requires choosing a static ApiObject.
-//!   This is a problem. It should allow dyn ApiObjects.
 
 use kameo::actor::ActorRef;
 use sscan::{actors::lua_vm::{messages::{ExecChunk, RegisterUserApi}, LuaVM}, userscript_api::{help_system::{HelpSystem, HelpTopic}, include::UserData, ApiObject}};
@@ -82,8 +78,8 @@ async fn should_register_api_and_help() -> anyhow::Result<()> {
 
     // Create and register help articles
     let topic: CounterApiHelp = CounterApiHelp;
-    let mut help_system: HelpSystem<_> = HelpSystem::default();
-    help_system.topic(topic)?;
+    let mut help_system: HelpSystem = HelpSystem::default();
+    help_system.topic(Box::new(topic))?;
 
     // Register the help API
     vm.ask(RegisterUserApi::with(help_system)).await.unwrap();
