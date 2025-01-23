@@ -147,18 +147,12 @@ where
 ///
 /// Topics can be registered with [`HelpSystem::topic()`]. To create a
 /// new custom help topic, see [`HelpTopic`].
-pub struct HelpSystem<H>
-where
-    H: HelpTopic,
-{
+pub struct HelpSystem {
     /// Holds the list of topics keyed by name.
-    topics: HashMap<String, H>,
+    topics: HashMap<String, Box<dyn HelpTopic>>,
 }
 
-impl<H> HelpSystem<H>
-where
-    H: HelpTopic,
-{
+impl HelpSystem {
     /// Creates a new Help System instance with no topics loaded.
     #[must_use]
     pub fn new() -> Self {
@@ -174,7 +168,7 @@ where
     /// If the help topic's name is a reserved name
     /// (currently, `topics`), then this function will return an error
     /// of type [`HelpError::ReservedTopicName`].
-    pub fn topic(&mut self, topic: H) -> Result<&mut Self, HelpError> {
+    pub fn topic(&mut self, topic: Box<dyn HelpTopic>) -> Result<&mut Self, HelpError> {
         // Validate a reserved topic name is not being used.
         let topic_name: &str = topic.name().trim();
         if topic_name == "topics" {
@@ -187,28 +181,22 @@ where
     }
 }
 
-impl<H> Default for HelpSystem<H>
-where
-    H: HelpTopic,
-{
+impl Default for HelpSystem {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<H> UserData for HelpSystem<H>
-where
-    H: HelpTopic,
-{
+impl UserData for HelpSystem {
     fn add_methods<M: mlua::UserDataMethods<Self>>(methods: &mut M) {
         // Print generic help
-        methods.add_method("all", |_, _this: &HelpSystem<H>, ()| {
+        methods.add_method("all", |_, _this: &HelpSystem, ()| {
             println!(include_str!("help_system/topics/topic.generic.md"));
             Ok(())
         });
 
         // List all available topics
-        methods.add_method("topics", |_, this: &HelpSystem<H>, ()| {
+        methods.add_method("topics", |_, this: &HelpSystem, ()| {
             println!("The following help topics are available:\n");
             for (name, topic) in &this.topics {
                 let name: &str = name.trim();
@@ -220,7 +208,7 @@ where
         });
 
         // Lookup and print a topic.
-        methods.add_method("with", |_, this: &HelpSystem<H>, name: String| {
+        methods.add_method("with", |_, this: &HelpSystem, name: String| {
             if let Some(topic) = this.topics.get(name.trim()) {
                 let content: &str = topic.content();
 
@@ -236,10 +224,7 @@ where
     }
 }
 
-impl<H> ApiObject for HelpSystem<H>
-where
-    H: HelpTopic,
-{
+impl ApiObject for HelpSystem {
     fn name(&self) -> &'static str {
         "help"
     }
