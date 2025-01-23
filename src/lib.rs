@@ -26,8 +26,3 @@
 
 // Enable pedantic linting
 #![warn(clippy::pedantic)]
-
-// Modules
-pub mod lua_vm;
-pub mod system;
-pub mod yara_engine;
