@@ -18,6 +18,29 @@ use mlua::prelude::*;
 /// After defining an API object, it needs to be registered with the
 /// virtual machine before userscripts can access the API. This message
 /// instructs the virtual machine to load an [`ApiObject`] into Lua.
+///
+/// # Example
+///
+/// ```
+/// # use sscan::{
+/// #     actors::lua_vm::{LuaVM, messages::RegisterUserApi},
+/// #     userscript_api::*,
+/// # };
+/// # use kameo::actor::ActorRef;
+/// # #[tokio::main]
+/// # async fn main() {
+/// # struct MyApi;
+/// # impl UserData for MyApi {}
+/// # impl ApiObject for MyApi {
+/// #   fn name(&self) -> &'static str {
+/// #       "my_api"
+/// #   }
+/// # }
+/// // Start LuaVM and register a userscript API
+/// let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
+/// vm.ask(RegisterUserApi::with(MyApi)).await.unwrap();
+/// # }
+/// ```
 pub struct RegisterUserApi<A>(A) where A: ApiObject;
 
 impl<A> Message<RegisterUserApi<A>> for LuaVM where A: ApiObject {

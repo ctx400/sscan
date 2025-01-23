@@ -51,8 +51,8 @@ impl Default for LuaVM {
     /// # use sscan::actors::lua_vm::LuaVM;
     /// # use kameo::actor::ActorRef;
     /// #
-    /// # #[tokio::test]
-    /// # async fn should_spawn_vm() {
+    /// # #[tokio::main]
+    /// # async fn main() {
     /// // Create a new userscript environment!
     /// let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
     /// # }
