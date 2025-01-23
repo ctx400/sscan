@@ -12,17 +12,10 @@
 //! The embedded Lua virtual machine is made possible by the
 //! [mlua](https://crates.io/crates/mlua) crate.
 //!
-//! ## Usage
-//!
-//! There are two binaries included with sscan: `sscan` and `sscani`.
-//! The main binary is `sscan`, the command-line file/process/network
-//! scanner tool.
-//!
-//! The `sscani` binary is a *very* primitive interactive Lua REPL
-//! primarily intended for light testing or debugging. It can accept
-//! multiline Lua snippets terminated by semicolons, which evaluate in
-//! the same context as userscripts do in `sscan`.
-//!
 
 // Enable pedantic linting
 #![deny(clippy::pedantic)]
+
+pub mod actors {
+    pub mod lua_vm;
+}
