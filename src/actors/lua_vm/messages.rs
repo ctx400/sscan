@@ -10,12 +10,10 @@
 //!
 
 use crate::{
-    actors::lua_vm::LuaVM,
+    actors::lua_vm::{LuaVM, error::LuaVmResult},
     userscript_api::ApiObject,
 };
 use kameo::message::{Context, Message};
-
-use super::error::LuaVmResult;
 
 /// # Register a userscript API object with [`LuaVM`]
 ///
@@ -25,7 +23,7 @@ use super::error::LuaVmResult;
 ///
 /// ## Reply
 ///
-/// Expect a reply of [`LuaVmResult<()>`].
+/// Expect a reply of [`LuaVmResult<()>`](LuaVmResult)
 ///
 /// ## Example
 ///
@@ -81,13 +79,11 @@ where
 /// # Execute a Lua chunk in the virtual machine.
 ///
 /// Requests for [`LuaVM`] to execute an arbitrary chunk of Lua code in
-/// the context of the userscript environment. This operation returns no
-/// value; see [`EvalChunk`] to evaluate and return the result of Lua
-/// expressions.
+/// the context of the userscript environment.
 ///
 /// ## Reply
 ///
-/// Expect a reply of type [`LuaVmResult<()>`]
+/// Expect a reply of type [`LuaVmResult<()>`](LuaVmResult)
 ///
 /// ## Example
 ///
@@ -125,10 +121,52 @@ impl<S> From<S> for ExecChunk where S: ToString {
     }
 }
 
+/// # Evaluate a Lua expression and return the result.
+///
+/// Requests for [`LuaVM`] to evaluate a Lua expression in the context
+/// of the userscript environment, returning any produced value.
+///
+/// ## Reply
+///
+/// Expect a reply of type [`LuaVmResult<mlua::Value>`](LuaVmResult)
+///
+/// ## Example
+///
+/// ```
+/// # use sscan::actors::lua_vm::{LuaVM, messages::EvalChunk};
+/// # #[tokio::main]
+/// # async fn main() {
+/// // Spawn a new LuaVM actor
+/// let vm = kameo::spawn(LuaVM::default());
+///
+/// // Evaluate a Lua expression in the VM
+/// let exec_request: EvalChunk = r#"
+///     5 + 6
+/// "#.into();
+/// let result = vm.ask(exec_request).await.unwrap();
+/// assert_eq!(result, mlua::Value::Integer(11));
+/// # }
+/// ```
+pub struct EvalChunk(String);
+
+impl Message<EvalChunk> for LuaVM {
+    type Reply = LuaVmResult<mlua::Value>;
+
+    async fn handle(&mut self, msg: EvalChunk, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+        Ok(self.vm.load(msg.0).eval()?)
+    }
+}
+
+impl<S> From<S> for EvalChunk where S: ToString {
+    fn from(value: S) -> Self {
+        Self(value.to_string())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{
-        actors::lua_vm::{messages::{ExecChunk, RegisterUserApi}, LuaVM},
+        actors::lua_vm::{messages::{EvalChunk, ExecChunk, RegisterUserApi}, LuaVM},
         userscript_api::ApiObject,
     };
     use kameo::actor::ActorRef;
@@ -180,5 +218,34 @@ mod tests {
             assert(5 == 4)
         "#.into();
         vm.ask(exec_request).await.unwrap();
+    }
+
+    /// This contains a valid Lua expression, so should return a result.
+    #[tokio::test]
+    async fn should_return_eval_result() {
+        // Create a LuaVM actor
+        let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
+
+        // Create an expression and execute it.
+        let expr_request: EvalChunk = r#"
+            5 + 6
+        "#.into();
+        let result: mlua::Value = vm.ask(expr_request).await.unwrap();
+        assert_eq!(result, mlua::Value::Integer(11));
+    }
+
+    /// This contains a bad expression, so should panic.
+    #[tokio::test]
+    #[should_panic]
+    async fn should_error_on_invalid_expr() {
+        // Create a LuaVM actor
+        let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
+
+        // Create an expression and execute it.
+        // The table and key don't exist, so this should error.
+        let expr_request: EvalChunk = r#"
+            nonexistent_table.nonexistent_key
+        "#.into();
+        vm.ask(expr_request).await.unwrap();
     }
 }
