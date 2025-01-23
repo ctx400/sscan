@@ -7,6 +7,8 @@
 //! Furthermore, userscripts can define custom scan engines that
 //! extend sscan beyond its baked-in capabilities.
 //!
+//! ## Module Structure
+//!
 //! The root of this module defines the traits necessary to expose
 //! an API to the userscript environment, as well as the traits
 //! necessary to register help topics with the userscript help system.
@@ -14,6 +16,8 @@
 //! The submodules of this module contain implementations of these
 //! traits for each userscript API, along with both the Rust and Lua
 //! documentation for those APIs.
+//!
+//! ## Developing Custom Userscript APIs
 //!
 //! To learn how to add custom APIs to the userscript environment, see
 //! the [`ApiObject`] trait.
