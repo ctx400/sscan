@@ -9,7 +9,7 @@
 //! controlling the virtual machine.
 //!
 
-use crate::{userscript_api::ApiObject, actors::lua_vm::LuaVM};
+use crate::{actors::lua_vm::LuaVM, userscript_api::ApiObject};
 use kameo::message::{Context, Message};
 use mlua::prelude::*;
 
@@ -24,7 +24,7 @@ use mlua::prelude::*;
 /// ```
 /// # use sscan::{
 /// #     actors::lua_vm::{LuaVM, messages::RegisterUserApi},
-/// #     userscript_api::*,
+/// #     userscript_api::{ApiObject, include::*},
 /// # };
 /// # use kameo::actor::ActorRef;
 /// # #[tokio::main]
@@ -41,17 +41,29 @@ use mlua::prelude::*;
 /// vm.ask(RegisterUserApi::with(MyApi)).await.unwrap();
 /// # }
 /// ```
-pub struct RegisterUserApi<A>(A) where A: ApiObject;
+pub struct RegisterUserApi<A>(A)
+where
+    A: ApiObject;
 
-impl<A> Message<RegisterUserApi<A>> for LuaVM where A: ApiObject {
+impl<A> Message<RegisterUserApi<A>> for LuaVM
+where
+    A: ApiObject,
+{
     type Reply = LuaResult<()>;
 
-    async fn handle(&mut self, msg: RegisterUserApi<A>, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+    async fn handle(
+        &mut self,
+        msg: RegisterUserApi<A>,
+        _: Context<'_, Self, Self::Reply>,
+    ) -> Self::Reply {
         self.vm.globals().set(msg.0.name(), msg.0)
     }
 }
 
-impl<A> RegisterUserApi<A> where A: ApiObject {
+impl<A> RegisterUserApi<A>
+where
+    A: ApiObject,
+{
     pub fn with(api: A) -> Self {
         Self(api)
     }
@@ -59,9 +71,12 @@ impl<A> RegisterUserApi<A> where A: ApiObject {
 
 #[cfg(test)]
 mod tests {
+    use crate::{
+        actors::lua_vm::{messages::RegisterUserApi, LuaVM},
+        userscript_api::ApiObject,
+    };
     use kameo::actor::ActorRef;
     use mlua::{UserData, UserDataMethods};
-    use crate::{actors::lua_vm::{messages::RegisterUserApi, LuaVM}, userscript_api::ApiObject};
 
     /// Any [`ApiObject`] should be able to be registered.
     #[tokio::test]
@@ -70,9 +85,7 @@ mod tests {
         struct MyApi;
         impl UserData for MyApi {
             fn add_methods<M: UserDataMethods<Self>>(methods: &mut M) {
-                methods.add_method("hello", |_, _this: &MyApi, ()| {
-                    Ok("Hello World")
-                });
+                methods.add_method("hello", |_, _this: &MyApi, ()| Ok("Hello World"));
             }
         }
         impl ApiObject for MyApi {

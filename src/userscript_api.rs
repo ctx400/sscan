@@ -23,12 +23,24 @@
 //! the [`ApiObject`] trait.
 //!
 
-pub use mlua::{UserData, UserDataFields, UserDataMethods};
+pub mod help_system;
+pub mod include {
+    //! # Useful re-exports from other crates.
+    //!
+    //! This module provides re-exported types, traits, and functions
+    //! from third-party crates where neccesary to implement the
+    //! functionality of the userscript API.
+
+    /// Exported from crate [`mlua`].
+    pub use mlua::{UserData, UserDataFields, UserDataMethods};
+}
+
+use include::UserData;
 
 /// # A userscript API object.
 ///
 /// Any type implementing this trait is eligible to be registered with
-/// LuaVM as a userscript API. A userscript API consists of one or more
+/// [`LuaVM`] as a userscript API. A userscript API consists of one or more
 /// data fields, functions, or methods, with which a userscript can
 /// utilize to interact with a component of sscan.
 ///
@@ -38,7 +50,7 @@ pub use mlua::{UserData, UserDataFields, UserDataMethods};
 /// # Example
 ///
 /// ```
-/// # use sscan::userscript_api::*;
+/// # use sscan::userscript_api::{ApiObject, include::*};
 /// // Let's define a userscript API.
 /// struct XkcdApi;
 ///
@@ -72,7 +84,9 @@ pub use mlua::{UserData, UserDataFields, UserDataMethods};
 /// assert(random_number == 4)
 /// assert(xkcd.source == "https://xkcd.com/221/")
 /// ```
-pub trait ApiObject : UserData + Send + 'static {
+///
+/// [`LuaVM`]: crate::actors::lua_vm::LuaVM
+pub trait ApiObject: UserData + Send + 'static {
     /// # The name of the API object, as visible from Lua
     ///
     /// `name` must be a valid Lua identifier. Valid Lua identifiers
@@ -91,7 +105,7 @@ pub trait ApiObject : UserData + Send + 'static {
     /// - `4_my_function`
     /// - `$myfunc`
     ///
-    /// ## Don't use _SPECIAL_IDENTIFIERS
+    /// ## Don't use `_SPECIAL_IDENTIFIERS`!
     ///
     /// Try not to use any identifiers that start with an
     /// underscore followed by all uppercase letters, such as `_MYFUNC`,
@@ -114,7 +128,7 @@ pub trait ApiObject : UserData + Send + 'static {
     /// ## Example
     ///
     /// ```
-    /// # use sscan::userscript_api::*;
+    /// # use sscan::userscript_api::{ApiObject, include::*};
     /// # struct MyApi;
     /// # impl UserData for MyApi {}
     /// impl ApiObject for MyApi {
