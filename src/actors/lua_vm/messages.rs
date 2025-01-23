@@ -9,7 +9,10 @@
 //! controlling the virtual machine.
 //!
 
-use crate::{actors::lua_vm::{LuaVM, error::LuaVmError}, userscript_api::ApiObject};
+use crate::{
+    actors::lua_vm::{error::LuaVmError, LuaVM},
+    userscript_api::ApiObject,
+};
 use kameo::message::{Context, Message};
 
 /// # Register a userscript API object with [`LuaVM`]
