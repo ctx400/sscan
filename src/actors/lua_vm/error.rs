@@ -7,7 +7,7 @@
 
 use thiserror::Error;
 
-/// Result type alias for LuaVM
+/// Result type alias for [`LuaVM`](super::LuaVM)
 pub type LuaVmResult<T> = Result<T, LuaVmError>;
 
 /// Comprehensive error type for the Lua virtual machine.
