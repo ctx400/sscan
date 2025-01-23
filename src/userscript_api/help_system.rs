@@ -151,13 +151,20 @@ pub struct HelpSystem<H> where H: HelpTopic {
 
 impl<H> HelpSystem<H> where H: HelpTopic {
     /// Creates a new Help System instance with no topics loaded.
+    #[must_use]
     pub fn new() -> Self {
         Self {
             topics: HashMap::with_capacity(50),
         }
     }
 
-    /// Adds a [`HelpTopic`] to the Help System.
+    /// Registers a new [`HelpTopic`] to the Help System.
+    ///
+    /// ## Errors
+    ///
+    /// If the help topic's name is a reserved name
+    /// (currently, `topics`), then this function will return an error
+    /// of type [`HelpError::ReservedTopicName`].
     pub fn topic(&mut self, topic: H) -> Result<&mut Self, HelpError> {
         // Validate a reserved topic name is not being used.
         let topic_name: &str = topic.name().trim();
@@ -168,6 +175,12 @@ impl<H> HelpSystem<H> where H: HelpTopic {
         // Add the help topic.
         self.topics.insert(topic_name.to_owned(), topic);
         Ok(self)
+    }
+}
+
+impl<H> Default for HelpSystem<H> where H: HelpTopic {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -185,7 +198,7 @@ impl<H> UserData for HelpSystem<H> where H: HelpTopic {
             for (name, topic) in &this.topics {
                 let name: &str = name.trim();
                 let description: &str = topic.short_description().trim();
-                println!("{:<16} - {:<50}", name, description);
+                println!("{name:<16} - {description:<50}");
             }
             println!("\nTo get help on a particular topic, use help:with 'topic'\n");
             Ok(())

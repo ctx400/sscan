@@ -21,11 +21,13 @@ pub enum HelpError {
 
 impl HelpError {
     /// Create a new [`HelpError::ReservedTopicName`]
+    #[must_use]
     pub fn reserved_topic_name(name: &str) -> Self {
         Self::ReservedTopicName(name.to_owned())
     }
 
     /// Create a new [`HelpError::TopicNotFound`]
+    #[must_use]
     pub fn topic_not_found(name: &str) -> Self {
         Self::TopicNotFound(name.to_owned())
     }

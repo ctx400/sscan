@@ -5,7 +5,7 @@
 //! and driven by userscripts, and userscripts can also define custom
 //! scan engines.
 //!
-//! ## Interacting with LuaVM
+//! ## Interacting with the Virtual Machine
 //!
 //! [`LuaVM`] is an asynchronous actor, meaning it runs the Lua virtual
 //! machine on its own thread independently and has full control over

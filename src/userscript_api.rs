@@ -35,12 +35,12 @@ pub mod include {
     pub use mlua::{UserData, UserDataFields, UserDataMethods};
 }
 
-use include::*;
+use include::UserData;
 
 /// # A userscript API object.
 ///
 /// Any type implementing this trait is eligible to be registered with
-/// LuaVM as a userscript API. A userscript API consists of one or more
+/// [`LuaVM`] as a userscript API. A userscript API consists of one or more
 /// data fields, functions, or methods, with which a userscript can
 /// utilize to interact with a component of sscan.
 ///
@@ -84,6 +84,8 @@ use include::*;
 /// assert(random_number == 4)
 /// assert(xkcd.source == "https://xkcd.com/221/")
 /// ```
+///
+/// [`LuaVM`]: crate::actors::lua_vm::LuaVM
 pub trait ApiObject : UserData + Send + 'static {
     /// # The name of the API object, as visible from Lua
     ///
@@ -103,7 +105,7 @@ pub trait ApiObject : UserData + Send + 'static {
     /// - `4_my_function`
     /// - `$myfunc`
     ///
-    /// ## Don't use _SPECIAL_IDENTIFIERS
+    /// ## Don't use `_SPECIAL_IDENTIFIERS`!
     ///
     /// Try not to use any identifiers that start with an
     /// underscore followed by all uppercase letters, such as `_MYFUNC`,
