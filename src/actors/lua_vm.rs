@@ -5,6 +5,18 @@
 //! and driven by userscripts, and userscripts can also define custom
 //! scan engines.
 //!
+//! ## Interacting with LuaVM
+//!
+//! [`LuaVM`] is an asynchronous actor, meaning it runs the Lua virtual
+//! machine on its own thread independently and has full control over
+//! its own state. Interaction with the VM is done by message-passing.
+//!
+//! See the [`messages`] module to learn about the various types of
+//! messages that can be sent to the VM to interact with it, along with
+//! usage and code examples.
+//!
+
+pub mod messages;
 
 use kameo::{mailbox::unbounded::UnboundedMailbox, Actor};
 use mlua::prelude::*;
@@ -39,8 +51,8 @@ impl Default for LuaVM {
     /// # use sscan::actors::lua_vm::LuaVM;
     /// # use kameo::actor::ActorRef;
     /// #
-    /// # #[tokio::test]
-    /// # async fn should_spawn_vm() {
+    /// # #[tokio::main]
+    /// # async fn main() {
     /// // Create a new userscript environment!
     /// let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
     /// # }
