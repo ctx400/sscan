@@ -24,7 +24,7 @@ use mlua::prelude::*;
 /// ```
 /// # use sscan::{
 /// #     actors::lua_vm::{LuaVM, messages::RegisterUserApi},
-/// #     userscript_api::*,
+/// #     userscript_api::{ApiObject, include::*},
 /// # };
 /// # use kameo::actor::ActorRef;
 /// # #[tokio::main]

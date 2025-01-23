@@ -50,7 +50,7 @@ use include::*;
 /// # Example
 ///
 /// ```
-/// # use sscan::userscript_api::*;
+/// # use sscan::userscript_api::{ApiObject, include::*};
 /// // Let's define a userscript API.
 /// struct XkcdApi;
 ///
@@ -126,7 +126,7 @@ pub trait ApiObject : UserData + Send + 'static {
     /// ## Example
     ///
     /// ```
-    /// # use sscan::userscript_api::*;
+    /// # use sscan::userscript_api::{ApiObject, include::*};
     /// # struct MyApi;
     /// # impl UserData for MyApi {}
     /// impl ApiObject for MyApi {
