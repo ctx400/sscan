@@ -33,7 +33,8 @@
 /// See each of the modules below to learn more about the actors that
 /// power sscan.
 ///
-/// [`LuaVM`]: lua_vm::LuaVM
+/// [`LuaVM`]: crate::actors::lua_vm::LuaVM
 pub mod actors {
     pub mod lua_vm;
 }
+pub mod userscript_api;
