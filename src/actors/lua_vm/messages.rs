@@ -9,15 +9,18 @@
 //! controlling the virtual machine.
 //!
 
-use crate::{actors::lua_vm::LuaVM, userscript_api::ApiObject};
+use crate::{actors::lua_vm::{LuaVM, error::LuaVmError}, userscript_api::ApiObject};
 use kameo::message::{Context, Message};
-use mlua::prelude::*;
 
-/// Register a userscript API object with [`LuaVM`]
+/// # Register a userscript API object with [`LuaVM`]
 ///
 /// After defining an API object, it needs to be registered with the
 /// virtual machine before userscripts can access the API. This message
 /// instructs the virtual machine to load an [`ApiObject`] into Lua.
+///
+/// # Reply
+///
+/// Expect a reply of [`Result<(), LuaVmError`](LuaVmError)
 ///
 /// # Example
 ///
@@ -49,14 +52,15 @@ impl<A> Message<RegisterUserApi<A>> for LuaVM
 where
     A: ApiObject,
 {
-    type Reply = LuaResult<()>;
+    type Reply = Result<(), LuaVmError>;
 
     async fn handle(
         &mut self,
         msg: RegisterUserApi<A>,
         _: Context<'_, Self, Self::Reply>,
     ) -> Self::Reply {
-        self.vm.globals().set(msg.0.name(), msg.0)
+        self.vm.globals().set(msg.0.name(), msg.0)?;
+        Ok(())
     }
 }
 

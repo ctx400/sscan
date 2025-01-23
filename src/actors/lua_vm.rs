@@ -16,6 +16,7 @@
 //! usage and code examples.
 //!
 
+pub mod error;
 pub mod messages;
 
 use kameo::{mailbox::unbounded::UnboundedMailbox, Actor};
