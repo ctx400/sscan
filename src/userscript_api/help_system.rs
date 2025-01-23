@@ -147,14 +147,12 @@ where
 ///
 /// Topics can be registered with [`HelpSystem::topic()`]. To create a
 /// new custom help topic, see [`HelpTopic`].
-pub struct HelpSystem
-{
+pub struct HelpSystem {
     /// Holds the list of topics keyed by name.
     topics: HashMap<String, Box<dyn HelpTopic>>,
 }
 
-impl HelpSystem
-{
+impl HelpSystem {
     /// Creates a new Help System instance with no topics loaded.
     #[must_use]
     pub fn new() -> Self {
@@ -183,15 +181,13 @@ impl HelpSystem
     }
 }
 
-impl Default for HelpSystem
-{
+impl Default for HelpSystem {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl UserData for HelpSystem
-{
+impl UserData for HelpSystem {
     fn add_methods<M: mlua::UserDataMethods<Self>>(methods: &mut M) {
         // Print generic help
         methods.add_method("all", |_, _this: &HelpSystem, ()| {
@@ -228,8 +224,7 @@ impl UserData for HelpSystem
     }
 }
 
-impl ApiObject for HelpSystem
-{
+impl ApiObject for HelpSystem {
     fn name(&self) -> &'static str {
         "help"
     }

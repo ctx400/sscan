@@ -10,7 +10,17 @@
 //!
 
 use kameo::actor::ActorRef;
-use sscan::{actors::lua_vm::{messages::{ExecChunk, RegisterUserApi}, LuaVM}, userscript_api::{help_system::{HelpSystem, HelpTopic}, include::UserData, ApiObject}};
+use sscan::{
+    actors::lua_vm::{
+        messages::{ExecChunk, RegisterUserApi},
+        LuaVM,
+    },
+    userscript_api::{
+        help_system::{HelpSystem, HelpTopic},
+        include::UserData,
+        ApiObject,
+    },
+};
 
 /// A simple increment-only counter API.
 pub struct CounterApi {
@@ -27,9 +37,7 @@ impl ApiObject for CounterApi {
 impl UserData for CounterApi {
     fn add_fields<F: mlua::UserDataFields<Self>>(fields: &mut F) {
         // Return the current value of the counter.
-        fields.add_field_method_get("value", |_, this| {
-            Ok(this.counter)
-        });
+        fields.add_field_method_get("value", |_, this| Ok(this.counter));
     }
 
     fn add_methods<M: mlua::UserDataMethods<Self>>(methods: &mut M) {
