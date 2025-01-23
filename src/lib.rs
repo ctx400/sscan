@@ -25,4 +25,4 @@
 //!
 
 // Enable pedantic linting
-#![warn(clippy::pedantic)]
+#![deny(clippy::pedantic)]
