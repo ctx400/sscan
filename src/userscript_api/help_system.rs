@@ -192,21 +192,20 @@ impl UserData for HelpSystem {
         // Print generic help, or specific help if `topic` is specified.
         methods.add_meta_method("__call", |_, this: &HelpSystem, topic: Option<String>| {
             if let Some(topic) = topic {
-                    if let Some(topic) = this.topics.get(topic.trim()) {
-                        let content: &str = topic.content();
-                        println!("{content}");
-                        if !content.ends_with('\n') {
-                            println!();
-                        }
-                        Ok(())
-                    } else {
-                        Err(HelpError::topic_not_found(&topic).into_lua_err())
+                if let Some(topic) = this.topics.get(topic.trim()) {
+                    let content: &str = topic.content();
+                    println!("{content}");
+                    if !content.ends_with('\n') {
+                        println!();
                     }
-                }
-                else {
-                    println!(include_str!("help_system/topics/topic.generic.md"));
                     Ok(())
+                } else {
+                    Err(HelpError::topic_not_found(&topic).into_lua_err())
                 }
+            } else {
+                println!(include_str!("help_system/topics/topic.generic.md"));
+                Ok(())
+            }
         });
 
         // List all available topics
