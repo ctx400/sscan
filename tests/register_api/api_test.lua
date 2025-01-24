@@ -2,13 +2,13 @@
 -- Otherwise this script will return an error to Rust.
 
 -- Can we see generic help?
-help:all()
+help()
 
 -- Can we see a list of topics?
 help:topics()
 
 -- Can we see our counter API's help
-help:with 'counter'
+help 'counter'
 
 -- Can we access the counter's value?
 assert(counter.value == 0)
