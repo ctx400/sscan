@@ -1,12 +1,21 @@
 pub mod cli;
 pub mod repl;
 
-use std::path::Path;
 use anyhow::Result;
 use clap::Parser;
-use cli::{Action::{Interactive, Run}, CliArgs};
+use cli::{
+    Action::{Interactive, Run},
+    CliArgs,
+};
 use kameo::actor::ActorRef;
-use sscan::{actors::lua_vm::{messages::{ExecChunk, RegisterUserApi}, LuaVM}, userscript_api::help_system::HelpSystem};
+use sscan::{
+    actors::lua_vm::{
+        messages::{ExecChunk, RegisterUserApi},
+        LuaVM,
+    },
+    userscript_api::help_system::HelpSystem,
+};
+use std::path::Path;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -17,14 +26,14 @@ async fn main() -> Result<()> {
         Run { script } => {
             let exec_request: ExecChunk = load_script(script).await?.into();
             vm.ask(exec_request).await?;
-        },
+        }
         Interactive { startup_script } => {
             if let Some(startup_script) = startup_script {
                 let exec_request: ExecChunk = load_script(startup_script).await?.into();
                 vm.ask(exec_request).await?;
             }
             repl::invoke_repl(&vm).await;
-        },
+        }
     }
 
     vm.stop_gracefully().await?;
@@ -44,7 +53,10 @@ async fn init_luavm() -> Result<ActorRef<LuaVM>> {
 }
 
 /// Load a userscript from disk into a [`String`].
-async fn load_script<P>(path: P) -> Result<String> where P: AsRef<Path> {
+async fn load_script<P>(path: P) -> Result<String>
+where
+    P: AsRef<Path>,
+{
     let path: &Path = path.as_ref();
     let script = std::fs::read_to_string(path.canonicalize()?)?;
     Ok(script)
