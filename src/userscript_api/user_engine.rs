@@ -35,9 +35,9 @@
 //! user_engines:register("match_helloworld", engine_match_helloworld)
 //! ```
 
-use std::collections::HashMap;
-use mlua::{Function, UserData};
 use super::{help_system::HelpTopic, ApiObject};
+use mlua::{Function, UserData};
+use std::collections::HashMap;
 
 /// # The Userscript Scan Engine API
 ///
@@ -69,10 +69,13 @@ impl Default for UserEngine {
 impl UserData for UserEngine {
     fn add_methods<M: mlua::UserDataMethods<Self>>(methods: &mut M) {
         // Register a userscript scan engine.
-        methods.add_method_mut("register", |_, this: &mut UserEngine, (name, func): (String, Function)| {
-            this.engines.insert(name, func);
-            Ok(())
-        });
+        methods.add_method_mut(
+            "register",
+            |_, this: &mut UserEngine, (name, func): (String, Function)| {
+                this.engines.insert(name, func);
+                Ok(())
+            },
+        );
 
         // Run a scan against all userscript scan engines.
         methods.add_method("scan", |_, this, bytestring: mlua::String| {

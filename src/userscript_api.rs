@@ -23,8 +23,8 @@
 //! the [`ApiObject`] trait.
 //!
 
-pub mod user_engine;
 pub mod help_system;
+pub mod user_engine;
 pub mod include {
     //! # Useful re-exports from other crates.
     //!

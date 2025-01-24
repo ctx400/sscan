@@ -13,7 +13,10 @@ use sscan::{
         messages::{ExecChunk, RegisterUserApi},
         LuaVM,
     },
-    userscript_api::{help_system::HelpSystem, user_engine::{UserEngine, UserEngineHelp}},
+    userscript_api::{
+        help_system::HelpSystem,
+        user_engine::{UserEngine, UserEngineHelp},
+    },
 };
 use std::path::Path;
 
