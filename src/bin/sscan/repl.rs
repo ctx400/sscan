@@ -62,13 +62,13 @@ async fn repl_print(value: Value) {
         Value::Integer(i) => println!("{i}"),
         Value::Number(n) => println!("{n}"),
         Value::String(s) => println!("{}", s.to_string_lossy()),
-        Value::Table(t) => println!("<table@{:0x}>", t.to_pointer() as usize),
-        Value::Thread(t) => println!("<coroutine@{:0x}>", t.to_pointer() as usize),
-        Value::Function(f) => println!("<function@{:0x}>", f.to_pointer() as usize),
-        Value::UserData(u) => println!("<userdata@{:0x}>", u.to_pointer() as usize),
-        Value::LightUserData(l) => println!("<lightuserdata@{:0x}>", l.0 as usize),
-        Value::Error(e) => eprintln!("{}", *e),
-        _ => println!("<unknown>"),
+        Value::Table(t) => println!("<table@0x{:x}>", t.to_pointer() as usize),
+        Value::Thread(t) => println!("<coroutine@0x{:x}>", t.to_pointer() as usize),
+        Value::Function(f) => println!("<function@0x{:x}>", f.to_pointer() as usize),
+        Value::UserData(u) => println!("<userdata@0x{:x}>", u.to_pointer() as usize),
+        Value::LightUserData(l) => println!("<lightuserdata@0x{:x}>", l.0 as usize),
+        Value::Error(e) => repl_print_error(anyhow::Error::from(*e)).await,
+        _ => println!("<unknown@0x{}>", value.to_pointer() as usize),
     }
 }
 
