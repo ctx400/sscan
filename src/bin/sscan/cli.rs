@@ -23,5 +23,9 @@ pub enum Action {
         /// If specified, runs a userscript before launching the REPL.
         #[arg(short, long)]
         startup_script: Option<PathBuf>,
+
+        /// If set, silences the spash message on REPL startup.
+        #[arg(short, long)]
+        nospash: bool
     },
 }

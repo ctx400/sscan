@@ -27,12 +27,12 @@ async fn main() -> Result<()> {
             let exec_request: ExecChunk = load_script(script).await?.into();
             vm.ask(exec_request).await?;
         }
-        Interactive { startup_script } => {
+        Interactive { startup_script, nospash: nosplash } => {
             if let Some(startup_script) = startup_script {
                 let exec_request: ExecChunk = load_script(startup_script).await?.into();
                 vm.ask(exec_request).await?;
             }
-            repl::invoke_repl(&vm).await;
+            repl::invoke_repl(&vm, nosplash).await;
         }
     }
 

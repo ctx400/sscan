@@ -8,11 +8,14 @@ use std::{
 };
 
 /// Starts an interactive REPL. Never returns unless LuaVM exits.
-pub async fn invoke_repl(vm: &ActorRef<LuaVM>) {
-    // Stores the current input chunk
-    let mut buffer: String = String::with_capacity(2048);
+pub async fn invoke_repl(vm: &ActorRef<LuaVM>, nosplash: bool) {
+    // Print the splash message
+    if !nosplash {
+        repl_print_splash().await;
+    }
 
     // Start REPL loop.
+    let mut buffer: String = String::with_capacity(2048);
     loop {
         // Exit if the virtual machine dies.
         if !vm.is_alive() {
@@ -123,3 +126,18 @@ async fn repl_print_continuation() -> Result<()> {
     stdout().lock().flush()?;
     Ok(())
 }
+
+/// Prints the [`SPLASH_MESSAGE`]
+async fn repl_print_splash() {
+    println!("{SPLASH_MESSAGE}");
+}
+
+/// The splash message printed by [`repl_print_splash()`].
+const SPLASH_MESSAGE: &str = r#"
+@@@
+@@@ Interactive REPL for sscan
+@@@
+@@@ Enter any valid multiline lua, terminated by a semicolon (;)
+@@@ For help, use help:all();
+@@@
+"#;
