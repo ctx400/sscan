@@ -1,4 +1,4 @@
-use std::io::{stdin, stdout, BufRead, Write};
+use std::{backtrace::BacktraceStatus::Captured, io::{stdin, stdout, BufRead, Write}};
 use anyhow::Result;
 use kameo::actor::ActorRef;
 use mlua::Value;
@@ -20,7 +20,7 @@ loop {
     repl_read(&mut buffer).await;
 
     // Evaluate the chunk in the virtual machine
-    match repl_evaluate(&vm, &buffer).await {
+    match repl_evaluate(vm, &buffer).await {
         Ok(value) => { repl_print(value).await; },
         Err(error) => { repl_print_error(error.context("failed to evaluate chunk")).await; }
     }
@@ -34,18 +34,15 @@ eprintln!("Error: {err}\n");
 
 // Create an iterator over all inner errors.
 // Skip the first error, as we've already printed it.
-let mut error_chain: std::iter::Skip<anyhow::Chain<'_>> = err.chain().skip(1);
+let error_chain: std::iter::Skip<anyhow::Chain<'_>> = err.chain().skip(1);
 
 // Print all chained errors
-while let Some(err) = error_chain.next() {
+for err in error_chain {
     eprintln!("Caused by: {err}\n");
 }
 
 // Print a backtrace, if available
-match err.backtrace().status() {
-    std::backtrace::BacktraceStatus::Captured => eprintln!("Backtrace:\n{}\n", err.backtrace()),
-    _ => {},
-}
+if err.backtrace().status() == Captured { eprintln!("Backtrace:\n{}\n", err.backtrace()) }
 }
 
 /// Try to pretty-print the result.
