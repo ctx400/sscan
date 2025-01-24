@@ -191,8 +191,7 @@ impl UserData for HelpSystem {
     fn add_methods<M: mlua::UserDataMethods<Self>>(methods: &mut M) {
         // Print generic help, or specific help if `topic` is specified.
         methods.add_meta_method("__call", |_, this: &HelpSystem, topic: Option<String>| {
-            match topic {
-                Some(topic) => {
+            if let Some(topic) = topic {
                     if let Some(topic) = this.topics.get(topic.trim()) {
                         let content: &str = topic.content();
                         println!("{content}");
@@ -203,12 +202,11 @@ impl UserData for HelpSystem {
                     } else {
                         Err(HelpError::topic_not_found(&topic).into_lua_err())
                     }
-                },
-                None => {
+                }
+                else {
                     println!(include_str!("help_system/topics/topic.generic.md"));
                     Ok(())
-                },
-            }
+                }
         });
 
         // List all available topics
