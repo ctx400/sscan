@@ -52,6 +52,7 @@ pub struct UserEngine {
 }
 
 impl UserEngine {
+    #[must_use]
     pub fn new() -> Self {
         Self {
             engines: HashMap::with_capacity(1024),
@@ -79,9 +80,9 @@ impl UserData for UserEngine {
             let mut matching_engines: Vec<String> = Vec::with_capacity(1024);
 
             // Call all scan engines sequentially.
-            for (name, engine) in this.engines.iter() {
+            for (name, engine) in &this.engines {
                 let result: bool = engine.call(&bytestring)?;
-                if result == true {
+                if result {
                     matching_engines.push(name.clone());
                 }
             }
