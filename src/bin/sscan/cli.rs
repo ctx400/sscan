@@ -26,6 +26,6 @@ pub enum Action {
 
         /// If set, silences the spash message on REPL startup.
         #[arg(short, long)]
-        nospash: bool
+        nosplash: bool,
     },
 }
