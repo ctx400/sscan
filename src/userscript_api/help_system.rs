@@ -2,7 +2,7 @@
 //!
 //! The [`HelpSystem`] API stores a list of help topics, which userscripts
 //! and interactive users can print by looking up the topic name. It
-//! provides the Lua function `help:with 'topic'`, which prints detailed
+//! provides the Lua function `help 'topic'`, which prints detailed
 //! help information on a given topic.
 //!
 //! ## Userscript API
@@ -19,7 +19,7 @@
 //! Usage: help:topics()
 //!   Print a list of all help topics.
 //!
-//! Usage: help:with 'topic'
+//! Usage: help 'topic'
 //!   Print detailed help on a topic.
 //! ```
 
@@ -76,7 +76,7 @@ use std::collections::HashMap;
 /// userscripts can look up the help content using:
 ///
 /// ```lua
-/// help:with 'my_help_topic'
+/// help 'my_help_topic'
 /// ```
 pub trait HelpTopic
 where
@@ -140,7 +140,7 @@ where
 
 /// # The Userscript Help System API
 ///
-/// The Help System API exposes a function `help:with 'topic'` to the Lua
+/// The Help System API exposes a function `help 'topic'` to the Lua
 /// userscript environment, which can print help on various topics to
 /// stdout. It is meant for interactive use, but can also be called from
 /// userscripts.
@@ -189,10 +189,23 @@ impl Default for HelpSystem {
 
 impl UserData for HelpSystem {
     fn add_methods<M: mlua::UserDataMethods<Self>>(methods: &mut M) {
-        // Print generic help
-        methods.add_method("all", |_, _this: &HelpSystem, ()| {
-            println!(include_str!("help_system/topics/topic.generic.md"));
-            Ok(())
+        // Print generic help, or specific help if `topic` is specified.
+        methods.add_meta_method("__call", |_, this: &HelpSystem, topic: Option<String>| {
+            if let Some(topic) = topic {
+                if let Some(topic) = this.topics.get(topic.trim()) {
+                    let content: &str = topic.content();
+                    println!("{content}");
+                    if !content.ends_with('\n') {
+                        println!();
+                    }
+                    Ok(())
+                } else {
+                    Err(HelpError::topic_not_found(&topic).into_lua_err())
+                }
+            } else {
+                println!(include_str!("help_system/topics/topic.generic.md"));
+                Ok(())
+            }
         });
 
         // List all available topics
@@ -205,21 +218,6 @@ impl UserData for HelpSystem {
             }
             println!("\nTo get help on a particular topic, use help:with 'topic'\n");
             Ok(())
-        });
-
-        // Lookup and print a topic.
-        methods.add_method("with", |_, this: &HelpSystem, name: String| {
-            if let Some(topic) = this.topics.get(name.trim()) {
-                let content: &str = topic.content();
-
-                println!("{content}");
-                if !content.ends_with('\n') {
-                    println!();
-                }
-                Ok(())
-            } else {
-                Err(HelpError::topic_not_found(&name).into_lua_err())
-            }
         });
     }
 }

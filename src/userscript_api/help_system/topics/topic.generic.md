@@ -4,11 +4,16 @@
 
 | Command           | Description                               |
 | ----------------- | ----------------------------------------- |
-| help:all()        | View this general help message.           |
+| help()            | View this general help message.           |
 | help:topics()     | List all available help topics.           |
-| help:with 'topic' | View detailed help on a particular topic. |
+| help 'topic'      | View detailed help on 'topic'.            |
 
-More Help:
+## Interactive Mode ##
+
+In interactive mode, sscan provides a REPL which accepts multiline Lua
+input terminated by a semicolon.
+
+## More Help ##
 
 - To get detailed help on a topic, use `help 'topic'`
 - To list all topics, use `help:topics()`
