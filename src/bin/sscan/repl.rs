@@ -138,6 +138,6 @@ const SPLASH_MESSAGE: &str = r#"
 @@@ Interactive REPL for sscan
 @@@
 @@@ Enter any valid multiline lua, terminated by a semicolon (;)
-@@@ For help, use help:all();
+@@@ For help, use help();
 @@@
 "#;

@@ -13,7 +13,7 @@ use sscan::{
         messages::{ExecChunk, RegisterUserApi},
         LuaVM,
     },
-    userscript_api::help_system::HelpSystem,
+    userscript_api::{help_system::HelpSystem, user_engine::{UserEngine, UserEngineHelp}},
 };
 use std::path::Path;
 
@@ -48,9 +48,16 @@ async fn main() -> Result<()> {
 async fn init_luavm() -> Result<ActorRef<LuaVM>> {
     let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
 
-    // Register the HelpSystem API
-    let help_api: HelpSystem = HelpSystem::new();
+    // Load APIs
+    let mut help_api: HelpSystem = Default::default();
+    let user_engine_api: UserEngine = Default::default();
+
+    // Load Help Topics
+    help_api.topic(Box::new(UserEngineHelp))?;
+
+    // Register APIs
     vm.ask(RegisterUserApi::with(help_api)).await?;
+    vm.ask(RegisterUserApi::with(user_engine_api)).await?;
 
     Ok(vm)
 }
