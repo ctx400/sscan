@@ -27,6 +27,11 @@ kameo = "0.13"
 # Scan engines
 yara-x = "0.12.0"
 
+# Command-line Interfaces
+[dependencies.clap]
+version = "4.5.27"
+features = ["derive"]
+
 # Async Runtimes
 [dependencies.tokio]
 version = "1"
