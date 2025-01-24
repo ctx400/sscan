@@ -80,7 +80,7 @@ use std::collections::HashMap;
 /// ```
 pub trait HelpTopic
 where
-    Self: Send + 'static,
+    Self: Send + Sync + 'static,
 {
     /// # The unique name of the help topic.
     ///
