@@ -15,7 +15,7 @@ use sscan::{
     },
     userscript_api::{
         help_system::HelpSystem,
-        user_engine::{UserEngine, Help},
+        user_engine::{Help, UserEngine},
     },
 };
 use std::path::Path;
