@@ -35,14 +35,9 @@ features = ["derive"]
 # Async Runtimes
 [dependencies.tokio]
 version = "1"
-features = ["full"]
+features = ["rt-multi-thread"]
 
 # Lua scripting support
 [dependencies.mlua]
 version = "0.10.2"
-features = ["lua54", "vendored", "serialize", "anyhow", "send", "error-send", "async"]
-
-# Serialization support
-[dependencies.serde]
-version = "1.0"
-features = ["derive"]
+features = ["lua54", "vendored", "anyhow", "send", "error-send", "async"]
