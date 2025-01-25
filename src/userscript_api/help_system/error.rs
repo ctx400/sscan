@@ -1,15 +1,15 @@
 //! # Error Type Definitions for the [`HelpSystem`].
 //!
-//! This module defines the comprehensive [`HelpError`] type for the
+//! This module defines the comprehensive [`Error`] type for the
 //! Help System API.
 //!
 //! [`HelpSystem`]: super::HelpSystem
 
-use thiserror::Error;
+use thiserror::Error as ThisError;
 
 /// Comprehensive error type for the help system.
-#[derive(Error, Debug)]
-pub enum HelpError {
+#[derive(ThisError, Debug)]
+pub enum Error {
     /// The user tried to use a reserved topic name, such as `topics`.
     #[error("cannot add help topic: use of reserved topic name `{0}`")]
     ReservedTopicName(String),
@@ -19,7 +19,7 @@ pub enum HelpError {
     TopicNotFound(String),
 }
 
-impl HelpError {
+impl Error {
     /// Create a new [`HelpError::ReservedTopicName`]
     #[must_use]
     pub fn reserved_topic_name(name: &str) -> Self {

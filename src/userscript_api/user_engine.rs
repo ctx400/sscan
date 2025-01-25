@@ -103,9 +103,9 @@ impl ApiObject for UserEngine {
 }
 
 /// A [`HelpTopic`] about the [`UserEngine`].
-pub struct UserEngineHelp;
+pub struct Help;
 
-impl HelpTopic for UserEngineHelp {
+impl HelpTopic for Help {
     fn name(&self) -> &'static str {
         "user_engines"
     }

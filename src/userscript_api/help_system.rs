@@ -26,7 +26,7 @@
 pub mod error;
 
 use super::ApiObject;
-use error::HelpError;
+use error::Error;
 use mlua::{ExternalError, UserData};
 use std::collections::HashMap;
 
@@ -168,11 +168,11 @@ impl HelpSystem {
     /// If the help topic's name is a reserved name
     /// (currently, `topics`), then this function will return an error
     /// of type [`HelpError::ReservedTopicName`].
-    pub fn topic(&mut self, topic: Box<dyn HelpTopic>) -> Result<&mut Self, HelpError> {
+    pub fn topic(&mut self, topic: Box<dyn HelpTopic>) -> Result<&mut Self, Error> {
         // Validate a reserved topic name is not being used.
         let topic_name: &str = topic.name().trim();
         if topic_name == "topics" {
-            return Err(HelpError::reserved_topic_name(topic_name));
+            return Err(Error::reserved_topic_name(topic_name));
         }
 
         // Add the help topic.
@@ -200,7 +200,7 @@ impl UserData for HelpSystem {
                     }
                     Ok(())
                 } else {
-                    Err(HelpError::topic_not_found(&topic).into_lua_err())
+                    Err(Error::topic_not_found(&topic).into_lua_err())
                 }
             } else {
                 println!(include_str!("help_system/topics/topic.generic.md"));
