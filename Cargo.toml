@@ -35,7 +35,7 @@ features = ["derive"]
 # Async Runtimes
 [dependencies.tokio]
 version = "1"
-features = ["full"]
+features = ["rt-multi-thread"]
 
 # Lua scripting support
 [dependencies.mlua]
