@@ -52,6 +52,7 @@ pub struct UserEngine {
 }
 
 impl UserEngine {
+    /// Creates a new Userscript Scan Engine API with no engines loaded.
     #[must_use]
     pub fn new() -> Self {
         Self {
