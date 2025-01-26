@@ -36,5 +36,6 @@
 /// [`LuaVM`]: crate::actors::lua_vm::LuaVM
 pub mod actors {
     pub mod lua_vm;
+    pub mod queue;
 }
 pub mod userscript_api;
