@@ -12,22 +12,29 @@
 //! The embedded Lua virtual machine is made possible by the
 //! [mlua](https://crates.io/crates/mlua) crate.
 //!
-//! ## Usage
-//!
-//! There are two binaries included with sscan: `sscan` and `sscani`.
-//! The main binary is `sscan`, the command-line file/process/network
-//! scanner tool.
-//!
-//! The `sscani` binary is a *very* primitive interactive Lua REPL
-//! primarily intended for light testing or debugging. It can accept
-//! multiline Lua snippets terminated by semicolons, which evaluate in
-//! the same context as userscripts do in `sscan`.
-//!
 
 // Enable pedantic linting
-#![warn(clippy::pedantic)]
+#![deny(clippy::pedantic)]
 
-// Modules
-pub mod lua_vm;
-pub mod system;
-pub mod yara_engine;
+/// # The distributed actors that make up sscan.
+///
+/// sscan makes use of an actor framework, [`kameo`], to allow many
+/// of its components to run concurrently on their own threads, all the
+/// while reducing complexity since each actor has ownership of its own
+/// mutable state (no locks!)
+///
+/// The most fundamental actor is [`LuaVM`], which is the bread and
+/// butter of sscan. It provides a Lua 5.4 virtual machine and
+/// userscript environment, complete with APIs to customize, configure,
+/// and control sscan's scan engines and services. Userscripts can also
+/// define their own custom scan engines, extending sscan's baked-in
+/// capabilities.
+///
+/// See each of the modules below to learn more about the actors that
+/// power sscan.
+///
+/// [`LuaVM`]: crate::actors::lua_vm::LuaVM
+pub mod actors {
+    pub mod lua_vm;
+}
+pub mod userscript_api;
