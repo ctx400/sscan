@@ -17,6 +17,11 @@ use super::{
 use kameo::message::{Context, Message};
 use std::path::PathBuf;
 
+/// # Push a [`DataItem`] into the scan queue.
+///
+/// A request for [`Queue`] to add a [`DataItem`] to the back of the
+/// scan queue. Once enqueued, a data item can be later dequeued and
+/// passed to any number of scan engines.
 pub struct Enqueue(Box<dyn DataItem>);
 
 impl Message<Enqueue> for Queue {
@@ -27,6 +32,19 @@ impl Message<Enqueue> for Queue {
     }
 }
 
+impl From<Box<dyn DataItem>> for Enqueue {
+    fn from(value: Box<dyn DataItem>) -> Self {
+        Self(value)
+    }
+}
+
+/// # Pop and realize a [`DataItem`] from the scan queue.
+///
+/// A request for [`Queue`] to pull a [`DataItem`] from the front of the
+/// scan queue. Once pulled, the data item is [`realized`] before
+/// returning to the sender.
+///
+/// [`realized`]: super::data_item::DataItem::realize()
 pub struct Dequeue;
 
 impl Message<Dequeue> for Queue {
