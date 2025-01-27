@@ -32,12 +32,14 @@ impl Actor for Queue {
 }
 
 impl Queue {
+    #[must_use]
     pub fn new() -> Self {
         Self {
             items: VecDeque::new(),
         }
     }
 
+    #[must_use]
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
             items: VecDeque::with_capacity(capacity),

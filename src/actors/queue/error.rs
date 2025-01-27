@@ -20,6 +20,7 @@ pub enum Error {
 }
 
 impl Error {
+    #[must_use]
     pub fn empty() -> Self {
         Self::QueueEmpty
     }

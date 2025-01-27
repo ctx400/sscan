@@ -21,9 +21,25 @@ pub trait DataItem where Self: Send {
     fn name(&self) -> String;
 
     /// The file path, if any, of the data item.
+    ///
+    /// This field is only relevant if the data item originated from a
+    /// file. It is used both for logging and special, memory-efficient
+    /// loading of files.
     fn path(&self) -> Option<PathBuf>;
 
-    /// Consumes the DataItem, returning its content.
+    /// Consumes the [`DataItem`], returning its content.
+    ///
+    /// This method consumes a [`Box<dyn DataItem>`], returning its
+    /// inner `name`, `path`, and `content` attributes. If the data item
+    /// is a lazy type, then calling this function initiates any
+    /// deferred processing steps.
+    ///
+    /// ## Errors
+    ///
+    /// Because data items support lazy processing, it is possible to
+    /// successfully create a lazy data item, only for processing to
+    /// fail after a call to [`DataItem::realize()`]. For this reason,
+    /// realize returns a [`QueueResult`].
     fn realize(self: Box<Self>) -> QueueResult<(String, Option<PathBuf>, Vec<u8>)>;
 }
 
