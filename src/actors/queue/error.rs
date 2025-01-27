@@ -12,9 +12,8 @@ pub type QueueResult<T> = Result<T, Error>;
 #[derive(ThisError, Debug)]
 pub enum Error {
     #[error("an IO error occurred: {source}")]
-    IOError {
-        source: std::io::Error,
-    },
+    IOError { source: std::io::Error },
+
     #[error("the item queue is empty")]
     QueueEmpty,
 }

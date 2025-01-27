@@ -9,9 +9,13 @@
 //! queue and to queue/dequeue data items.
 //!
 
-use std::path::PathBuf;
+use super::{
+    data_item::DataItem,
+    error::{Error, QueueResult},
+    Queue,
+};
 use kameo::message::{Context, Message};
-use super::{data_item::DataItem, error::{Error, QueueResult}, Queue};
+use std::path::PathBuf;
 
 pub struct Enqueue(Box<dyn DataItem>);
 

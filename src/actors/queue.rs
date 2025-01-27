@@ -15,13 +15,13 @@
 //! with usage and code examples.
 //!
 
-pub mod error;
 pub mod data_item;
+pub mod error;
 pub mod messages;
 
-use std::collections::VecDeque;
 use data_item::DataItem;
 use kameo::{mailbox::unbounded::UnboundedMailbox, Actor};
+use std::collections::VecDeque;
 
 pub struct Queue {
     items: VecDeque<Box<dyn DataItem>>,

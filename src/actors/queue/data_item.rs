@@ -6,8 +6,8 @@
 //!
 //! [`Queue`]: super::Queue
 
-use std::path::PathBuf;
 use super::error::QueueResult;
+use std::path::PathBuf;
 
 /// An item that can be enqueued in the [`Queue`].
 ///
@@ -16,7 +16,10 @@ use super::error::QueueResult;
 /// have been provided for convienience.
 ///
 /// [`Queue`]: super::Queue
-pub trait DataItem where Self: Send {
+pub trait DataItem
+where
+    Self: Send,
+{
     /// The human-friendly name of the data item.
     fn name(&self) -> String;
 
@@ -58,14 +61,17 @@ pub struct RawDatum {
 
 impl RawDatum {
     /// Create a new, boxed [`RawDatum`].
-    pub fn new<S,D>(name: &S, content: D) -> Box<Self>
+    pub fn new<S, D>(name: &S, content: D) -> Box<Self>
     where
         S: ToString,
         D: Into<Vec<u8>>,
     {
         let name: String = name.to_string();
         let content: Vec<u8> = content.into();
-        Box::new(Self { dname: name, content })
+        Box::new(Self {
+            dname: name,
+            content,
+        })
     }
 }
 
