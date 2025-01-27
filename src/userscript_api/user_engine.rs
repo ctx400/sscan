@@ -11,6 +11,9 @@
 //!
 //! ### API Usage Examples
 //!
+//! **For full API documentation, launch sscan in interactive mode and
+//!   enter `help 'user_engines'`.**
+//!
 //! Register a simple scan engine that always returns true.
 //!
 //! ```lua

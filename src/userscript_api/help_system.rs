@@ -13,7 +13,7 @@
 //! ### API Usage Examples
 //!
 //! ```text
-//! Usage: help:all()
+//! Usage: help()
 //!   Print generic help information.
 //!
 //! Usage: help:topics()
