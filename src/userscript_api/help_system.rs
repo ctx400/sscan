@@ -161,13 +161,13 @@ impl HelpSystem {
         }
     }
 
-    /// Registers a new [`HelpTopic`] to the Help System.
+    /// Registers a new [`HelpTopic`] with the Help System.
     ///
     /// ## Errors
     ///
     /// If the help topic's name is a reserved name
     /// (currently, `topics`), then this function will return an error
-    /// of type [`HelpError::ReservedTopicName`].
+    /// of type [`Error::ReservedTopicName`].
     pub fn topic(&mut self, topic: Box<dyn HelpTopic>) -> Result<&mut Self, Error> {
         // Validate a reserved topic name is not being used.
         let topic_name: &str = topic.name().trim();
