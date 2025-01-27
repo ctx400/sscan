@@ -56,6 +56,7 @@ impl Message<Enqueue> for Queue {
 
 impl Enqueue {
     /// Create a new enqueue request from a [`DataItem`].
+    #[must_use]
     pub fn item(item: Box<dyn DataItem>) -> Self {
         Self(item)
     }

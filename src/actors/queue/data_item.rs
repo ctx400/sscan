@@ -102,9 +102,8 @@ pub struct RawDatum {
 
 impl RawDatum {
     /// Create a new, boxed [`RawDatum`].
-    pub fn new<S, D>(name: S, content: D) -> Box<Self>
+    pub fn new<D>(name: &str, content: D) -> Box<Self>
     where
-        S: ToString,
         D: Into<Vec<u8>>,
     {
         let name: String = name.to_string();
