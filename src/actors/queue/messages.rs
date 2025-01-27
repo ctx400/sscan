@@ -22,6 +22,28 @@ use std::path::PathBuf;
 /// A request for [`Queue`] to add a [`DataItem`] to the back of the
 /// scan queue. Once enqueued, a data item can be later dequeued and
 /// passed to any number of scan engines.
+///
+/// ## Reply
+///
+/// Expect no reply from the scan queue.
+///
+/// ## Example
+///
+/// ```
+/// # use sscan::actors::queue::{Queue, messages::Enqueue, data_item::RawDatum};
+/// # use kameo::actor::ActorRef;
+/// # #[tokio::main]
+/// # async fn main() {
+/// // Create a new scan queue.
+/// let queue: ActorRef<Queue> = kameo::spawn(Queue::default());
+///
+/// // Create a new data item for scanning
+/// let data: Box<RawDatum> = RawDatum::new("hello_world", "blablabla-Hello World-blablabla");
+///
+/// // Enqueue the data item
+/// queue.ask(Enqueue::item(data)).await.unwrap();
+/// # }
+/// ```
 pub struct Enqueue(Box<dyn DataItem>);
 
 impl Message<Enqueue> for Queue {
@@ -32,9 +54,10 @@ impl Message<Enqueue> for Queue {
     }
 }
 
-impl From<Box<dyn DataItem>> for Enqueue {
-    fn from(value: Box<dyn DataItem>) -> Self {
-        Self(value)
+impl Enqueue {
+    /// Create a new enqueue request from a [`DataItem`].
+    pub fn item(item: Box<dyn DataItem>) -> Self {
+        Self(item)
     }
 }
 
@@ -44,6 +67,33 @@ impl From<Box<dyn DataItem>> for Enqueue {
 /// scan queue. Once pulled, the data item is [`realized`] before
 /// returning to the sender.
 ///
+/// ## Reply
+///
+/// Expect a reply of type [`QueueResult`].
+///
+/// ## Example
+///
+/// ```
+/// # use sscan::actors::queue::{Queue, messages::{Enqueue, Dequeue}, data_item::RawDatum};
+/// # use kameo::actor::ActorRef;
+/// # #[tokio::main]
+/// # async fn main() {
+/// // Create a new scan queue.
+/// let queue: ActorRef<Queue> = kameo::spawn(Queue::default());
+///
+/// // Create a new data item for scanning
+/// let data: Box<RawDatum> = RawDatum::new("hello_world", "blablabla-Hello World-blablabla");
+///
+/// // Enqueue the data item
+/// queue.ask(Enqueue::item(data)).await.unwrap();
+///
+/// // Now, dequeue the data item.
+/// let (name, path, content) = queue.ask(Dequeue).await.unwrap();
+/// assert_eq!(name, "hello_world");
+/// assert_eq!(path, None);
+/// assert_eq!(content, b"blablabla-Hello World-blablabla".to_vec());
+/// # }
+/// ```
 /// [`realized`]: super::data_item::DataItem::realize()
 pub struct Dequeue;
 

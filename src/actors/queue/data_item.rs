@@ -61,7 +61,7 @@ pub struct RawDatum {
 
 impl RawDatum {
     /// Create a new, boxed [`RawDatum`].
-    pub fn new<S, D>(name: &S, content: D) -> Box<Self>
+    pub fn new<S, D>(name: S, content: D) -> Box<Self>
     where
         S: ToString,
         D: Into<Vec<u8>>,
@@ -138,7 +138,7 @@ impl DataItem for File {
 
     fn realize(self: Box<Self>) -> QueueResult<(String, Option<PathBuf>, Vec<u8>)> {
         let name: String = self.name();
-        let path: PathBuf = self.path;
+        let path: PathBuf = self.path.canonicalize()?;
         let contents: Vec<u8> = std::fs::read(&path)?;
         Ok((name, Some(path), contents))
     }
