@@ -10,23 +10,38 @@ use std::path::PathBuf;
 use super::error::QueueResult;
 
 /// An item that can be enqueued in the [`Queue`].
+///
+/// Any type that implements [`DataItem`] can be enqueued in the
+/// [`Queue`]. Two default implementations, [`RawDatum`] and [`File`],
+/// have been provided for convienience.
+///
+/// [`Queue`]: super::Queue
 pub trait DataItem where Self: Send {
-    /// The name of the data item.
+    /// The human-friendly name of the data item.
     fn name(&self) -> String;
 
     /// The file path, if any, of the data item.
     fn path(&self) -> Option<PathBuf>;
 
     /// Consumes the DataItem, returning its content.
-    fn realize(&self) -> QueueResult<(String, Option<PathBuf>, Vec<u8>)>;
+    fn realize(self: Box<Self>) -> QueueResult<(String, Option<PathBuf>, Vec<u8>)>;
 }
 
+/// # Raw, user-supplied data item.
+///
+/// Use this type when there is data to be enqueued that does not
+/// originate from a file. For file data, it is better to use the
+/// dedicated [`File`] type.
 pub struct RawDatum {
-    name: String,
+    /// Human-friendly name of the data item.
+    dname: String,
+
+    /// The raw bytes comprising the data item.
     content: Vec<u8>,
 }
 
 impl RawDatum {
+    /// Create a new, boxed [`RawDatum`].
     pub fn new<S,D>(name: &S, content: D) -> Box<Self>
     where
         S: ToString,
@@ -34,29 +49,49 @@ impl RawDatum {
     {
         let name: String = name.to_string();
         let content: Vec<u8> = content.into();
-        Box::new(Self { name, content })
+        Box::new(Self { dname: name, content })
     }
 }
 
 impl DataItem for RawDatum {
     fn name(&self) -> String {
-        self.name.clone()
+        self.dname.clone()
     }
 
     fn path(&self) -> Option<PathBuf> {
         None
     }
 
-    fn realize(&self) -> QueueResult<(String, Option<PathBuf>, Vec<u8>)> {
-        Ok((self.name.clone(), None, self.content.clone()))
+    fn realize(self: Box<Self>) -> QueueResult<(String, Option<PathBuf>, Vec<u8>)> {
+        Ok((self.dname, None, self.content))
     }
 }
 
+/// # File Data Item
+///
+/// Use this type when there is data to be enqueued that originates from
+/// a file. This type is designed to save on memory usage; see section
+/// `Behavior` below.
+///
+/// ## Behavior
+///
+/// This type is lazy: on creation it stores just the path to
+/// the file, and only once [`DataItem::realize()`] is called does it
+/// actually load the file from disk.
+///
+/// If you need to eagerly load file contents into memory, consider
+/// implementing trait [`DataItem`] on a custom file-based data item,
+/// and then enqueueing that custom item instead.
 pub struct File {
+    /// Reference path to the file to be loaded.
     path: PathBuf,
 }
 
 impl File {
+    /// Create a new, boxed [`File`] data item.
+    ///
+    /// This does not immediately load the file from disk. See section
+    /// `Behavior` at the top of this page to learn more.
     pub fn new<P>(path: P) -> Box<Self>
     where
         P: Into<PathBuf>,
@@ -79,9 +114,9 @@ impl DataItem for File {
         Some(self.path.clone())
     }
 
-    fn realize(&self) -> QueueResult<(String, Option<PathBuf>, Vec<u8>)> {
+    fn realize(self: Box<Self>) -> QueueResult<(String, Option<PathBuf>, Vec<u8>)> {
         let name: String = self.name();
-        let path: PathBuf = self.path.clone();
+        let path: PathBuf = self.path;
         let contents: Vec<u8> = std::fs::read(&path)?;
         Ok((name, Some(path), contents))
     }
