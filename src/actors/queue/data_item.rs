@@ -15,6 +15,47 @@ use std::path::PathBuf;
 /// [`Queue`]. Two default implementations, [`RawDatum`] and [`File`],
 /// have been provided for convienience.
 ///
+/// ## Example
+///
+/// ```
+/// # use sscan::actors::queue::{Queue, data_item::DataItem, error::QueueResult, messages::{Enqueue, Dequeue}};
+/// # use std::path::PathBuf;
+/// # #[tokio::main]
+/// # async fn main() {
+/// // let's define a new dummy data item type.
+/// pub struct MyDummyDataItem;
+///
+/// // Implement the DataItem trait so we can add it to the scan queue.
+/// impl DataItem for MyDummyDataItem {
+///     // The human-friendly name for our data item
+///     fn name(&self) -> String {
+///         "my_dummy_data".to_string()
+///     }
+///
+///     // Our data item isn't a file, so no path is required.
+///     fn path(&self) -> Option<PathBuf> {
+///         None
+///     }
+///
+///     // The dummy data item always has the same content
+///     fn realize(self: Box<Self>) -> QueueResult<(String, Option<PathBuf>, Vec<u8>)> {
+///         Ok((self.name(), self.path(), b"some dummy content".to_vec()))
+///     }
+/// }
+///
+/// // Now, let's create a queue and enqueue our data item.
+/// let queue = kameo::spawn(Queue::default());
+/// let my_dummy_data = Box::new(MyDummyDataItem);
+/// queue.ask(Enqueue::item(my_dummy_data)).await.unwrap();
+///
+/// // Let's dequeue the item we just enqueued and validate it.
+/// let (name, path, content) = queue.ask(Dequeue).await.unwrap();
+/// assert_eq!(name, "my_dummy_data");
+/// assert_eq!(path, None);
+/// assert_eq!(content, b"some dummy content".to_vec());
+/// # }
+/// ```
+///
 /// [`Queue`]: super::Queue
 pub trait DataItem
 where
