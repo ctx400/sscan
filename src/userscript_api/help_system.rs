@@ -24,6 +24,14 @@
 //! ```
 
 pub mod error;
+pub mod topics {
+    //! Help topic definitions for the Userscript API.
+    //!
+    //! Each of the following help topics can be accessed within the
+    //! userscript environment using `help 'topic_name'`
+
+    pub mod user_engines;
+}
 
 use super::ApiObject;
 use error::Error;
@@ -203,7 +211,7 @@ impl UserData for HelpSystem {
                     Err(Error::topic_not_found(&topic).into_lua_err())
                 }
             } else {
-                println!(include_str!("help_system/topics/topic.generic.md"));
+                println!(include_str!("help_system/topics/topic.generic.txt"));
                 Ok(())
             }
         });

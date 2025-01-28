@@ -38,7 +38,7 @@
 //! user_engines:register("match_helloworld", engine_match_helloworld)
 //! ```
 
-use super::{help_system::HelpTopic, ApiObject};
+use super::ApiObject;
 use mlua::{Function, UserData};
 use std::collections::HashMap;
 
@@ -102,22 +102,5 @@ impl UserData for UserEngine {
 impl ApiObject for UserEngine {
     fn name(&self) -> &'static str {
         "user_engines"
-    }
-}
-
-/// A [`HelpTopic`] about the [`UserEngine`].
-pub struct Help;
-
-impl HelpTopic for Help {
-    fn name(&self) -> &'static str {
-        "user_engines"
-    }
-
-    fn short_description(&self) -> &'static str {
-        "Register custom scan engines from userscripts."
-    }
-
-    fn content(&self) -> &'static str {
-        include_str!("help_system/topics/topic.user_engine.md")
     }
 }

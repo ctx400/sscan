@@ -2,7 +2,7 @@
 //!
 //! This module defines the [`DataItem`] trait, which is any type the
 //! [`Queue`] can accept, as well as a few impls of data items, such as
-//! the [`RawDatum`] and [`File`] types.
+//! the [`RawDatum`] and [`FileDatum`] types.
 //!
 //! [`Queue`]: super::Queue
 
@@ -12,7 +12,7 @@ use std::path::PathBuf;
 /// An item that can be enqueued in the [`Queue`].
 ///
 /// Any type that implements [`DataItem`] can be enqueued in the
-/// [`Queue`]. Two default implementations, [`RawDatum`] and [`File`],
+/// [`Queue`]. Two default implementations, [`RawDatum`] and [`FileDatum`],
 /// have been provided for convienience.
 ///
 /// ## Example
@@ -91,7 +91,7 @@ where
 ///
 /// Use this type when there is data to be enqueued that does not
 /// originate from a file. For file data, it is better to use the
-/// dedicated [`File`] type.
+/// dedicated [`FileDatum`] type.
 pub struct RawDatum {
     /// Human-friendly name of the data item.
     dname: String,
@@ -150,7 +150,7 @@ pub struct FileDatum {
 }
 
 impl FileDatum {
-    /// Create a new, boxed [`File`] data item.
+    /// Create a new, boxed [`FileDatum`] data item.
     ///
     /// This does not immediately load the file from disk. See section
     /// `Behavior` at the top of this page to learn more.
