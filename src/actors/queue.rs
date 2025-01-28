@@ -19,12 +19,17 @@ pub mod data_item;
 pub mod error;
 pub mod messages;
 
-use data_item::DataItem;
-use kameo::{actor::{ActorRef, WeakActorRef}, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
-use std::collections::VecDeque;
-use crate::userscript_api::queue::QueueApi;
 use super::lua_vm::{messages::RegisterUserApi, LuaVM};
+use crate::userscript_api::queue::QueueApi;
+use data_item::DataItem;
 use error::Error as QueueError;
+use kameo::{
+    actor::{ActorRef, WeakActorRef},
+    error::BoxError,
+    mailbox::unbounded::UnboundedMailbox,
+    Actor,
+};
+use std::collections::VecDeque;
 
 /// # The Global Scan Queue
 ///

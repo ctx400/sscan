@@ -9,10 +9,13 @@ use cli::{
 };
 use kameo::actor::ActorRef;
 use sscan::{
-    actors::{lua_vm::{
-        messages::{ExecChunk, RegisterUserApi},
-        LuaVM,
-    }, queue::Queue},
+    actors::{
+        lua_vm::{
+            messages::{ExecChunk, RegisterUserApi},
+            LuaVM,
+        },
+        queue::Queue,
+    },
     userscript_api::{
         help_system::HelpSystem,
         user_engine::{Help as UserEngineHelp, UserEngine},

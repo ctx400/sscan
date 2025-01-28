@@ -28,11 +28,18 @@
 //!
 //! [global scan queue]: crate::actors::queue::Queue
 
-use std::path::PathBuf;
+use crate::{
+    actors::queue::{
+        data_item::{FileDatum, RawDatum},
+        error::Error as QueueError,
+        messages::{Dequeue, Enqueue},
+        Queue,
+    },
+    userscript_api::ApiObject,
+};
 use kameo::actor::WeakActorRef;
 use mlua::{ExternalError, Lua, UserData, UserDataRef};
-use crate::actors::queue::{data_item::{FileDatum, RawDatum}, error::Error as QueueError, messages::{Dequeue, Enqueue}, Queue};
-use super::ApiObject;
+use std::path::PathBuf;
 
 pub struct QueueApi(WeakActorRef<Queue>);
 
@@ -58,7 +65,11 @@ impl ApiObject for QueueApi {
 }
 
 /// Userscript function `queue:add_raw(name, data)`
-async fn queue_add_raw(_: Lua, this: UserDataRef<QueueApi>, (name, content): (String, String)) -> mlua::Result<()> {
+async fn queue_add_raw(
+    _: Lua,
+    this: UserDataRef<QueueApi>,
+    (name, content): (String, String),
+) -> mlua::Result<()> {
     if let Some(queue) = this.0.upgrade() {
         let data_item: Box<RawDatum> = RawDatum::new(&name, content.as_bytes().to_vec());
         if queue.ask(Enqueue::item(data_item)).await.is_err() {
@@ -86,7 +97,11 @@ async fn queue_add_file(_: Lua, this: UserDataRef<QueueApi>, path: PathBuf) -> m
 }
 
 /// Userscript function `queue:dequeue()`
-async fn queue_dequeue(_: Lua, this: UserDataRef<QueueApi>, (): ()) -> mlua::Result<(String, Option<PathBuf>, Vec<u8>)> {
+async fn queue_dequeue(
+    _: Lua,
+    this: UserDataRef<QueueApi>,
+    (): (),
+) -> mlua::Result<(String, Option<PathBuf>, Vec<u8>)> {
     if let Some(queue) = this.0.upgrade() {
         match queue.ask(Dequeue).await {
             Ok(dqi) => Ok(dqi),
