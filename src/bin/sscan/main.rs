@@ -17,7 +17,7 @@ use sscan::{
         queue::Queue,
     },
     userscript_api::{
-        help_system::{HelpSystem, topics::user_engines::UserEngineHelp},
+        help_system::{topics::user_engines::UserEngineHelp, HelpSystem},
         user_engine::UserEngine,
     },
 };
