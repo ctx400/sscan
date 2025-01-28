@@ -37,6 +37,7 @@ use super::ApiObject;
 pub struct QueueApi(WeakActorRef<Queue>);
 
 impl QueueApi {
+    #[must_use]
     pub fn new(queue: WeakActorRef<Queue>) -> Self {
         Self(queue)
     }
@@ -60,7 +61,7 @@ impl ApiObject for QueueApi {
 async fn queue_add_raw(_: Lua, this: UserDataRef<QueueApi>, (name, content): (String, String)) -> mlua::Result<()> {
     if let Some(queue) = this.0.upgrade() {
         let data_item: Box<RawDatum> = RawDatum::new(&name, content.as_bytes().to_vec());
-        if let Err(_) = queue.ask(Enqueue::item(data_item)).await {
+        if queue.ask(Enqueue::item(data_item)).await.is_err() {
             Err(QueueError::SendError.into_lua_err())
         } else {
             Ok(())
@@ -74,7 +75,7 @@ async fn queue_add_raw(_: Lua, this: UserDataRef<QueueApi>, (name, content): (St
 async fn queue_add_file(_: Lua, this: UserDataRef<QueueApi>, path: PathBuf) -> mlua::Result<()> {
     if let Some(queue) = this.0.upgrade() {
         let data_item: Box<FileDatum> = FileDatum::new(path);
-        if let Err(_) = queue.ask(Enqueue::item(data_item)).await {
+        if queue.ask(Enqueue::item(data_item)).await.is_err() {
             Err(QueueError::SendError.into_lua_err())
         } else {
             Ok(())
@@ -85,7 +86,7 @@ async fn queue_add_file(_: Lua, this: UserDataRef<QueueApi>, path: PathBuf) -> m
 }
 
 /// Userscript function `queue:dequeue()`
-async fn queue_dequeue(_: Lua, this: UserDataRef<QueueApi>, _: ()) -> mlua::Result<(String, Option<PathBuf>, Vec<u8>)> {
+async fn queue_dequeue(_: Lua, this: UserDataRef<QueueApi>, (): ()) -> mlua::Result<(String, Option<PathBuf>, Vec<u8>)> {
     if let Some(queue) = this.0.upgrade() {
         match queue.ask(Dequeue).await {
             Ok(dqi) => Ok(dqi),

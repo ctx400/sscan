@@ -35,7 +35,7 @@ pub struct Queue {
     /// A double-ended queue storing items implementing [`DataItem`]
     items: VecDeque<Box<dyn DataItem>>,
 
-    /// WeakRef to the Lua virtual machine, for registering the API.
+    /// Weak ref to the Lua virtual machine, for registering the API.
     lua_vm: WeakActorRef<LuaVM>,
 }
 
