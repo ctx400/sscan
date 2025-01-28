@@ -110,7 +110,7 @@ impl Message<ExecChunk> for LuaVM {
     type Reply = LuaVmResult<()>;
 
     async fn handle(&mut self, msg: ExecChunk, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
-        self.vm.load(msg.0).exec()?;
+        self.vm.load(msg.0).exec_async().await?;
         Ok(())
     }
 }
@@ -156,7 +156,7 @@ impl Message<EvalChunk> for LuaVM {
     type Reply = LuaVmResult<mlua::Value>;
 
     async fn handle(&mut self, msg: EvalChunk, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
-        Ok(self.vm.load(msg.0).eval()?)
+        Ok(self.vm.load(msg.0).eval_async().await?)
     }
 }
 
