@@ -20,8 +20,11 @@ pub mod error;
 pub mod messages;
 
 use data_item::DataItem;
-use kameo::{mailbox::unbounded::UnboundedMailbox, Actor};
+use kameo::{actor::{ActorRef, WeakActorRef}, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
 use std::collections::VecDeque;
+use crate::userscript_api::queue::QueueApi;
+use super::lua_vm::{messages::RegisterUserApi, LuaVM};
+use error::Error as QueueError;
 
 /// # The Global Scan Queue
 ///
@@ -31,6 +34,9 @@ use std::collections::VecDeque;
 pub struct Queue {
     /// A double-ended queue storing items implementing [`DataItem`]
     items: VecDeque<Box<dyn DataItem>>,
+
+    /// WeakRef to the Lua virtual machine, for registering the API.
+    lua_vm: WeakActorRef<LuaVM>,
 }
 
 /// # [`Queue`] is an actor.
@@ -41,6 +47,17 @@ pub struct Queue {
 /// maintaining owned mutable state without locks.
 impl Actor for Queue {
     type Mailbox = UnboundedMailbox<Self>;
+
+    /// On startup, register the userscript API and help topics.
+    async fn on_start(&mut self, queue: ActorRef<Self>) -> Result<(), BoxError> {
+        if let Some(lua_vm) = self.lua_vm.upgrade() {
+            let queue_api: QueueApi = QueueApi::new(queue.downgrade());
+            lua_vm.ask(RegisterUserApi::with(queue_api)).await?;
+            Ok(())
+        } else {
+            Err(Box::new(QueueError::NoLuaVm))
+        }
+    }
 }
 
 impl Queue {
@@ -48,27 +65,22 @@ impl Queue {
     ///
     /// **Efficiency**: A queue of size zero will allocate very
     /// frequently when items are enqueued. It is recommended to use
-    /// [`Queue::with_capacity()`] or [`Queue::default()`] to choose a
+    /// [`Queue::with_capacity()`] to choose a
     /// reasonable starting capacity.
     #[must_use]
-    pub fn new() -> Self {
+    pub fn new(vm: WeakActorRef<LuaVM>) -> Self {
         Self {
             items: VecDeque::new(),
+            lua_vm: vm,
         }
     }
 
     /// Create a new [`Queue`] of capacity [`usize`] data items.
     #[must_use]
-    pub fn with_capacity(capacity: usize) -> Self {
+    pub fn with_capacity(vm: WeakActorRef<LuaVM>, capacity: usize) -> Self {
         Self {
             items: VecDeque::with_capacity(capacity),
+            lua_vm: vm,
         }
-    }
-}
-
-impl Default for Queue {
-    /// Create a new [`Queue`] of capacity `2048` data items.
-    fn default() -> Self {
-        Self::with_capacity(2048)
     }
 }

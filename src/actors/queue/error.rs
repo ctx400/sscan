@@ -32,6 +32,20 @@ pub enum Error {
     /// [`Queue`]: super::Queue
     #[error("the item queue is empty")]
     QueueEmpty,
+
+    /// Unable to send a message to the queue actor.
+    #[error("unable to communicate with the global queue")]
+    SendError,
+
+    /// The [`Queue`] actor is not currently running.
+    ///
+    /// [`Queue`]: super::Queue
+    #[error("there is no running global queue")]
+    NoGlobalQueue,
+
+    /// The Lua userscript environment is not running.
+    #[error("the Lua userscript environment does not appear to be running")]
+    NoLuaVm,
 }
 
 impl Error {

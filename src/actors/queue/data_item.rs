@@ -144,12 +144,12 @@ impl DataItem for RawDatum {
 /// If you need to eagerly load file contents into memory, consider
 /// implementing trait [`DataItem`] on a custom file-based data item,
 /// and then enqueueing that custom item instead.
-pub struct File {
+pub struct FileDatum {
     /// Reference path to the file to be loaded.
     path: PathBuf,
 }
 
-impl File {
+impl FileDatum {
     /// Create a new, boxed [`File`] data item.
     ///
     /// This does not immediately load the file from disk. See section
@@ -163,7 +163,7 @@ impl File {
     }
 }
 
-impl DataItem for File {
+impl DataItem for FileDatum {
     fn name(&self) -> String {
         if let Some(name) = self.path.file_name() {
             name.to_string_lossy().to_string()

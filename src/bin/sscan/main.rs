@@ -9,21 +9,25 @@ use cli::{
 };
 use kameo::actor::ActorRef;
 use sscan::{
-    actors::lua_vm::{
+    actors::{lua_vm::{
         messages::{ExecChunk, RegisterUserApi},
         LuaVM,
-    },
+    }, queue::Queue},
     userscript_api::{
         help_system::HelpSystem,
-        user_engine::{Help, UserEngine},
+        user_engine::{Help as UserEngineHelp, UserEngine},
     },
 };
 use std::path::Path;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Parse commandline arguments
     let _args: CliArgs = CliArgs::parse();
+
+    // Initialize LuaVM and auxillary services.
     let vm: ActorRef<LuaVM> = init_luavm().await?;
+    let queue: ActorRef<Queue> = kameo::spawn(Queue::with_capacity(vm.downgrade(), 2048));
 
     match _args.action {
         Run { script } => {
@@ -42,7 +46,12 @@ async fn main() -> Result<()> {
         }
     }
 
+    // Shut down all services
+    queue.stop_gracefully().await?;
     vm.stop_gracefully().await?;
+
+    // Wait for services to stop
+    queue.wait_for_stop().await;
     vm.wait_for_stop().await;
     Ok(())
 }
@@ -56,7 +65,7 @@ async fn init_luavm() -> Result<ActorRef<LuaVM>> {
     let user_engine_api: UserEngine = Default::default();
 
     // Load Help Topics
-    help_api.topic(Box::new(Help))?;
+    help_api.topic(Box::new(UserEngineHelp))?;
 
     // Register APIs
     vm.ask(RegisterUserApi::with(help_api)).await?;
