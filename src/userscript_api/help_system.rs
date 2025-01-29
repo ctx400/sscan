@@ -40,7 +40,7 @@
 ///
 /// 1. Adds a `pub mod modname;` declaration under mod `topics`,
 /// 2. Adds a doc attribute which includes the file
-///    `topic.<modname>.txt`, as well as some rustdoc helper markdown.
+///    `<modname>.txt`, as well as some rustdoc helper markdown.
 macro_rules! topics {
     (
         $(pub ApiTopic for $topic:ident;)+
@@ -70,7 +70,7 @@ macro_rules! topics {
                     stringify!($topic),
                     "'`.\n\n```txt\n",
                     include_str!(
-                        concat!("help_system/topics/topic.", stringify!($topic), ".txt")
+                        concat!("help_system/topics/", stringify!($topic), ".txt")
                 ))]
                 pub mod $topic;
             )+
@@ -264,7 +264,7 @@ impl UserData for HelpSystem {
                     Err(Error::topic_not_found(&topic).into_lua_err())
                 }
             } else {
-                println!(include_str!("help_system/topics/topic.generic.txt"));
+                println!(include_str!("help_system/topics/__generic.txt"));
                 Ok(())
             }
         });

@@ -15,6 +15,6 @@ impl HelpTopic for Topic {
     }
 
     fn content(&self) -> &'static str {
-        include_str!("topic.user_engines.txt")
+        include_str!("user_engines.txt")
     }
 }
