@@ -43,7 +43,7 @@
 ///    `<modname>.txt`, as well as some rustdoc helper markdown.
 macro_rules! topics {
     (
-        $(pub ApiTopic for $topic:ident;)+
+        $(use HelpTopic $topic:ident for $desc:literal;)+
     ) => {
         pub mod topics {
             //! # Userscript API Help Topics
@@ -64,15 +64,36 @@ macro_rules! topics {
 
             $(
                 #[doc = concat!(
-                    "# Userscript API help for `",
-                    stringify!($topic),
-                    "`\n\nTo access this help from Lua, call `help '",
+                    "# ",
+                    $desc,
+                    "\n\nTo access this help from Lua, call `help '",
                     stringify!($topic),
                     "'`.\n\n```txt\n",
                     include_str!(
                         concat!("help_system/topics/", stringify!($topic), ".txt")
                 ))]
-                pub mod $topic;
+                pub mod $topic {
+                    use crate::userscript_api::help_system::HelpTopic;
+
+                    #[doc = "Userscript API help topic definition."]
+                    pub struct Topic;
+
+                    impl HelpTopic for Topic {
+                        fn name(&self) -> &'static str {
+                            stringify!($topic)
+                        }
+
+                        fn short_description(&self) -> &'static str {
+                            $desc
+                        }
+
+                        fn content(&self) -> &'static str {
+                            include_str!(
+                                concat!("help_system/topics/", stringify!($topic), ".txt")
+                            )
+                        }
+                    }
+                }
             )+
         }
     };
@@ -87,8 +108,8 @@ use std::collections::HashMap;
 
 // List of Userscript API Topics
 topics! {
-    pub ApiTopic for queue;
-    pub ApiTopic for user_engines;
+    use HelpTopic queue for "Queue up files and other data for scanning.";
+    use HelpTopic user_engines for "Register custom scan engines from userscripts.";
 }
 
 /// # A help topic for userscript APIs.
