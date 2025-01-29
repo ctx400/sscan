@@ -1,20 +1,20 @@
 use crate::userscript_api::help_system::HelpTopic;
 
-/// Help topic definition for [`UserEngine`]
+/// Help topic definition for [`QueueApi`]
 ///
-/// [`UserEngine`]: crate::userscript_api::user_engine::UserEngine
+/// [`QueueApi`]: crate::userscript_api::queue::QueueApi
 pub struct Topic;
 
 impl HelpTopic for Topic {
     fn name(&self) -> &'static str {
-        "user_engines"
+        "queue"
     }
 
     fn short_description(&self) -> &'static str {
-        "Register custom scan engines from userscripts."
+        "Queue up files and other data for scanning."
     }
 
     fn content(&self) -> &'static str {
-        include_str!("topic.user_engines.txt")
+        include_str!("topic.queue.txt")
     }
 }

@@ -43,7 +43,7 @@
 ///    `topic.<modname>.txt`, as well as some rustdoc helper markdown.
 macro_rules! topics {
     (
-        $(pub ApiTopic for $topic:ident;),+
+        $(pub ApiTopic for $topic:ident;)+
     ) => {
         pub mod topics {
             //! # Userscript API Help Topics
@@ -73,7 +73,7 @@ macro_rules! topics {
                         concat!("help_system/topics/topic.", stringify!($topic), ".txt")
                 ))]
                 pub mod $topic;
-            ),+
+            )+
         }
     };
 }
@@ -85,7 +85,9 @@ use error::Error;
 use mlua::{ExternalError, UserData};
 use std::collections::HashMap;
 
+// List of Userscript API Topics
 topics! {
+    pub ApiTopic for queue;
     pub ApiTopic for user_engines;
 }
 

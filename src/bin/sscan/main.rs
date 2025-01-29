@@ -17,7 +17,7 @@ use sscan::{
         queue::Queue,
     },
     userscript_api::{
-        help_system::{topics::user_engines::UserEngineHelp, HelpSystem},
+        help_system::{topics::user_engines::Topic, HelpSystem},
         user_engine::UserEngine,
     },
 };
@@ -68,7 +68,7 @@ async fn init_luavm() -> Result<ActorRef<LuaVM>> {
     let user_engine_api: UserEngine = Default::default();
 
     // Load Help Topics
-    help_api.topic(Box::new(UserEngineHelp))?;
+    help_api.topic(Box::new(Topic))?;
 
     // Register APIs
     vm.ask(RegisterUserApi::with(help_api)).await?;
