@@ -39,4 +39,5 @@ pub mod actors {
     pub mod lua_vm;
     pub mod queue;
 }
+pub mod macros;
 pub mod userscript_api;
