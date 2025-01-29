@@ -41,9 +41,26 @@ use kameo::actor::WeakActorRef;
 use mlua::{ExternalError, Lua, UserData, UserDataRef};
 use std::path::PathBuf;
 
+/// # Global Scan Queue Userscript API
+///
+/// This [`ApiObject`] is exposed to the Lua userscript environment,
+/// allowing for scripts to queue and dequeue [`DataItem`] objects
+/// programmatically.
+///
+/// ## API Docs
+///
+/// To see detailed help for this API, launch sscan and call
+/// `help 'queue'`. Alternatively, the docs for this API are
+/// available [here](super::help_system::topics::queue).
+///
+/// [`DataItem`]: crate::actors::queue::data_item::DataItem
 pub struct QueueApi(WeakActorRef<Queue>);
 
 impl QueueApi {
+    /// Create the API object for [registration] with [`LuaVM`].
+    ///
+    /// [registration]: crate::actors::lua_vm::messages::RegisterUserApi
+    /// [`LuaVM`]: crate::actors::lua_vm::LuaVM
     #[must_use]
     pub fn new(queue: WeakActorRef<Queue>) -> Self {
         Self(queue)

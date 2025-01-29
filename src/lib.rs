@@ -14,6 +14,7 @@
 //!
 
 // Enable pedantic linting
+#![deny(missing_docs)]
 #![deny(clippy::pedantic)]
 
 /// # The distributed actors that make up sscan.

@@ -71,6 +71,7 @@ impl<A> RegisterUserApi<A>
 where
     A: ApiObject,
 {
+    /// Create an API registration request with an [`ApiObject`]
     pub fn with(api: A) -> Self {
         Self(api)
     }
