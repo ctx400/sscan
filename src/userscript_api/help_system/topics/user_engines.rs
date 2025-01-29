@@ -1,9 +1,3 @@
-#![doc = concat!(
-    "# Help topic for the `user_engines` userscript API\n\n```txt\n",
-    include_str!("topic.user_engines.txt"),
-    "\n```",
-)]
-
 use crate::userscript_api::help_system::HelpTopic;
 
 /// Help topic definition for [`UserEngine`]

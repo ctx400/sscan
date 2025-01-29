@@ -1,11 +1,11 @@
-# Global Scan Queue #
+__Global Scan Queue__
 
 The global scan queue holds a list of all files and other data to be
 scanned by activated scan engines. Userscripts can queue files, strings,
 bytestrings, and other data types into the queue, and these queued data
 items will be passed to all running scanners for analysis.
 
-## Usage ##
+_Usage_
 
 queue:add_file 'path/to/file'
     Enqueue a file for scanning by all activated engines.

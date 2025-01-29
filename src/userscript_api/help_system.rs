@@ -23,20 +23,71 @@
 //!   Print detailed help on a topic.
 //! ```
 
-pub mod error;
-pub mod topics {
-    //! Help topic definitions for the Userscript API.
-    //!
-    //! Each of the following help topics can be accessed within the
-    //! userscript environment using `help 'topic_name'`
+/// # Helper to add userscript API help topics to Rust docs.
+///
+/// Just a cleaner abstraction over some very tedious/messy `#[doc]`
+/// attributes. The goal of this is to use the API help topics as the
+/// single source of truth for API help, instead of having to update
+/// the docs in multiple places.
+///
+/// ## Usage
+///
+/// The macro takes one or more lines of:
+///
+/// `pub ApiTopic for modname`
+///
+/// Each line:
+///
+/// 1. Adds a `pub mod modname;` declaration under mod `topics`,
+/// 2. Adds a doc attribute which includes the file
+///    `topic.<modname>.txt`, as well as some rustdoc helper markdown.
+macro_rules! topics {
+    (
+        $(pub ApiTopic for $topic:ident;),+
+    ) => {
+        pub mod topics {
+            //! # Userscript API Help Topics
+            //!
+            //! This is a list of API help topics accessible from the
+            //! userscript environment. To access a help topic in Lua,
+            //! call:
+            //!
+            //! ```lua
+            //! help 'topic_name'
+            //! ```
+            //!
+            //! To list all help topics from Lua, call:
+            //!
+            //! ```lua
+            //! help:topics()
+            //! ```
 
-    pub mod user_engines;
+            $(
+                #[doc = concat!(
+                    "# Userscript API help for `",
+                    stringify!($topic),
+                    "`\n\nTo access this help from Lua, call `help '",
+                    stringify!($topic),
+                    "'`.\n\n```txt\n",
+                    include_str!(
+                        concat!("help_system/topics/topic.", stringify!($topic), ".txt")
+                ))]
+                pub mod $topic;
+            ),+
+        }
+    };
 }
+
+pub mod error;
 
 use super::ApiObject;
 use error::Error;
 use mlua::{ExternalError, UserData};
 use std::collections::HashMap;
+
+topics! {
+    pub ApiTopic for user_engines;
+}
 
 /// # A help topic for userscript APIs.
 ///
