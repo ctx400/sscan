@@ -30,7 +30,7 @@ async fn main() -> Result<()> {
 
     // Initialize LuaVM and auxillary services.
     let vm: ActorRef<LuaVM> = init_luavm().await?;
-    let queue: ActorRef<Queue> = kameo::spawn(Queue::with_capacity(vm.downgrade(), 2048));
+    let queue: ActorRef<Queue> = Queue::spawn_with_size(vm.downgrade(), 2048);
 
     match _args.action {
         Run { script } => {

@@ -66,26 +66,35 @@ impl Actor for Queue {
 }
 
 impl Queue {
-    /// Create a new [`Queue`] of capacity `ZERO`.
+    /// Create a global scan queue.
+    ///
+    /// Spawns a new [`Queue`] actor with a default queue
+    /// size of `ZERO`. The queue will dynamically resize as needed.
     ///
     /// **Efficiency**: A queue of size zero will allocate very
     /// frequently when items are enqueued. It is recommended to use
     /// [`Queue::with_capacity()`] to choose a
     /// reasonable starting capacity.
     #[must_use]
-    pub fn new(vm: WeakActorRef<LuaVM>) -> Self {
-        Self {
+    pub fn spawn(vm: WeakActorRef<LuaVM>) -> ActorRef<Self> {
+        let actor: Queue = Self {
             items: VecDeque::new(),
             lua_vm: vm,
-        }
+        };
+        kameo::spawn(actor)
     }
 
-    /// Create a new [`Queue`] of capacity [`usize`] data items.
+    /// Create a global scan queue with given capacity.
+    ///
+    /// Spawns a new [`Queue`] actor with the provided starting capacity.
+    /// This is recommended over [`Queue::spawn()`] as the initial
+    /// capacity can be tuned to help avoid excessive allocations.
     #[must_use]
-    pub fn with_capacity(vm: WeakActorRef<LuaVM>, capacity: usize) -> Self {
-        Self {
+    pub fn spawn_with_size(vm: WeakActorRef<LuaVM>, capacity: usize) -> ActorRef<Self> {
+        let actor: Queue = Self {
             items: VecDeque::with_capacity(capacity),
             lua_vm: vm,
-        }
+        };
+        kameo::spawn(actor)
     }
 }
