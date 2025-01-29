@@ -30,15 +30,16 @@ use std::path::PathBuf;
 /// ## Example
 ///
 /// ```
-/// # use sscan::actors::queue::{Queue, messages::Enqueue, data_item::RawDatum};
+/// # use sscan::actors::{lua_vm::LuaVM, queue::{Queue, messages::Enqueue, data_item::RawDatum}};
 /// # use kameo::actor::ActorRef;
 /// # #[tokio::main]
 /// # async fn main() {
 /// // Create a new scan queue.
-/// let queue: ActorRef<Queue> = kameo::spawn(Queue::default());
+/// let lua_ref = kameo::spawn(LuaVM::default());
+/// let queue = Queue::spawn(lua_ref.downgrade());
 ///
 /// // Create a new data item for scanning
-/// let data: Box<RawDatum> = RawDatum::new("hello_world", "blablabla-Hello World-blablabla");
+/// let data = RawDatum::new("hello_world", "blablabla-Hello World-blablabla");
 ///
 /// // Enqueue the data item
 /// queue.ask(Enqueue::item(data)).await.unwrap();
@@ -75,15 +76,16 @@ impl Enqueue {
 /// ## Example
 ///
 /// ```
-/// # use sscan::actors::queue::{Queue, messages::{Enqueue, Dequeue}, data_item::RawDatum};
+/// # use sscan::actors::{lua_vm::LuaVM, queue::{Queue, messages::{Enqueue, Dequeue}, data_item::RawDatum}};
 /// # use kameo::actor::ActorRef;
 /// # #[tokio::main]
 /// # async fn main() {
 /// // Create a new scan queue.
-/// let queue: ActorRef<Queue> = kameo::spawn(Queue::default());
+/// let lua_ref = kameo::spawn(LuaVM::default());
+/// let queue = Queue::spawn(lua_ref.downgrade());
 ///
 /// // Create a new data item for scanning
-/// let data: Box<RawDatum> = RawDatum::new("hello_world", "blablabla-Hello World-blablabla");
+/// let data = RawDatum::new("hello_world", "blablabla-Hello World-blablabla");
 ///
 /// // Enqueue the data item
 /// queue.ask(Enqueue::item(data)).await.unwrap();

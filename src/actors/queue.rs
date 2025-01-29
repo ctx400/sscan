@@ -73,7 +73,7 @@ impl Queue {
     ///
     /// **Efficiency**: A queue of size zero will allocate very
     /// frequently when items are enqueued. It is recommended to use
-    /// [`Queue::with_capacity()`] to choose a
+    /// [`Queue::spawn_with_size()`] to choose a
     /// reasonable starting capacity.
     #[must_use]
     pub fn spawn(vm: WeakActorRef<LuaVM>) -> ActorRef<Self> {

@@ -18,7 +18,7 @@ use std::path::PathBuf;
 /// ## Example
 ///
 /// ```
-/// # use sscan::actors::queue::{Queue, data_item::DataItem, error::QueueResult, messages::{Enqueue, Dequeue}};
+/// # use sscan::actors::{lua_vm::LuaVM, queue::{Queue, data_item::DataItem, error::QueueResult, messages::{Enqueue, Dequeue}}};
 /// # use std::path::PathBuf;
 /// # #[tokio::main]
 /// # async fn main() {
@@ -43,8 +43,11 @@ use std::path::PathBuf;
 ///     }
 /// }
 ///
-/// // Now, let's create a queue and enqueue our data item.
-/// let queue = kameo::spawn(Queue::default());
+/// // Now, let's create a new scan queue.
+/// let lua_ref = kameo::spawn(LuaVM::default());
+/// let queue = Queue::spawn(lua_ref.downgrade());
+///
+/// // Let's enqueue our dummy data item.
 /// let my_dummy_data = Box::new(MyDummyDataItem);
 /// queue.ask(Enqueue::item(my_dummy_data)).await.unwrap();
 ///
