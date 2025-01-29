@@ -86,8 +86,8 @@ async fn should_register_api_and_help() -> anyhow::Result<()> {
 
     // Create and register help articles
     let topic: CounterApiHelp = CounterApiHelp;
-    let mut help_system: HelpSystem = HelpSystem::default();
-    help_system.topic(Box::new(topic))?;
+    let mut help_system: HelpSystem = HelpSystem::new();
+    help_system.topic(Box::new(topic));
 
     // Register the help API
     vm.ask(RegisterUserApi::with(help_system)).await.unwrap();

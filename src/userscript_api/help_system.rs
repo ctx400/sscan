@@ -223,28 +223,22 @@ impl HelpSystem {
     }
 
     /// Registers a new [`HelpTopic`] with the Help System.
-    ///
-    /// ## Errors
-    ///
-    /// If the help topic's name is a reserved name
-    /// (currently, `topics`), then this function will return an error
-    /// of type [`Error::ReservedTopicName`].
-    pub fn topic(&mut self, topic: Box<dyn HelpTopic>) -> Result<&mut Self, Error> {
-        // Validate a reserved topic name is not being used.
-        let topic_name: &str = topic.name().trim();
-        if topic_name == "topics" {
-            return Err(Error::reserved_topic_name(topic_name));
-        }
-
-        // Add the help topic.
-        self.topics.insert(topic_name.to_owned(), topic);
-        Ok(self)
+    pub fn topic(&mut self, topic: Box<dyn HelpTopic>) -> &mut Self {
+        self.topics.insert(topic.name().to_owned(), topic);
+        self
     }
 }
 
+/// Registers all built-in help topics with the new [`HelpSystem`].
 impl Default for HelpSystem {
     fn default() -> Self {
-        Self::new()
+        use topics::{queue, user_engines};
+
+        let mut help_system: HelpSystem = Self::new();
+        help_system
+            .topic(Box::new(queue::Topic))
+            .topic(Box::new(user_engines::Topic));
+        help_system
     }
 }
 

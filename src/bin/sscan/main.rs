@@ -17,7 +17,7 @@ use sscan::{
         queue::Queue,
     },
     userscript_api::{
-        help_system::{topics::user_engines::Topic, HelpSystem},
+        help_system::HelpSystem,
         user_engine::UserEngine,
     },
 };
@@ -63,16 +63,9 @@ async fn main() -> Result<()> {
 async fn init_luavm() -> Result<ActorRef<LuaVM>> {
     let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
 
-    // Load APIs
-    let mut help_api: HelpSystem = Default::default();
-    let user_engine_api: UserEngine = Default::default();
-
-    // Load Help Topics
-    help_api.topic(Box::new(Topic))?;
-
     // Register APIs
-    vm.ask(RegisterUserApi::with(help_api)).await?;
-    vm.ask(RegisterUserApi::with(user_engine_api)).await?;
+    vm.ask(RegisterUserApi::with(HelpSystem::default())).await?;
+    vm.ask(RegisterUserApi::with(UserEngine::default())).await?;
 
     Ok(vm)
 }
