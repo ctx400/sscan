@@ -11,17 +11,6 @@
 /// single source of truth for API help, instead of having to update
 /// the docs in multiple places.
 ///
-/// ## Usage
-///
-/// The macro takes one or more lines of:
-///
-/// `pub ApiTopic for modname`
-///
-/// Each line:
-///
-/// 1. Adds a `pub mod modname;` declaration under mod `topics`,
-/// 2. Adds a doc attribute which includes the file
-///    `<modname>.txt`, as well as some rustdoc helper markdown.
 macro_rules! topics {
     (
         $(use HelpTopic $topic:ident for $desc:literal;)+
