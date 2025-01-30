@@ -20,27 +20,6 @@ queue:add_file 'path/to/file'
     ```
 ---
 
-queue:add_dir(dir, recursive=false)
-    Enqueue all files in a directory, optionally using recursion.
-
-    Parameters:
-    - <dir>: String
-      Any valid path to a directory.
-
-    - <recurse>: Boolean
-      If `true`, enqueue all files in subdirectories as well.
-
-    Example (non-recursive):
-    ```
-    queue:add_dir('C:/users/user/documents')
-    ```
-
-    Example (recursive):
-    ```
-    queue:add_dir('C:/users/user/documents', true)
-    ```
----
-
 queue:add_raw(name, data)
     Enqueue a raw Lua string or bytestring for scanning by all engines.
 
