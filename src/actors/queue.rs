@@ -20,7 +20,7 @@ pub mod error;
 pub mod messages;
 
 use super::lua_vm::{messages::RegisterUserApi, LuaVM};
-use crate::userscript_api::queue::QueueApi;
+use crate::userscript_api::queue_api::QueueApi;
 use data_item::DataItem;
 use error::Error as QueueError;
 use kameo::{
