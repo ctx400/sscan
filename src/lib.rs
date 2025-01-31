@@ -14,6 +14,7 @@
 //!
 
 // Enable pedantic linting
+#![deny(missing_docs)]
 #![deny(clippy::pedantic)]
 
 /// # The distributed actors that make up sscan.
@@ -36,5 +37,7 @@
 /// [`LuaVM`]: crate::actors::lua_vm::LuaVM
 pub mod actors {
     pub mod lua_vm;
+    pub mod queue;
 }
+pub mod macros;
 pub mod userscript_api;

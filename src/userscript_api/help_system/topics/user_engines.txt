@@ -1,10 +1,10 @@
-# Userscript Scan Engines #
+__Userscript Scan Engines__
 
 You can register custom Lua functions as scan engines. A custom scan
 engine is any Lua function that accepts a `string` payload, returning
 either `true` or `false` based on match or non-match, respectively.
 
-## Usage
+_Usage_
 
 user_engines:register(name, function)
     Register a userscript scan engine.
@@ -13,7 +13,7 @@ user_engines:scan(string)
     Test a `string` payload against all registered engines.
     `string` may be any valid Lua string, including bytestrings.
 
-## Example: Hello World Engine ##
+_Example: Hello World Engine_
 
 This engine detects the presence of "Hello World" anywhere in the string
 payload, returning `true` if found.

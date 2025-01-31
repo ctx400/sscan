@@ -13,7 +13,7 @@
 //! ### API Usage Examples
 //!
 //! ```text
-//! Usage: help:all()
+//! Usage: help()
 //!   Print generic help information.
 //!
 //! Usage: help:topics()
@@ -25,10 +25,16 @@
 
 pub mod error;
 
-use super::ApiObject;
+use crate::{macros::topics, userscript_api::ApiObject};
 use error::Error;
 use mlua::{ExternalError, UserData};
 use std::collections::HashMap;
+
+// List of Userscript API Topics
+topics! {
+    use HelpTopic queue for "Queue up files and other data for scanning.";
+    use HelpTopic user_engines for "Register custom scan engines from userscripts.";
+}
 
 /// # A help topic for userscript APIs.
 ///
@@ -161,29 +167,23 @@ impl HelpSystem {
         }
     }
 
-    /// Registers a new [`HelpTopic`] to the Help System.
-    ///
-    /// ## Errors
-    ///
-    /// If the help topic's name is a reserved name
-    /// (currently, `topics`), then this function will return an error
-    /// of type [`HelpError::ReservedTopicName`].
-    pub fn topic(&mut self, topic: Box<dyn HelpTopic>) -> Result<&mut Self, Error> {
-        // Validate a reserved topic name is not being used.
-        let topic_name: &str = topic.name().trim();
-        if topic_name == "topics" {
-            return Err(Error::reserved_topic_name(topic_name));
-        }
-
-        // Add the help topic.
-        self.topics.insert(topic_name.to_owned(), topic);
-        Ok(self)
+    /// Registers a new [`HelpTopic`] with the Help System.
+    pub fn topic(&mut self, topic: Box<dyn HelpTopic>) -> &mut Self {
+        self.topics.insert(topic.name().to_owned(), topic);
+        self
     }
 }
 
+/// Registers all built-in help topics with the new [`HelpSystem`].
 impl Default for HelpSystem {
     fn default() -> Self {
-        Self::new()
+        use topics::{queue, user_engines};
+
+        let mut help_system: HelpSystem = Self::new();
+        help_system
+            .topic(Box::new(queue::Topic))
+            .topic(Box::new(user_engines::Topic));
+        help_system
     }
 }
 
@@ -203,7 +203,7 @@ impl UserData for HelpSystem {
                     Err(Error::topic_not_found(&topic).into_lua_err())
                 }
             } else {
-                println!(include_str!("help_system/topics/topic.generic.md"));
+                println!(include_str!("help_system/topics/__generic.txt"));
                 Ok(())
             }
         });

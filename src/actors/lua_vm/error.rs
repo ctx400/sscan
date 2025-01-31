@@ -15,7 +15,10 @@ pub type LuaVmResult<T> = Result<T, Error>;
 pub enum Error {
     /// An internal Lua interpreter error occurred.
     #[error("the Lua interpreter encountered an error: {source}")]
-    InternalLuaError { source: mlua::Error },
+    InternalLuaError {
+        /// The inner Lua error that occurred.
+        source: mlua::Error,
+    },
 }
 
 impl From<mlua::Error> for Error {
