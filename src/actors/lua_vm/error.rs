@@ -17,7 +17,7 @@ pub enum Error {
     #[error("the Lua interpreter encountered an error: {source}")]
     InternalLuaError {
         /// The inner Lua error that occurred.
-        source: mlua::Error
+        source: mlua::Error,
     },
 }
 
