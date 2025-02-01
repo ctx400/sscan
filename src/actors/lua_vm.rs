@@ -47,8 +47,30 @@ impl LuaVM {
     /// Spawn a new Lua virtual machine in default execution mode.
     #[must_use]
     pub fn spawn() -> ActorRef<Self> {
-        let lua_vm: LuaVM = Self {
+        let lua_vm: Self = Self {
             vm: Lua::new(),
+        };
+        kameo::spawn(lua_vm)
+    }
+
+    /// Spawn a new Lua virtual machine with unsafe libraries loaded.
+    ///
+    /// This function spawns [`LuaVM`] in unsafe mode. This means unsafe
+    /// libraries, such as `debug`, are loaded into Lua. *Be careful
+    /// with this!*
+    ///
+    /// ## Safety
+    ///
+    /// Incorrect use of the Lua `debug` library or other unsafe
+    /// libraries can cause *undefined behavior*, leading to panics or
+    /// unpredictable side effects! Unsafe mode is only intended for
+    /// advanced users, and testing purposes only. Production
+    /// userscripts should *never* rely on any functionality provided by
+    /// unsafe mode.
+    #[must_use]
+    pub unsafe fn spawn_unsafe() -> ActorRef<Self> {
+        let lua_vm: Self = Self {
+            vm: Lua::unsafe_new(),
         };
         kameo::spawn(lua_vm)
     }

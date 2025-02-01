@@ -6,6 +6,22 @@ use std::path::PathBuf;
 #[command(propagate_version = true)]
 #[command(infer_subcommands = true)]
 pub struct CliArgs {
+    /// Load unsafe Lua standard libraries.
+    ///
+    /// If set, sscan will load unsafe Lua standard libraries, such as
+    /// the `debug` library, alongside the usual "safe" standard
+    /// libraries.
+    ///
+    /// WARNING: Incorrect use of the Lua debug library and other unsafe
+    /// libraries may cause undefined behavior, which can cause panics
+    /// or other unpredictable side effects. Unsafe mode is intended
+    /// only for advanced users, and for testing purposes only.
+    ///
+    /// Userscripts in production should never rely on unsafe
+    /// functionality, as it introduces security and isolation risks.
+    #[arg(short, long)]
+    pub unsafe_mode: bool,
+
     #[command(subcommand)]
     pub action: Action,
 }
