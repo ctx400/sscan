@@ -47,9 +47,7 @@ impl LuaVM {
     /// Spawn a new Lua virtual machine in default execution mode.
     #[must_use]
     pub fn spawn() -> ActorRef<Self> {
-        let lua_vm: Self = Self {
-            vm: Lua::new(),
-        };
+        let lua_vm: Self = Self { vm: Lua::new() };
         kameo::spawn(lua_vm)
     }
 
