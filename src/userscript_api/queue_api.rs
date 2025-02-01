@@ -124,7 +124,7 @@ async fn queue_dequeue(
             Ok((name, path, content)) => {
                 let content = mlua::String::wrap(content);
                 Ok((name, path, content))
-            },
+            }
             Err(error) => Err(error.into_lua_err()),
         }
     } else {
