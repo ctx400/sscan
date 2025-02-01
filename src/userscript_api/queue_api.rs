@@ -118,10 +118,13 @@ async fn queue_dequeue(
     _: Lua,
     this: UserDataRef<QueueApi>,
     (): (),
-) -> mlua::Result<(String, Option<PathBuf>, Vec<u8>)> {
+) -> mlua::Result<(String, Option<PathBuf>, impl mlua::IntoLua)> {
     if let Some(queue) = this.0.upgrade() {
         match queue.ask(Dequeue).await {
-            Ok(dqi) => Ok(dqi),
+            Ok((name, path, content)) => {
+                let content = mlua::String::wrap(content);
+                Ok((name, path, content))
+            },
             Err(error) => Err(error.into_lua_err()),
         }
     } else {
