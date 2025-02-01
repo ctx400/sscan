@@ -58,7 +58,7 @@ async fn main() -> Result<()> {
 
 /// Initialize LuaVM and load APIs.
 async fn init_luavm() -> Result<ActorRef<LuaVM>> {
-    let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
+    let vm: ActorRef<LuaVM> = LuaVM::spawn();
 
     // Register APIs
     vm.ask(RegisterUserApi::with(HelpSystem::default())).await?;

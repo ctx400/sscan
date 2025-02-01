@@ -82,7 +82,7 @@ impl HelpTopic for CounterApiHelp {
 #[tokio::test]
 async fn should_register_api_and_help() -> anyhow::Result<()> {
     // Spawn a new userscript environment
-    let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
+    let vm: ActorRef<LuaVM> = LuaVM::spawn();
 
     // Create and register help articles
     let topic: CounterApiHelp = CounterApiHelp;

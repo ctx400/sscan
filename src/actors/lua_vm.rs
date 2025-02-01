@@ -19,7 +19,7 @@
 pub mod error;
 pub mod messages;
 
-use kameo::{mailbox::unbounded::UnboundedMailbox, Actor};
+use kameo::{actor::ActorRef, mailbox::unbounded::UnboundedMailbox, Actor};
 use mlua::prelude::*;
 
 /// # An actor which hosts a Lua VM and userscript environment.
@@ -43,22 +43,13 @@ impl Actor for LuaVM {
     type Mailbox = UnboundedMailbox<Self>;
 }
 
-impl Default for LuaVM {
-    /// Creates a new [`LuaVM`] instance to be passed into [`kameo::spawn()`].
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use sscan::actors::lua_vm::LuaVM;
-    /// # use kameo::actor::ActorRef;
-    /// #
-    /// # #[tokio::main]
-    /// # async fn main() {
-    /// // Create a new userscript environment!
-    /// let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
-    /// # }
-    /// ```
-    fn default() -> Self {
-        Self { vm: Lua::new() }
+impl LuaVM {
+    /// Spawn a new Lua virtual machine in default execution mode.
+    #[must_use]
+    pub fn spawn() -> ActorRef<Self> {
+        let lua_vm: LuaVM = Self {
+            vm: Lua::new(),
+        };
+        kameo::spawn(lua_vm)
     }
 }

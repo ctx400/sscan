@@ -43,7 +43,7 @@ use kameo::message::{Context, Message};
 /// #   }
 /// # }
 /// // Start LuaVM and register a userscript API
-/// let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
+/// let vm: ActorRef<LuaVM> = LuaVM::spawn();
 /// vm.ask(RegisterUserApi::with(MyApi)).await.unwrap();
 /// # }
 /// ```
@@ -93,7 +93,7 @@ where
 /// # #[tokio::main]
 /// # async fn main() {
 /// // Spawn a new LuaVM actor
-/// let vm = kameo::spawn(LuaVM::default());
+/// let vm = LuaVM::spawn();
 ///
 /// // Execute a chunk of Lua in the VM
 /// let exec_request: ExecChunk = r#"
@@ -141,7 +141,7 @@ where
 /// # #[tokio::main]
 /// # async fn main() {
 /// // Spawn a new LuaVM actor
-/// let vm = kameo::spawn(LuaVM::default());
+/// let vm = LuaVM::spawn();
 ///
 /// // Evaluate a Lua expression in the VM
 /// let exec_request: EvalChunk = r#"
@@ -199,7 +199,7 @@ mod tests {
         }
 
         // Register the API with LuaVM
-        let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
+        let vm: ActorRef<LuaVM> = LuaVM::spawn();
         vm.ask(RegisterUserApi::with(MyApi)).await.unwrap();
     }
 
@@ -207,7 +207,7 @@ mod tests {
     #[tokio::test]
     async fn should_exec_successfully() {
         // Create a LuaVM actor
-        let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
+        let vm: ActorRef<LuaVM> = LuaVM::spawn();
 
         // Create a chunk and execute it.
         let exec_request: ExecChunk = r#"
@@ -222,7 +222,7 @@ mod tests {
     #[should_panic]
     async fn should_fail_exec() {
         // Create a LuaVM actor
-        let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
+        let vm: ActorRef<LuaVM> = LuaVM::spawn();
 
         // Create a chunk and execute it.
         let exec_request: ExecChunk = r#"
@@ -236,7 +236,7 @@ mod tests {
     #[tokio::test]
     async fn should_return_eval_result() {
         // Create a LuaVM actor
-        let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
+        let vm: ActorRef<LuaVM> = LuaVM::spawn();
 
         // Create an expression and execute it.
         let expr_request: EvalChunk = r#"
@@ -252,7 +252,7 @@ mod tests {
     #[should_panic]
     async fn should_error_on_invalid_expr() {
         // Create a LuaVM actor
-        let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
+        let vm: ActorRef<LuaVM> = LuaVM::spawn();
 
         // Create an expression and execute it.
         // The table and key don't exist, so this should error.

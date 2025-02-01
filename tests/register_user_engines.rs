@@ -17,7 +17,7 @@ use sscan::{
 #[tokio::test]
 async fn should_register_user_engines() {
     // Spawn the virtual machine
-    let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
+    let vm: ActorRef<LuaVM> = LuaVM::spawn();
 
     // Register the UserEngine API
     vm.ask(RegisterUserApi::with(UserEngine::new()))

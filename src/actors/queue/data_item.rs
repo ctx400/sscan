@@ -44,7 +44,7 @@ use std::path::PathBuf;
 /// }
 ///
 /// // Now, let's create a new scan queue.
-/// let lua_ref = kameo::spawn(LuaVM::default());
+/// let lua_ref = LuaVM::spawn();
 /// let queue = Queue::spawn(lua_ref.downgrade());
 ///
 /// // Let's enqueue our dummy data item.
