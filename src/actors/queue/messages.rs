@@ -35,7 +35,7 @@ use std::path::PathBuf;
 /// # #[tokio::main]
 /// # async fn main() {
 /// // Create a new scan queue.
-/// let lua_ref = kameo::spawn(LuaVM::default());
+/// let lua_ref = LuaVM::spawn();
 /// let queue = Queue::spawn(lua_ref.downgrade());
 ///
 /// // Create a new data item for scanning
@@ -81,7 +81,7 @@ impl Enqueue {
 /// # #[tokio::main]
 /// # async fn main() {
 /// // Create a new scan queue.
-/// let lua_ref = kameo::spawn(LuaVM::default());
+/// let lua_ref = LuaVM::spawn();
 /// let queue = Queue::spawn(lua_ref.downgrade());
 ///
 /// // Create a new data item for scanning

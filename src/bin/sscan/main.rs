@@ -23,13 +23,13 @@ use std::path::Path;
 #[tokio::main]
 async fn main() -> Result<()> {
     // Parse commandline arguments
-    let _args: CliArgs = CliArgs::parse();
+    let args: CliArgs = CliArgs::parse();
 
     // Initialize LuaVM and auxillary services.
-    let vm: ActorRef<LuaVM> = init_luavm().await?;
+    let vm: ActorRef<LuaVM> = init_luavm(args.unsafe_mode).await?;
     let queue: ActorRef<Queue> = Queue::spawn_with_size(vm.downgrade(), 2048);
 
-    match _args.action {
+    match args.action {
         Run { script } => {
             let exec_request: ExecChunk = load_script(script).await?.into();
             vm.ask(exec_request).await?;
@@ -57,8 +57,11 @@ async fn main() -> Result<()> {
 }
 
 /// Initialize LuaVM and load APIs.
-async fn init_luavm() -> Result<ActorRef<LuaVM>> {
-    let vm: ActorRef<LuaVM> = kameo::spawn(LuaVM::default());
+async fn init_luavm(unsafe_mode: bool) -> Result<ActorRef<LuaVM>> {
+    let vm: ActorRef<LuaVM> = match unsafe_mode {
+        true => unsafe { LuaVM::spawn_unsafe() },
+        false => LuaVM::spawn(),
+    };
 
     // Register APIs
     vm.ask(RegisterUserApi::with(HelpSystem::default())).await?;
