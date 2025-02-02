@@ -1,3 +1,5 @@
+#![deny(clippy::pedantic)]
+
 pub mod cli;
 pub mod repl;
 
