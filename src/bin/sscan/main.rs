@@ -8,16 +8,9 @@ use cli::{
     CliArgs,
 };
 use kameo::actor::ActorRef;
-use sscan::{
-    actors::{
-        lua_vm::{
-            messages::{ExecChunk, RegisterUserApi},
-            LuaVM,
-        },
-        queue::Queue,
-    },
-    userscript_api::{help_system::HelpSystem, user_engine::UserEngine},
-};
+use sscan::actors::lua_vm::{
+            messages::ExecChunk,
+            LuaVM};
 use std::path::Path;
 
 #[tokio::main]
@@ -26,8 +19,11 @@ async fn main() -> Result<()> {
     let args: CliArgs = CliArgs::parse();
 
     // Initialize LuaVM and auxillary services.
-    let vm: ActorRef<LuaVM> = init_luavm(args.unsafe_mode).await?;
-    let queue: ActorRef<Queue> = Queue::spawn_with_size(vm.downgrade(), 2048);
+    let vm: ActorRef<LuaVM> = match args.unsafe_mode {
+        true => unsafe { LuaVM::spawn_unsafe() },
+        false => LuaVM::spawn(),
+    };
+    vm.wait_startup().await;
 
     match args.action {
         Run { script } => {
@@ -47,27 +43,9 @@ async fn main() -> Result<()> {
     }
 
     // Shut down all services
-    queue.stop_gracefully().await?;
     vm.stop_gracefully().await?;
-
-    // Wait for services to stop
-    queue.wait_for_stop().await;
     vm.wait_for_stop().await;
     Ok(())
-}
-
-/// Initialize LuaVM and load APIs.
-async fn init_luavm(unsafe_mode: bool) -> Result<ActorRef<LuaVM>> {
-    let vm: ActorRef<LuaVM> = match unsafe_mode {
-        true => unsafe { LuaVM::spawn_unsafe() },
-        false => LuaVM::spawn(),
-    };
-
-    // Register APIs
-    vm.ask(RegisterUserApi::with(HelpSystem::default())).await?;
-    vm.ask(RegisterUserApi::with(UserEngine::default())).await?;
-
-    Ok(vm)
 }
 
 /// Load a userscript from disk into a [`String`].

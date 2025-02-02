@@ -19,8 +19,10 @@
 pub mod error;
 pub mod messages;
 
-use kameo::{actor::ActorRef, mailbox::unbounded::UnboundedMailbox, Actor};
+use kameo::{actor::ActorRef, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
+use messages::RegisterUserApi;
 use mlua::prelude::*;
+use crate::{actors::queue::Queue, userscript_api::{help_system::HelpSystem, user_engine::UserEngine}};
 
 /// # An actor which hosts a Lua VM and userscript environment.
 ///
@@ -31,6 +33,9 @@ use mlua::prelude::*;
 pub struct LuaVM {
     /// The inner Lua 5.4 Virtual Machine
     vm: Lua,
+
+    /// Reference to the Queue service
+    queue: Option<ActorRef<Queue>>,
 }
 
 /// # [`LuaVM`] is an actor.
@@ -41,13 +46,32 @@ pub struct LuaVM {
 /// subsystems while maintaining owned mutable state without locks.
 impl Actor for LuaVM {
     type Mailbox = UnboundedMailbox<Self>;
+
+    async fn on_start(&mut self, lua_vm: ActorRef<Self>) -> Result<(), BoxError> {
+        // Spawn other actors
+        let queue: ActorRef<Queue> = Queue::spawn(lua_vm.downgrade());
+
+        // Register auxillary userscript APIs
+        lua_vm.tell(RegisterUserApi::with(HelpSystem::default())).await?;
+        lua_vm.tell(RegisterUserApi::with(UserEngine::default())).await?;
+
+        // Link all actors to self
+        lua_vm.link(&queue).await;
+
+        // Store references to the other actors
+        self.queue = Some(queue);
+        Ok(())
+    }
 }
 
 impl LuaVM {
     /// Spawn a new Lua virtual machine in default execution mode.
     #[must_use]
     pub fn spawn() -> ActorRef<Self> {
-        let lua_vm: Self = Self { vm: Lua::new() };
+        let lua_vm: Self = Self {
+            vm: Lua::new(),
+            queue: None,
+        };
         kameo::spawn(lua_vm)
     }
 
@@ -69,6 +93,7 @@ impl LuaVM {
     pub unsafe fn spawn_unsafe() -> ActorRef<Self> {
         let lua_vm: Self = Self {
             vm: Lua::unsafe_new(),
+            queue: None,
         };
         kameo::spawn(lua_vm)
     }
