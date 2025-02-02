@@ -130,7 +130,7 @@ where
     ///
     /// Required. This is the detailed help content the [`HelpSystem`]
     /// returns when a user looks up a help topic by name with
-    /// `help:with 'topic'`. The format of the content is free-form,
+    /// `help 'topic'`. The format of the content is free-form,
     /// but try to write it in a way that is easy for end-users to
     /// digest.
     ///
