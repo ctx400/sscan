@@ -10,18 +10,49 @@
 Its high level of configurability is powered by userscripts which run in
 an embeded [Lua](https://www.lua.org/) virtual machine.
 
-Currently, scanning is provided by the
-[YARA-X](https://virustotal.github.io/yara-x/) scan engine. YARA-X is a
-Rust implementation of the original YARA scan engine. Additional scan
-engines may be implemented or integrated in the future.
+Scanning is provided via both custom, user-defined scan engines, as well
+as a built-in YARA scan engine (provided by YARA-X, currently WIP.)
+A global scan queue is implemented to automatically distribute files and
+other scannable data to all activated scan engines.
 
 The embedded Lua virtual machine is made possible by the
 [mlua](https://crates.io/crates/mlua) crate.
 
 ## *Early Development!*
 
-This crate is in *very* early development. While I expect sscan to be
-totally epic once stable, it is almost useless in its current state.
+This crate is in early development. Some features are available now,
+such as custom userscript scan engine support, but other features are
+still in progress!
+
+## Getting Started
+
+To install sscan, run the following in your terminal:
+
+```bash
+cargo install --locked sscan
+```
+
+To try out sscan in interactive mode, run:
+
+```bash
+sscan interactive
+```
+
+Or, if you have already created a Lua userscript, run:
+
+```bash
+sscan run myscript.lua
+```
+
+sscan has a built-in help system. You can access it by calling (in Lua):
+
+```lua
+help()            -- For general help, or
+help:topics()     -- For a list of specific help topics, or
+help 'topic_name' -- To view detailed help on a topic.
+```
+
+Finally, you can get even more help from [the docs](https://docs.rs/sscan/latest/sscan).
 
 ## Free and Open-Source Software
 
@@ -58,9 +89,3 @@ version of sscan, use `git checkout vX.Y.Z`
 
 Finally, any versions \< v1.0.0 are early development. Consider them unstable!
 In these versions, *anything may change at any time*!
-
-## Roadmap
-
-- Full configurability with Lua userscripts
-- YARA-X scan engine integration
-- Custom Lua userscript scan engines
