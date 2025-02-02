@@ -7,7 +7,7 @@ use anyhow::Result;
 use clap::Parser;
 use cli::{
     Action::{Interactive, Run},
-    CliArgs,
+    Args,
 };
 use kameo::actor::ActorRef;
 use sscan::actors::lua_vm::{messages::ExecChunk, LuaVM};
@@ -16,18 +16,15 @@ use std::path::Path;
 #[tokio::main]
 async fn main() -> Result<()> {
     // Parse commandline arguments
-    let args: CliArgs = CliArgs::parse();
+    let args: Args = Args::parse();
 
     // Initialize LuaVM and auxillary services.
-    let vm: ActorRef<LuaVM> = match args.unsafe_mode {
-        true => unsafe { LuaVM::spawn_unsafe() },
-        false => LuaVM::spawn(),
-    };
+    let vm: ActorRef<LuaVM> = if args.unsafe_mode { unsafe { LuaVM::spawn_unsafe() } } else { LuaVM::spawn() };
     vm.wait_startup().await;
 
     match args.action {
         Run { script } => {
-            let exec_request: ExecChunk = load_script(script).await?.into();
+            let exec_request: ExecChunk = load_script(script)?.into();
             vm.ask(exec_request).await?;
         }
         Interactive {
@@ -35,10 +32,10 @@ async fn main() -> Result<()> {
             nosplash,
         } => {
             if let Some(startup_script) = startup_script {
-                let exec_request: ExecChunk = load_script(startup_script).await?.into();
+                let exec_request: ExecChunk = load_script(startup_script)?.into();
                 vm.ask(exec_request).await?;
             }
-            repl::invoke_repl(&vm, nosplash).await;
+            repl::invoke(&vm, nosplash).await;
         }
     }
 
@@ -49,7 +46,7 @@ async fn main() -> Result<()> {
 }
 
 /// Load a userscript from disk into a [`String`].
-async fn load_script<P>(path: P) -> Result<String>
+fn load_script<P>(path: P) -> Result<String>
 where
     P: AsRef<Path>,
 {
