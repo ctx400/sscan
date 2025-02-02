@@ -8,9 +8,7 @@ use cli::{
     CliArgs,
 };
 use kameo::actor::ActorRef;
-use sscan::actors::lua_vm::{
-            messages::ExecChunk,
-            LuaVM};
+use sscan::actors::lua_vm::{messages::ExecChunk, LuaVM};
 use std::path::Path;
 
 #[tokio::main]

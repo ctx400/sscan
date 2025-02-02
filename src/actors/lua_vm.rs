@@ -19,10 +19,13 @@
 pub mod error;
 pub mod messages;
 
+use crate::{
+    actors::queue::Queue,
+    userscript_api::{help_system::HelpSystem, user_engine::UserEngine},
+};
 use kameo::{actor::ActorRef, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
 use messages::RegisterUserApi;
 use mlua::prelude::*;
-use crate::{actors::queue::Queue, userscript_api::{help_system::HelpSystem, user_engine::UserEngine}};
 
 /// # An actor which hosts a Lua VM and userscript environment.
 ///
@@ -52,8 +55,12 @@ impl Actor for LuaVM {
         let queue: ActorRef<Queue> = Queue::spawn(lua_vm.downgrade());
 
         // Register auxillary userscript APIs
-        lua_vm.tell(RegisterUserApi::with(HelpSystem::default())).await?;
-        lua_vm.tell(RegisterUserApi::with(UserEngine::default())).await?;
+        lua_vm
+            .tell(RegisterUserApi::with(HelpSystem::default()))
+            .await?;
+        lua_vm
+            .tell(RegisterUserApi::with(UserEngine::default()))
+            .await?;
 
         // Link all actors to self
         lua_vm.link(&queue).await;
