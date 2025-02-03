@@ -25,6 +25,11 @@ pub async fn invoke(vm: &ActorRef<LuaVM>, nosplash: bool) {
         // Read a multiline Lua chunk terminated by a semicolon.
         read_chunk(&mut buffer);
 
+        // Check if the `exit` keyword was passed
+        if buffer == "exit" {
+            break;
+        }
+
         // Evaluate the chunk in the virtual machine
         match evaluate(vm, &buffer).await {
             Ok(value) => {
@@ -111,7 +116,7 @@ fn read_chunk(buffer: &mut String) {
     }
 
     // Trim the semicolon off of the end of the buffer.
-    *buffer = buffer.trim().trim_end_matches(';').into();
+    *buffer = buffer.trim().trim_end_matches(';').trim().into();
 }
 
 /// Prints a prompt message before input.
@@ -139,6 +144,6 @@ const SPLASH_MESSAGE: &str = r"
 @@@ Interactive REPL for sscan
 @@@
 @@@ Enter any valid multiline lua, terminated by a semicolon (;)
-@@@ For help, use help();
+@@@ For help, use help(), to exit, use exit;
 @@@
 ";
