@@ -28,7 +28,7 @@ use mlua::Function;
 ///
 /// This actor provides a service for registering userscript-provided
 /// scan engines, as well as invoking scans against all registered
-/// engines for any [`DataItem`]
+/// engines for any byte vector.
 pub struct UserEngine {
     /// Stores all registered userscript scan engines.
     engines: HashMap<String, Function>,
