@@ -19,7 +19,7 @@
 pub mod error;
 pub mod messages;
 
-use crate::{actors::lua_vm::{LuaVM, messages::RegisterUserApi}, userscript_api::user_engine::UserEngineApi};
+use crate::{actors::lua_vm::{LuaVM, messages::RegisterUserApi}, userscript_api::user_engine_api::UserEngineApi};
 use std::collections::HashMap;
 use kameo::{actor::{ActorRef, WeakActorRef}, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
 use mlua::Function;
