@@ -12,21 +12,11 @@
 //!
 //! ## API Usage Examples
 //!
-//! **For full API documentation, launch sscan in interactive mode and
-//!   enter `help 'queue'`.**
-//!
-//! ```lua
-//! Usage: queue:add_file 'path/to/file'
-//!     Enqueue a file for scanning.
-//!
-//! Usage: queue:add_raw(name, data)
-//!     Enqueue a raw Lua string/bytestring for scanning.
-//!
-//! Usage: queue:dequeue()
-//!     Pull the data item at the front of the queue.
-//! ```
+//! For full API documentation, launch sscan in interactive mode and
+//! enter `help 'queue'`, or see [`topics::queue`].
 //!
 //! [global scan queue]: crate::actors::queue::Queue
+//! [`topics::queue`]: crate::userscript_api::help_system::topics::queue
 
 use crate::{
     actors::queue::{

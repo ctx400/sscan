@@ -25,6 +25,8 @@ _QUEUE METHODS_
 |                   |                | file is only loaded once        |
 |                   |                | queue:dequeue() is called.      |
 +-------------------+----------------+---------------------------------+
+| queue:len()       | number         | Get the length of the queue.    |
++-------------------+----------------+---------------------------------+
 | queue:dequeue()   | name: string,  | Dequeue a data item.            |
 |                   | path: string?, |                                 |
 |                   | data: string,  | Meant for advanced use only.    |
