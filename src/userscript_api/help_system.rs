@@ -216,7 +216,7 @@ impl UserData for HelpSystem {
                 let description: &str = topic.short_description().trim();
                 println!("{name:<16} - {description:<50}");
             }
-            println!("\nTo get help on a particular topic, use help:with 'topic'\n");
+            println!("\nTo get help on a particular topic, use help 'topic'\n");
             Ok(())
         });
     }
