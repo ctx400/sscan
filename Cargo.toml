@@ -1,7 +1,7 @@
 [package]
 # Crate Information
 name = "sscan"
-version = "0.12.0"
+version = "0.13.0"
 authors = ["ctx400"]
 description = "A scriptable file/process/network scanner"
 repository = "https://github.com/ctx400/sscan"
