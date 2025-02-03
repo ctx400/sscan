@@ -2,11 +2,13 @@ __sscan - A scriptable file/process/network scanner__
 
 _Basic Commands_
 
++-------------------+-------------------------------------------+
 | Command           | Description                               |
-| ----------------- | ----------------------------------------- |
++-------------------+-------------------------------------------+
 | help()            | View this general help message.           |
 | help:topics()     | List all available help topics.           |
 | help 'topic'      | View detailed help on 'topic'.            |
++-------------------+-------------------------------------------+
 
 _Interactive Mode_
 

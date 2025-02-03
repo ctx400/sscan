@@ -29,9 +29,11 @@ use crate::{macros::topics, userscript_api::ApiObject};
 use error::Error;
 use mlua::{ExternalError, UserData};
 use std::collections::HashMap;
+use topics::about;
 
 // List of Userscript API Topics
 topics! {
+    use HelpTopic about for "Build, version, and license information.";
     use HelpTopic queue for "Queue up files and other data for scanning.";
     use HelpTopic user_engines for "Register custom scan engines from userscripts.";
 }
@@ -130,7 +132,7 @@ where
     ///
     /// Required. This is the detailed help content the [`HelpSystem`]
     /// returns when a user looks up a help topic by name with
-    /// `help:with 'topic'`. The format of the content is free-form,
+    /// `help 'topic'`. The format of the content is free-form,
     /// but try to write it in a way that is easy for end-users to
     /// digest.
     ///
@@ -181,6 +183,7 @@ impl Default for HelpSystem {
 
         let mut help_system: HelpSystem = Self::new();
         help_system
+            .topic(Box::new(about::Topic))
             .topic(Box::new(queue::Topic))
             .topic(Box::new(user_engines::Topic));
         help_system
@@ -216,7 +219,7 @@ impl UserData for HelpSystem {
                 let description: &str = topic.short_description().trim();
                 println!("{name:<16} - {description:<50}");
             }
-            println!("\nTo get help on a particular topic, use help:with 'topic'\n");
+            println!("\nTo get help on a particular topic, use help 'topic'\n");
             Ok(())
         });
     }

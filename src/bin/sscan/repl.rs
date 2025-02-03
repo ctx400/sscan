@@ -7,11 +7,11 @@ use std::{
     io::{stdin, stdout, BufRead, Write},
 };
 
-/// Starts an interactive REPL. Never returns unless LuaVM exits.
-pub async fn invoke_repl(vm: &ActorRef<LuaVM>, nosplash: bool) {
+/// Starts an interactive REPL. Never returns unless [`LuaVM`] exits.
+pub async fn invoke(vm: &ActorRef<LuaVM>, nosplash: bool) {
     // Print the splash message
     if !nosplash {
-        repl_print_splash().await;
+        print_splash();
     }
 
     // Start REPL loop.
@@ -23,22 +23,27 @@ pub async fn invoke_repl(vm: &ActorRef<LuaVM>, nosplash: bool) {
         }
 
         // Read a multiline Lua chunk terminated by a semicolon.
-        repl_read(&mut buffer).await;
+        read_chunk(&mut buffer);
+
+        // Check if the `exit` keyword was passed
+        if buffer == "exit" {
+            break;
+        }
 
         // Evaluate the chunk in the virtual machine
-        match repl_evaluate(vm, &buffer).await {
+        match evaluate(vm, &buffer).await {
             Ok(value) => {
-                repl_print(value).await;
+                print_result(value);
             }
             Err(error) => {
-                repl_print_error(error.context("failed to evaluate chunk")).await;
+                print_error(&error.context("failed to evaluate chunk"));
             }
         }
     }
 }
 
 /// Try to pretty-print an error.
-async fn repl_print_error(err: anyhow::Error) {
+fn print_error(err: &anyhow::Error) {
     // Print the base error
     eprintln!("Error: {err}\n");
 
@@ -53,12 +58,13 @@ async fn repl_print_error(err: anyhow::Error) {
 
     // Print a backtrace, if available
     if err.backtrace().status() == Captured {
-        eprintln!("Backtrace:\n{}\n", err.backtrace())
+        eprintln!("Backtrace:\n{}\n", err.backtrace());
     }
 }
 
 /// Try to pretty-print the result.
-async fn repl_print(value: Value) {
+fn print_result(value: Value) {
+    #[allow(clippy::match_wildcard_for_single_variants)] // invalid lint
     match value {
         Value::Nil => {}
         Value::Boolean(b) => println!("{b}"),
@@ -70,19 +76,19 @@ async fn repl_print(value: Value) {
         Value::Function(f) => println!("<function@0x{:x}>", f.to_pointer() as usize),
         Value::UserData(u) => println!("<userdata@0x{:x}>", u.to_pointer() as usize),
         Value::LightUserData(l) => println!("<lightuserdata@0x{:x}>", l.0 as usize),
-        Value::Error(e) => repl_print_error(anyhow::Error::from(*e)).await,
+        Value::Error(e) => print_error(&anyhow::Error::from(*e)),
         _ => println!("<unknown@0x{}>", value.to_pointer() as usize),
     }
 }
 
 /// Evaluate the Lua expression and return a result.
-async fn repl_evaluate(vm: &ActorRef<LuaVM>, chunk: &str) -> Result<Value> {
+async fn evaluate(vm: &ActorRef<LuaVM>, chunk: &str) -> Result<Value> {
     let eval_request: EvalChunk = chunk.into();
     Ok(vm.ask(eval_request).await?)
 }
 
 /// Reads a multiline Lua chunk, terminated by a semicolon.
-async fn repl_read(buffer: &mut String) {
+fn read_chunk(buffer: &mut String) {
     // Flag to determine if the continuation prompt should be printed.
     let mut continuation: bool = false;
 
@@ -90,12 +96,12 @@ async fn repl_read(buffer: &mut String) {
     buffer.clear();
 
     // An error printing the prompt is non-critical.
-    let _ = repl_print_prompt().await;
+    let _ = print_prompt();
 
     while !buffer.trim().ends_with(';') {
         if continuation {
             // An error printing the prompt is non-critical.
-            let _ = repl_print_continuation().await;
+            let _ = print_continuation();
         }
         if let Err(error) = stdin().lock().read_line(buffer) {
             // Create a human-friendly error message.
@@ -110,34 +116,34 @@ async fn repl_read(buffer: &mut String) {
     }
 
     // Trim the semicolon off of the end of the buffer.
-    *buffer = buffer.trim().trim_end_matches(';').to_owned();
+    *buffer = buffer.trim().trim_end_matches(';').trim().into();
 }
 
 /// Prints a prompt message before input.
-async fn repl_print_prompt() -> Result<()> {
+fn print_prompt() -> Result<()> {
     print!("sscan> ");
     stdout().lock().flush()?;
     Ok(())
 }
 
 /// Prints the continuation prompt.
-async fn repl_print_continuation() -> Result<()> {
+fn print_continuation() -> Result<()> {
     print!("   ... ");
     stdout().lock().flush()?;
     Ok(())
 }
 
 /// Prints the [`SPLASH_MESSAGE`]
-async fn repl_print_splash() {
+fn print_splash() {
     println!("{SPLASH_MESSAGE}");
 }
 
 /// The splash message printed by [`repl_print_splash()`].
-const SPLASH_MESSAGE: &str = r#"
+const SPLASH_MESSAGE: &str = r"
 @@@
 @@@ Interactive REPL for sscan
 @@@
 @@@ Enter any valid multiline lua, terminated by a semicolon (;)
-@@@ For help, use help();
+@@@ For help, use help(), to exit, use exit;
 @@@
-"#;
+";

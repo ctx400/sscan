@@ -4,32 +4,30 @@ You can register custom Lua functions as scan engines. A custom scan
 engine is any Lua function that accepts a `string` payload, returning
 either `true` or `false` based on match or non-match, respectively.
 
-_Usage_
+_USER_ENGINES METHODS_
 
-user_engines:register(name, function)
-    Register a userscript scan engine.
-
-user_engines:scan(string)
-    Test a `string` payload against all registered engines.
-    `string` may be any valid Lua string, including bytestrings.
-
-_Example: Hello World Engine_
-
-This engine detects the presence of "Hello World" anywhere in the string
-payload, returning `true` if found.
-
-    function engine_helloworld(payload)
-        if string.find(payload, "Hello World") ~= nil then
-            return true
-        end
-        return false
-    end
-
-    user_engines:register("match_helloworld", engine_helloworld)
-
-Then, you can launch a scan against all registered engines at once by
-calling the following function:
-
-    matches = user_engines:scan("blablabla-Hello World-blablabla")
-
-`matches` is a list of the names of each engine that returned `true`.
++------------------------+---------+------------------------------------+
+| Method                 | Returns | Description                        |
++------------------------+---------+------------------------------------+
+| user_engines:register( | nil     | Register a userscript scan engine. |
+|   name: string,        |         |                                    |
+|   spec: function       |         | Installs the provided function as  |
+| )                      |         | a custom userscript scan engine.   |
+|                        |         | The `name` parameter uniquely      |
+|                        |         | identifies the scan engine in scan |
+|                        |         | results.                           |
++------------------------+---------+------------------------------------+
+| user_engines:scan(     | array   | Scan `content` against all engines |
+|   content: string      |         |                                    |
+| )                      |         | Manually initiates a scan of       |
+|                        |         | user-provided `content` against    |
+|                        |         | all registered userscript scan     |
+|                        |         | engines. Returns an array of the   |
+|                        |         | names of all scan engines that     |
+|                        |         | matched `content`.                 |
+|                        |         |                                    |
+|                        |         | This method is mainly for testing. |
+|                        |         | Typically the scan manager handles |
+|                        |         | the invocation of userscript scan  |
+|                        |         | engines.                           |
++------------------------+---------+------------------------------------+

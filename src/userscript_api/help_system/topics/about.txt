@@ -1,0 +1,45 @@
+__Program and License Information__
+
+sscan exposes its program, build, and license information through the
+userscript API. This allows for programmatic access to build-time
+information.
+
+_GLOBAL VARIABLES_
+
++-------------+--------+-----------------------------------+
+| Variable    | Type   | Description                       |
++-------------+--------+-----------------------------------+
+| _BUILD      | table  | Build Info                        |
+|             |        | {                                 |
+|             |        |    major: number,                 |
+|             |        |    minor: number,                 |
+|             |        |    patch: number,                 |
+|             |        | }                                 |
+| _DOCS       | string | Docs.rs and help system info.     |
+| _LICENSE    | string | The full MIT license text.        |
+| _POWERED_BY | string | Attribution for Lua 5.4           |
+| _VERSION    | string | Program name and version.         |
++-------------+--------+-----------------------------------+
+
+_ABOUT METHODS_
+
++---------+---------+------------------------------------------------+
+| Method  | Returns | Description                                    |
++---------+---------+------------------------------------------------+
+| about() | string  | Brief summary of the info this module exposes. |
++---------+---------+------------------------------------------------+
+
+_ABOUT FIELDS_
+
+All about.* fields are strings.
+
++---------------+----------------------------+
+| Field         | Description                |
++---------------+----------------------------+
+| about.docs    | Docs.rs link.              |
+| about.license | The full MIT license text. |
+| about.program | Name of the program.       |
+| about.lua     | Attribution for Lua 5.4.   |
+| about.repo    | Github link.               |
+| about.version | Version as X.X.X           |
++---------------+----------------------------+

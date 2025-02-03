@@ -5,57 +5,31 @@ scanned by activated scan engines. Userscripts can queue files, strings,
 bytestrings, and other data types into the queue, and these queued data
 items will be passed to all running scanners for analysis.
 
-_Usage_
+_QUEUE METHODS_
 
-queue:add_file 'path/to/file'
-    Enqueue a file for scanning by all activated engines.
-
-    Parameters:
-    - <path/to/file>: String
-      Any valid path to a file to enqueue for scanning.
-
-    Example:
-    ```
-    queue:add_file 'C:/users/user/documents/spreadsheet.xlsm'
-    ```
----
-
-queue:add_raw(name, data)
-    Enqueue a raw Lua string or bytestring for scanning by all engines.
-
-    Parameters:
-    - <name>: String
-      Human-friendly identifier for the raw data.
-      Shows up in scan results.
-
-    - <data>: String
-      Any valid Lua string or bytestring.
-      This is the content the scan engines will scan.
-
-    Example:
-    ```
-    queue:add_raw('my_data_item', 'blablablablabla')
-    ```
----
-
-queue:dequeue()
-    Pull the data item at the front of the queue.
-    This is meant only for advanced use cases!
-
-    Returns:
-    - <String>, <String or Nil>, <String>
-
-      1. <String>        - Human-friendly data item identifier.
-      2. <String or Nil> - The file path, if applicable.
-      3. <String>        - The data that was enqueued.
-
-    Errors:
-        Certain conditions, such as an empty queue, a nonexistent file,
-        or bad filesystem permissions, may cause dequeue() to return a
-        Queue error.
-
-    Example:
-    ```
-    local name, path, content = queue:dequeue()
-    ```
----
++-------------------+----------------+---------------------------------+
+| Method            | Returns        | Description                     |
++-------------------+----------------+---------------------------------+
+| queue:add_raw(    | nil            | Enqueue raw bytes for scanning. |
+|   name: string,   |                |                                 |
+|   content: string |                | This is useful for scanning     |
+| )                 |                | data that does not originate    |
+|                   |                | file, such as process or        |
+|                   |                | network bytes.                  |
++-------------------+----------------+---------------------------------+
+| queue:add_file(   | nil            | Enqueue a file for scanning.    |
+|   path: string    |                |                                 |
+| )                 |                | Note that the file will be      |
+|                   |                | lazy-loaded. That is, only the  |
+|                   |                | path is queued, and the actual  |
+|                   |                | file is only loaded once        |
+|                   |                | queue:dequeue() is called.      |
++-------------------+----------------+---------------------------------+
+| queue:len()       | number         | Get the length of the queue.    |
++-------------------+----------------+---------------------------------+
+| queue:dequeue()   | name: string,  | Dequeue a data item.            |
+|                   | path: string?, |                                 |
+|                   | data: string,  | Meant for advanced use only.    |
+|                   |                | Typically, the scan manager     |
+|                   |                | handles dequeueing data.        |
++-------------------+----------------+---------------------------------+

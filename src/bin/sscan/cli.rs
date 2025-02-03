@@ -5,7 +5,7 @@ use std::path::PathBuf;
 #[command(version, about, long_about = None)]
 #[command(propagate_version = true)]
 #[command(infer_subcommands = true)]
-pub struct CliArgs {
+pub struct Args {
     /// Load unsafe Lua standard libraries.
     ///
     /// If set, sscan will load unsafe Lua standard libraries, such as

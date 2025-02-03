@@ -111,3 +111,34 @@ impl Message<Dequeue> for Queue {
         }
     }
 }
+
+/// # Check the number of items in the scan queue.
+///
+/// A request for [`Queue`] to compute the number of [`DataItem`]
+/// objects currently enqueued.
+///
+/// ## Reply
+///
+/// Expect a reply of type [`usize`].
+///
+/// ## Example
+///
+/// ```
+/// # use sscan::actors::{queue::{Queue, messages::GetLength}, lua_vm::LuaVM};
+/// # #[tokio::main]
+/// # async fn main() {
+/// # let lua_ref = LuaVM::spawn();
+/// # let queue = Queue::spawn(lua_ref.downgrade());
+/// let length = queue.ask(GetLength).await.unwrap();
+/// # assert_eq!(length, 0usize);
+/// # }
+/// ```
+pub struct GetLength;
+
+impl Message<GetLength> for Queue {
+    type Reply = usize;
+
+    async fn handle(&mut self, _: GetLength, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+        self.items.len()
+    }
+}
