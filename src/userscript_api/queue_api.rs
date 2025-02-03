@@ -12,27 +12,17 @@
 //!
 //! ## API Usage Examples
 //!
-//! **For full API documentation, launch sscan in interactive mode and
-//!   enter `help 'queue'`.**
-//!
-//! ```lua
-//! Usage: queue:add_file 'path/to/file'
-//!     Enqueue a file for scanning.
-//!
-//! Usage: queue:add_raw(name, data)
-//!     Enqueue a raw Lua string/bytestring for scanning.
-//!
-//! Usage: queue:dequeue()
-//!     Pull the data item at the front of the queue.
-//! ```
+//! For full API documentation, launch sscan in interactive mode and
+//! enter `help 'queue'`, or see [`topics::queue`].
 //!
 //! [global scan queue]: crate::actors::queue::Queue
+//! [`topics::queue`]: crate::userscript_api::help_system::topics::queue
 
 use crate::{
     actors::queue::{
         data_item::{FileDatum, RawDatum},
         error::Error as QueueError,
-        messages::{Dequeue, Enqueue},
+        messages::{Dequeue, Enqueue, GetLength},
         Queue,
     },
     userscript_api::ApiObject,
@@ -72,6 +62,7 @@ impl UserData for QueueApi {
         methods.add_async_method("add_raw", queue_add_raw);
         methods.add_async_method("add_file", queue_add_file);
         methods.add_async_method("dequeue", queue_dequeue);
+        methods.add_async_method("len", queue_len);
     }
 }
 
@@ -127,6 +118,18 @@ async fn queue_dequeue(
             }
             Err(error) => Err(error.into_lua_err()),
         }
+    } else {
+        Err(QueueError::NoGlobalQueue.into_lua_err())
+    }
+}
+
+/// Userscript function `queue:len()`
+async fn queue_len(_: Lua, this: UserDataRef<QueueApi>, (): ()) -> mlua::Result<usize> {
+    if let Some(queue) = this.0.upgrade() {
+        queue
+            .ask(GetLength)
+            .await
+            .map_err(mlua::ExternalError::into_lua_err)
     } else {
         Err(QueueError::NoGlobalQueue.into_lua_err())
     }
