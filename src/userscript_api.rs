@@ -38,7 +38,7 @@ pub mod include {
     pub use mlua::prelude::*;
 }
 
-use include::*;
+use include::{Lua, LuaUserData};
 
 /// # A userscript API object.
 ///
@@ -58,14 +58,14 @@ use include::*;
 /// struct XkcdApi;
 ///
 /// // We define our methods and fields here.
-/// impl UserData for XkcdApi {
-///     fn add_methods<M: UserDataMethods<Self>>(methods: &mut M) {
+/// impl LuaUserData for XkcdApi {
+///     fn add_methods<M: LuaUserDataMethods<Self>>(methods: &mut M) {
 ///         methods.add_method("get_random_number", |_, _this: &XkcdApi, ()| {
 ///             Ok(4)
 ///         });
 ///     }
 ///
-///     fn add_fields<F: UserDataFields<Self>>(fields: &mut F) {
+///     fn add_fields<F: LuaUserDataFields<Self>>(fields: &mut F) {
 ///         fields.add_field_method_get("source", |_, _this: &XkcdApi| {
 ///             Ok("https://xkcd.com/221/")
 ///         });
@@ -134,7 +134,7 @@ pub trait ApiObject: LuaUserData + Send + 'static {
     /// ```
     /// # use sscan::userscript_api::{ApiObject, include::*};
     /// # struct MyApi;
-    /// # impl UserData for MyApi {}
+    /// # impl LuaUserData for MyApi {}
     /// impl ApiObject for MyApi {
     ///     fn name(&self) -> &'static str {
     ///         "my_api"
@@ -154,12 +154,18 @@ pub trait ApiObject: LuaUserData + Send + 'static {
     /// The init function is called *before* registering the API object,
     /// so the API object will not yet be available from Lua globals.
     ///
+    /// ## Errors
+    ///
+    /// Any Lua errors that occur should be either handled or propagated
+    /// up with the `?` operator. Other types of errors should be
+    /// handled directly or converted into a Lua error.
+    ///
     /// ## Example
     ///
     /// ```
     /// # use sscan::userscript_api::{ApiObject, include::*};
     /// # struct MyApi;
-    /// # impl UserData for MyApi {}
+    /// # impl LuaUserData for MyApi {}
     /// impl ApiObject for MyApi {
     /// #   fn name(&self) -> &'static str { "my_api" }
     ///     fn init_script(&self, lua: &Lua) -> LuaResult<()> {

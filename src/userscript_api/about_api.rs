@@ -11,10 +11,10 @@
 //! the Lua virtual machine, where userscripts can call into it.
 //!
 
-use crate::userscript_api::{ApiObject, include::*};
+use crate::userscript_api::{ApiObject, include::{LuaUserData, LuaUserDataMethods, LuaUserDataRef, LuaTable}};
 
 /// Extended attribution information
-const LICENSE_EXT: &'static str = "\
+const LICENSE_EXT: &str = "\
 sscan is made possible thanks to the use of open-source software. A full
 list of software, the authors, and package licenses can be found in the
 OPEN_SOURCE_LICENSES.md file of the source repository.

@@ -36,7 +36,7 @@ use kameo::message::{Context, Message};
 /// # #[tokio::main]
 /// # async fn main() {
 /// # struct MyApi;
-/// # impl UserData for MyApi {}
+/// # impl LuaUserData for MyApi {}
 /// # impl ApiObject for MyApi {
 /// #   fn name(&self) -> &'static str {
 /// #       "my_api"
