@@ -126,7 +126,10 @@ async fn queue_dequeue(
 /// Userscript function `queue:len()`
 async fn queue_len(_: Lua, this: UserDataRef<QueueApi>, (): ()) -> mlua::Result<usize> {
     if let Some(queue) = this.0.upgrade() {
-        queue.ask(GetLength).await.map_err(mlua::ExternalError::into_lua_err)
+        queue
+            .ask(GetLength)
+            .await
+            .map_err(mlua::ExternalError::into_lua_err)
     } else {
         Err(QueueError::NoGlobalQueue.into_lua_err())
     }
