@@ -6,23 +6,15 @@
 //!
 
 use kameo::actor::ActorRef;
-use sscan::{
-    actors::lua_vm::{
-        messages::{EvalChunk, ExecChunk, RegisterUserApi},
+use sscan::actors::lua_vm::{
+        messages::{EvalChunk, ExecChunk},
         LuaVM,
-    },
-    userscript_api::user_engine::UserEngine,
-};
+    };
 
 #[tokio::test]
 async fn should_register_user_engines() {
     // Spawn the virtual machine
     let vm: ActorRef<LuaVM> = LuaVM::spawn();
-
-    // Register the UserEngine API
-    vm.ask(RegisterUserApi::with(UserEngine::new()))
-        .await
-        .expect("should have no issues registering the UserEngine API");
 
     // Load some userscript scan engines the quick and dirty way
     let exec_request: ExecChunk = concat!(

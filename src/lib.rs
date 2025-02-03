@@ -75,6 +75,7 @@
 pub mod actors {
     pub mod lua_vm;
     pub mod queue;
+    pub mod user_engine;
 }
 pub(crate) mod macros;
 pub mod userscript_api;

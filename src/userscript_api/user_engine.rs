@@ -38,9 +38,9 @@
 //! user_engines:register("match_helloworld", engine_match_helloworld)
 //! ```
 
-use super::ApiObject;
-use mlua::{Function, UserData};
-use std::collections::HashMap;
+use crate::{actors::user_engine::{error::Error, messages::{RegisterUserEngine, ScanBytes}, UserEngine}, userscript_api::{include::{LuaFunction, LuaString, LuaUserData, LuaUserDataMethods, LuaUserDataRef}, ApiObject}};
+use kameo::actor::WeakActorRef;
+use mlua::ExternalError;
 
 /// # The Userscript Scan Engine API
 ///
@@ -49,57 +49,46 @@ use std::collections::HashMap;
 /// environment. Once one or more userscript scan engines are registered,
 /// a scan can be launched using `user_engines:scan(<string>)`, where
 /// `<string>` may also be a bytestring.
-pub struct UserEngine {
-    /// Holds the list of registered userscript scan engines.
-    engines: HashMap<String, Function>,
+pub struct UserEngineApi {
+    /// Weak ref to the user engine actor.
+    engine_ref: WeakActorRef<UserEngine>,
 }
 
-impl UserEngine {
+impl UserEngineApi {
     /// Creates a new Userscript Scan Engine API with no engines loaded.
     #[must_use]
-    pub fn new() -> Self {
-        Self {
-            engines: HashMap::with_capacity(1024),
-        }
+    pub fn new(engine_ref: WeakActorRef<UserEngine>) -> Self {
+        Self { engine_ref }
     }
 }
 
-impl Default for UserEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl UserData for UserEngine {
-    fn add_methods<M: mlua::UserDataMethods<Self>>(methods: &mut M) {
-        // Register a userscript scan engine.
-        methods.add_method_mut(
-            "register",
-            |_, this: &mut UserEngine, (name, func): (String, Function)| {
-                this.engines.insert(name, func);
+impl LuaUserData for UserEngineApi {
+    fn add_methods<M: LuaUserDataMethods<Self>>(methods: &mut M) {
+        methods.add_async_method("register", |_, this: LuaUserDataRef<UserEngineApi>, (name, spec): (String, LuaFunction)| async move {
+            if let Some(user_engine) = this.engine_ref.upgrade() {
+                user_engine.ask(RegisterUserEngine::using(name, spec)).await.map_err(|err| err.into_lua_err())?;
                 Ok(())
-            },
-        );
-
-        // Run a scan against all userscript scan engines.
-        methods.add_method("scan", |_, this, bytestring: mlua::String| {
-            // When an engine returns true, it is pushed into this list.
-            let mut matching_engines: Vec<String> = Vec::with_capacity(1024);
-
-            // Call all scan engines sequentially.
-            for (name, engine) in &this.engines {
-                let result: bool = engine.call(&bytestring)?;
-                if result {
-                    matching_engines.push(name.clone());
-                }
+            } else {
+                Err(Error::NoUserEngine.into_lua_err())
             }
-            matching_engines.shrink_to_fit();
-            Ok(matching_engines)
+        });
+
+        methods.add_async_method("scan", |_, this: LuaUserDataRef<UserEngineApi>, content: LuaString| async move {
+            if let Some(user_engine) = this.engine_ref.upgrade() {
+                // Convert `content` into a byte vector
+                let scan_request: ScanBytes = content.as_bytes().to_vec().into();
+
+                // Call the userscript scan engine service
+                let scan_results: Vec<String> = user_engine.ask(scan_request).await.map_err(|err| err.into_lua_err())?;
+                Ok(scan_results)
+            } else {
+                Err(Error::NoUserEngine.into_lua_err())
+            }
         });
     }
 }
 
-impl ApiObject for UserEngine {
+impl ApiObject for UserEngineApi {
     fn name(&self) -> &'static str {
         "user_engines"
     }
