@@ -21,11 +21,13 @@ pub mod messages;
 
 use crate::{
     actors::queue::Queue,
-    userscript_api::{about_api::AboutApi, help_system::HelpSystem, user_engine::UserEngine},
+    userscript_api::{about_api::AboutApi, help_system::HelpSystem},
 };
 use kameo::{actor::ActorRef, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
 use messages::RegisterUserApi;
 use mlua::prelude::*;
+
+use super::user_engine::UserEngine;
 
 /// # An actor which hosts a Lua VM and userscript environment.
 ///
@@ -37,8 +39,11 @@ pub struct LuaVM {
     /// The inner Lua 5.4 Virtual Machine
     vm: Lua,
 
-    /// Reference to the Queue service
+    /// Reference to the [`Queue`] service
     queue: Option<ActorRef<Queue>>,
+
+    /// Reference to the [`UserEngine`] service
+    user_engine: Option<ActorRef<UserEngine>>,
 }
 
 /// # [`LuaVM`] is an actor.
@@ -52,7 +57,9 @@ impl Actor for LuaVM {
 
     async fn on_start(&mut self, lua_vm: ActorRef<Self>) -> Result<(), BoxError> {
         // Spawn other actors
-        let queue: ActorRef<Queue> = Queue::spawn(lua_vm.downgrade());
+        let queue: ActorRef<Queue> = Queue::spawn_with_size(lua_vm.downgrade(), 16384);
+        let user_engine: ActorRef<UserEngine> =
+            UserEngine::spawn_with_capacity(lua_vm.downgrade(), 128);
 
         // Register auxillary userscript APIs
         lua_vm
@@ -61,15 +68,14 @@ impl Actor for LuaVM {
         lua_vm
             .tell(RegisterUserApi::with(AboutApi::default()))
             .await?;
-        lua_vm
-            .tell(RegisterUserApi::with(UserEngine::default()))
-            .await?;
 
         // Link all actors to self
         lua_vm.link(&queue).await;
+        lua_vm.link(&user_engine).await;
 
         // Store references to the other actors
         self.queue = Some(queue);
+        self.user_engine = Some(user_engine);
         Ok(())
     }
 }
@@ -81,6 +87,7 @@ impl LuaVM {
         let lua_vm: Self = Self {
             vm: Lua::new(),
             queue: None,
+            user_engine: None,
         };
         kameo::spawn(lua_vm)
     }
@@ -104,6 +111,7 @@ impl LuaVM {
         let lua_vm: Self = Self {
             vm: Lua::unsafe_new(),
             queue: None,
+            user_engine: None,
         };
         kameo::spawn(lua_vm)
     }

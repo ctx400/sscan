@@ -7,7 +7,7 @@
 //! ## Interacting with the Input Queue
 //!
 //! [`Queue`] is an asynchronous actor, meaning it runs on its own
-//! independent thread and as full control over its own mutable state.
+//! independent thread and has full control over its own mutable state.
 //! Interaction with the queue is done through message passing.
 //!
 //! See the [`messages`] module to learn about the various types of
