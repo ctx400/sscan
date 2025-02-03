@@ -23,6 +23,7 @@
 //! the [`ApiObject`] trait.
 //!
 
+pub mod about_api;
 pub mod help_system;
 pub mod queue_api;
 pub mod user_engine;
@@ -34,10 +35,10 @@ pub mod include {
     //! functionality of the userscript API.
 
     /// Exported from crate [`mlua`].
-    pub use mlua::{UserData, UserDataFields, UserDataMethods};
+    pub use mlua::prelude::*;
 }
 
-use include::UserData;
+use include::*;
 
 /// # A userscript API object.
 ///
@@ -46,8 +47,8 @@ use include::UserData;
 /// data fields, functions, or methods, with which a userscript can
 /// utilize to interact with a component of sscan.
 ///
-/// Every API object must implement the [`UserData`] trait from crate
-/// [`mlua`], and must be [`Send`] and `'static`.
+/// Every API object must implement the [`LuaUserData`] trait, and must
+/// be [`Send`] and [`'static`].
 ///
 /// # Example
 ///
@@ -88,7 +89,8 @@ use include::UserData;
 /// ```
 ///
 /// [`LuaVM`]: crate::actors::lua_vm::LuaVM
-pub trait ApiObject: UserData + Send + 'static {
+/// [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
+pub trait ApiObject: LuaUserData + Send + 'static {
     /// # The name of the API object, as visible from Lua
     ///
     /// `name` must be a valid Lua identifier. Valid Lua identifiers
@@ -140,4 +142,35 @@ pub trait ApiObject: UserData + Send + 'static {
     /// }
     /// ```
     fn name(&self) -> &'static str;
+
+    /// # An optional startup function, which runs when the [`ApiObject`]
+    /// is loaded through a [`RegisterUserApi`] request.
+    ///
+    /// If a startup script is needed to properly load a userscript API,
+    /// override the default implementation of this trait method.
+    /// Otherwise, the default implementation of this function is a
+    /// simple no-op.
+    ///
+    /// The init function is called *before* registering the API object,
+    /// so the API object will not yet be available from Lua globals.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// # use sscan::userscript_api::{ApiObject, include::*};
+    /// # struct MyApi;
+    /// # impl UserData for MyApi {}
+    /// impl ApiObject for MyApi {
+    /// #   fn name(&self) -> &'static str { "my_api" }
+    ///     fn init_script(&self, lua: &Lua) -> LuaResult<()> {
+    ///         lua.globals().set("hello", "world!")?;
+    ///         Ok(())
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// [`RegisterUserApi`]: crate::actors::lua_vm::messages::RegisterUserApi
+    fn init_script(&self, _: &Lua) -> mlua::Result<()> {
+        Ok(())
+    }
 }

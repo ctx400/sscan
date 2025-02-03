@@ -62,6 +62,7 @@ where
         msg: RegisterUserApi<A>,
         _: Context<'_, Self, Self::Reply>,
     ) -> Self::Reply {
+        msg.0.init_script(&self.vm)?;
         self.vm.globals().set(msg.0.name(), msg.0)?;
         Ok(())
     }
