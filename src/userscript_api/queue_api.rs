@@ -32,7 +32,7 @@ use crate::{
     actors::queue::{
         data_item::{FileDatum, RawDatum},
         error::Error as QueueError,
-        messages::{Dequeue, Enqueue},
+        messages::{Dequeue, Enqueue, GetLength},
         Queue,
     },
     userscript_api::ApiObject,
@@ -72,6 +72,7 @@ impl UserData for QueueApi {
         methods.add_async_method("add_raw", queue_add_raw);
         methods.add_async_method("add_file", queue_add_file);
         methods.add_async_method("dequeue", queue_dequeue);
+        methods.add_async_method("len", queue_len);
     }
 }
 
@@ -127,6 +128,15 @@ async fn queue_dequeue(
             }
             Err(error) => Err(error.into_lua_err()),
         }
+    } else {
+        Err(QueueError::NoGlobalQueue.into_lua_err())
+    }
+}
+
+/// Userscript function `queue:len()`
+async fn queue_len(_: Lua, this: UserDataRef<QueueApi>, (): ()) -> mlua::Result<usize> {
+    if let Some(queue) = this.0.upgrade() {
+        queue.ask(GetLength).await.map_err(|err| err.into_lua_err())
     } else {
         Err(QueueError::NoGlobalQueue.into_lua_err())
     }
