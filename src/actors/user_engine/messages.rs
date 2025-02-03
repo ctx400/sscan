@@ -46,6 +46,7 @@ impl Message<RegisterUserEngine> for UserEngine {
 
 impl RegisterUserEngine {
     /// Create a new [`RegisterUserEngine`] message.
+    #[must_use]
     pub fn using(name: String, spec: LuaFunction) -> Self {
         Self { name, spec }
     }

@@ -66,7 +66,7 @@ impl LuaUserData for UserEngineApi {
     fn add_methods<M: LuaUserDataMethods<Self>>(methods: &mut M) {
         methods.add_async_method("register", |_, this: LuaUserDataRef<UserEngineApi>, (name, spec): (String, LuaFunction)| async move {
             if let Some(user_engine) = this.engine_ref.upgrade() {
-                user_engine.ask(RegisterUserEngine::using(name, spec)).await.map_err(|err| err.into_lua_err())?;
+                user_engine.ask(RegisterUserEngine::using(name, spec)).await.map_err(mlua::ExternalError::into_lua_err)?;
                 Ok(())
             } else {
                 Err(Error::NoUserEngine.into_lua_err())
@@ -79,7 +79,7 @@ impl LuaUserData for UserEngineApi {
                 let scan_request: ScanBytes = content.as_bytes().to_vec().into();
 
                 // Call the userscript scan engine service
-                let scan_results: Vec<String> = user_engine.ask(scan_request).await.map_err(|err| err.into_lua_err())?;
+                let scan_results: Vec<String> = user_engine.ask(scan_request).await.map_err(mlua::ExternalError::into_lua_err)?;
                 Ok(scan_results)
             } else {
                 Err(Error::NoUserEngine.into_lua_err())

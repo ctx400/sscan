@@ -58,6 +58,7 @@ impl UserEngine {
     /// [`UserEngine::spawn_with_capacity()`], which allows setting an
     /// initial allocation size that makes sense. Otherwise, the
     /// standard `spawn()` function will allocate very often.
+    #[must_use]
     pub fn spawn(vm: WeakActorRef<LuaVM>) -> ActorRef<Self> {
         let engine: Self = Self {
             engines: HashMap::new(),
@@ -67,6 +68,7 @@ impl UserEngine {
     }
 
     /// Spawn a new [`UserEngine`] with the given initial capacity.
+    #[must_use]
     pub fn spawn_with_capacity(vm: WeakActorRef<LuaVM>, capacity: usize) -> ActorRef<Self> {
         let engine: Self = Self {
             engines: HashMap::with_capacity(capacity),

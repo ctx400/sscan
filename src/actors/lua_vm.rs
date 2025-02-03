@@ -39,10 +39,10 @@ pub struct LuaVM {
     /// The inner Lua 5.4 Virtual Machine
     vm: Lua,
 
-    /// Reference to the Queue service
+    /// Reference to the [`Queue`] service
     queue: Option<ActorRef<Queue>>,
 
-    /// Reference to the UserEngine service
+    /// Reference to the [`UserEngine`] service
     user_engine: Option<ActorRef<UserEngine>>,
 }
 

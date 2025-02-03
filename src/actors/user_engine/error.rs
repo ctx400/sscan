@@ -41,6 +41,7 @@ pub enum Error {
 
 impl Error {
     /// Create a new [`Error::EngineInvocation`].
+    #[must_use]
     pub fn engine_invocation(engine: String, source: mlua::Error) -> Self {
         Self::EngineInvocation { engine, source }
     }
