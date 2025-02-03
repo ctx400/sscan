@@ -7,9 +7,9 @@
 
 use kameo::actor::ActorRef;
 use sscan::actors::lua_vm::{
-        messages::{EvalChunk, ExecChunk},
-        LuaVM,
-    };
+    messages::{EvalChunk, ExecChunk},
+    LuaVM,
+};
 
 #[tokio::test]
 async fn should_register_user_engines() {

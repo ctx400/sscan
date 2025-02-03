@@ -38,7 +38,17 @@
 //! user_engines:register("match_helloworld", engine_match_helloworld)
 //! ```
 
-use crate::{actors::user_engine::{error::Error, messages::{RegisterUserEngine, ScanBytes}, UserEngine}, userscript_api::{include::{LuaFunction, LuaString, LuaUserData, LuaUserDataMethods, LuaUserDataRef}, ApiObject}};
+use crate::{
+    actors::user_engine::{
+        error::Error,
+        messages::{RegisterUserEngine, ScanBytes},
+        UserEngine,
+    },
+    userscript_api::{
+        include::{LuaFunction, LuaString, LuaUserData, LuaUserDataMethods, LuaUserDataRef},
+        ApiObject,
+    },
+};
 use kameo::actor::WeakActorRef;
 use mlua::ExternalError;
 
@@ -73,18 +83,24 @@ impl LuaUserData for UserEngineApi {
             }
         });
 
-        methods.add_async_method("scan", |_, this: LuaUserDataRef<UserEngineApi>, content: LuaString| async move {
-            if let Some(user_engine) = this.engine_ref.upgrade() {
-                // Convert `content` into a byte vector
-                let scan_request: ScanBytes = content.as_bytes().to_vec().into();
+        methods.add_async_method(
+            "scan",
+            |_, this: LuaUserDataRef<UserEngineApi>, content: LuaString| async move {
+                if let Some(user_engine) = this.engine_ref.upgrade() {
+                    // Convert `content` into a byte vector
+                    let scan_request: ScanBytes = content.as_bytes().to_vec().into();
 
-                // Call the userscript scan engine service
-                let scan_results: Vec<String> = user_engine.ask(scan_request).await.map_err(mlua::ExternalError::into_lua_err)?;
-                Ok(scan_results)
-            } else {
-                Err(Error::NoUserEngine.into_lua_err())
-            }
-        });
+                    // Call the userscript scan engine service
+                    let scan_results: Vec<String> = user_engine
+                        .ask(scan_request)
+                        .await
+                        .map_err(mlua::ExternalError::into_lua_err)?;
+                    Ok(scan_results)
+                } else {
+                    Err(Error::NoUserEngine.into_lua_err())
+                }
+            },
+        );
     }
 }
 

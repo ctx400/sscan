@@ -58,7 +58,8 @@ impl Actor for LuaVM {
     async fn on_start(&mut self, lua_vm: ActorRef<Self>) -> Result<(), BoxError> {
         // Spawn other actors
         let queue: ActorRef<Queue> = Queue::spawn_with_size(lua_vm.downgrade(), 16384);
-        let user_engine: ActorRef<UserEngine> = UserEngine::spawn_with_capacity(lua_vm.downgrade(), 128);
+        let user_engine: ActorRef<UserEngine> =
+            UserEngine::spawn_with_capacity(lua_vm.downgrade(), 128);
 
         // Register auxillary userscript APIs
         lua_vm

@@ -10,8 +10,14 @@
 //! scan engine service and to register custom scan engines.
 //!
 
+use crate::{
+    actors::user_engine::{
+        error::{Error, UserEngineResult},
+        UserEngine,
+    },
+    userscript_api::include::{LuaFunction, LuaString},
+};
 use kameo::message::{Context, Message};
-use crate::{actors::user_engine::{UserEngine, error::{Error, UserEngineResult}}, userscript_api::include::{LuaFunction, LuaString}};
 
 /// # Register a Userscript Scan Engine
 ///
@@ -43,7 +49,11 @@ pub struct RegisterUserEngine {
 impl Message<RegisterUserEngine> for UserEngine {
     type Reply = ();
 
-    async fn handle(&mut self, msg: RegisterUserEngine, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+    async fn handle(
+        &mut self,
+        msg: RegisterUserEngine,
+        _: Context<'_, Self, Self::Reply>,
+    ) -> Self::Reply {
         self.engines.insert(msg.name, msg.spec);
     }
 }
@@ -95,7 +105,10 @@ impl Message<ScanBytes> for UserEngine {
                 let bytestring = LuaString::wrap(msg.0.as_slice());
 
                 // Invoke the scan engine and get the result.
-                let result: UserEngineResult<bool> = spec.call_async(bytestring).await.map_err(|err: mlua::Error| Error::engine_invocation(name.clone(), err));
+                let result: UserEngineResult<bool> = spec
+                    .call_async(bytestring)
+                    .await
+                    .map_err(|err: mlua::Error| Error::engine_invocation(name.clone(), err));
                 if result? {
                     results.push(name.clone());
                 }

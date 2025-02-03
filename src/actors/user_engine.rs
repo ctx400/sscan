@@ -19,10 +19,18 @@
 pub mod error;
 pub mod messages;
 
-use crate::{actors::lua_vm::{LuaVM, messages::RegisterUserApi}, userscript_api::user_engine_api::UserEngineApi};
-use std::collections::HashMap;
-use kameo::{actor::{ActorRef, WeakActorRef}, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
+use crate::{
+    actors::lua_vm::{messages::RegisterUserApi, LuaVM},
+    userscript_api::user_engine_api::UserEngineApi,
+};
+use kameo::{
+    actor::{ActorRef, WeakActorRef},
+    error::BoxError,
+    mailbox::unbounded::UnboundedMailbox,
+    Actor,
+};
 use mlua::Function;
+use std::collections::HashMap;
 
 /// # The Userscript Scan Engine Service
 ///

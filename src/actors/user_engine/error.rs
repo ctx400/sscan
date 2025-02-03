@@ -36,7 +36,7 @@ pub enum Error {
 
         /// Inner Lua error for more context.
         source: mlua::Error,
-    }
+    },
 }
 
 impl Error {
