@@ -36,7 +36,7 @@ use kameo::message::{Context, Message};
 /// # #[tokio::main]
 /// # async fn main() {
 /// # struct MyApi;
-/// # impl UserData for MyApi {}
+/// # impl LuaUserData for MyApi {}
 /// # impl ApiObject for MyApi {
 /// #   fn name(&self) -> &'static str {
 /// #       "my_api"
@@ -62,6 +62,7 @@ where
         msg: RegisterUserApi<A>,
         _: Context<'_, Self, Self::Reply>,
     ) -> Self::Reply {
+        msg.0.init_script(&self.vm)?;
         self.vm.globals().set(msg.0.name(), msg.0)?;
         Ok(())
     }

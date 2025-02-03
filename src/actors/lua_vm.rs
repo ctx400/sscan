@@ -21,7 +21,7 @@ pub mod messages;
 
 use crate::{
     actors::queue::Queue,
-    userscript_api::{help_system::HelpSystem, user_engine::UserEngine},
+    userscript_api::{about_api::AboutApi, help_system::HelpSystem, user_engine::UserEngine},
 };
 use kameo::{actor::ActorRef, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
 use messages::RegisterUserApi;
@@ -57,6 +57,9 @@ impl Actor for LuaVM {
         // Register auxillary userscript APIs
         lua_vm
             .tell(RegisterUserApi::with(HelpSystem::default()))
+            .await?;
+        lua_vm
+            .tell(RegisterUserApi::with(AboutApi::default()))
             .await?;
         lua_vm
             .tell(RegisterUserApi::with(UserEngine::default()))

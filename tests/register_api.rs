@@ -17,7 +17,7 @@ use sscan::{
     },
     userscript_api::{
         help_system::{HelpSystem, HelpTopic},
-        include::UserData,
+        include::LuaUserData,
         ApiObject,
     },
 };
@@ -34,7 +34,7 @@ impl ApiObject for CounterApi {
     }
 }
 
-impl UserData for CounterApi {
+impl LuaUserData for CounterApi {
     fn add_fields<F: mlua::UserDataFields<Self>>(fields: &mut F) {
         // Return the current value of the counter.
         fields.add_field_method_get("value", |_, this| Ok(this.counter));
