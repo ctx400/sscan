@@ -26,7 +26,9 @@ pub async fn invoke(vm: &ActorRef<LuaVM>, nosplash: bool) {
         read_chunk(&mut buffer);
 
         // Check if the `exit` keyword was passed
-        if buffer == "exit" { break }
+        if buffer == "exit" {
+            break;
+        }
 
         // Evaluate the chunk in the virtual machine
         match evaluate(vm, &buffer).await {
