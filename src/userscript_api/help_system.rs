@@ -28,8 +28,8 @@ pub mod error;
 use crate::{macros::topics, userscript_api::ApiObject};
 use error::Error;
 use mlua::{ExternalError, UserData};
-use topics::about;
 use std::collections::HashMap;
+use topics::about;
 
 // List of Userscript API Topics
 topics! {

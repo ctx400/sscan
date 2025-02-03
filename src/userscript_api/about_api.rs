@@ -11,7 +11,10 @@
 //! the Lua virtual machine, where userscripts can call into it.
 //!
 
-use crate::userscript_api::{ApiObject, include::{LuaUserData, LuaUserDataMethods, LuaUserDataRef, LuaTable}};
+use crate::userscript_api::{
+    include::{LuaTable, LuaUserData, LuaUserDataMethods, LuaUserDataRef},
+    ApiObject,
+};
 
 /// Extended attribution information
 const LICENSE_EXT: &str = "\
@@ -50,61 +53,62 @@ impl Default for AboutApi {
         let license: String = format!("{license}\n{LICENSE_EXT}\n{repo}");
         let powered_by: String = format!(
             "{} ({})\nSource: {}",
-            "Lua 5.4",
-            "Copyright (c) 1994–2024 Lua.org, PUC-Rio.",
-            "https://lua.org"
+            "Lua 5.4", "Copyright (c) 1994–2024 Lua.org, PUC-Rio.", "https://lua.org"
         );
         let version_major: u16 = env!("CARGO_PKG_VERSION_MAJOR").parse::<u16>().unwrap();
         let version_minor: u16 = env!("CARGO_PKG_VERSION_MINOR").parse::<u16>().unwrap();
         let version_patch: u16 = env!("CARGO_PKG_VERSION_PATCH").parse::<u16>().unwrap();
 
-        Self { pkg_name, pkg_description, pkg_authors, pkg_license, docs_link, license, powered_by, repo, version_major, version_minor, version_patch }
+        Self {
+            pkg_name,
+            pkg_description,
+            pkg_authors,
+            pkg_license,
+            docs_link,
+            license,
+            powered_by,
+            repo,
+            version_major,
+            version_minor,
+            version_patch,
+        }
     }
 }
 
 impl LuaUserData for AboutApi {
     fn add_fields<F: mlua::UserDataFields<Self>>(fields: &mut F) {
-        fields.add_field_method_get("docs", |_, this: &AboutApi| {
-            Ok(this.docs_link.clone())
-        });
-
-        fields.add_field_method_get("license", |_, this: &AboutApi| {
-            Ok(this.license.clone())
-        });
-
-        fields.add_field_method_get("program", |_, this: &AboutApi| {
-            Ok(this.pkg_name.clone())
-        });
-
-        fields.add_field_method_get("lua", |_, this: &AboutApi| {
-            Ok(this.powered_by.clone())
-        });
-
-        fields.add_field_method_get("repo", |_, this: &AboutApi| {
-            Ok(this.repo.clone())
-        });
-
+        fields.add_field_method_get("docs", |_, this: &AboutApi| Ok(this.docs_link.clone()));
+        fields.add_field_method_get("license", |_, this: &AboutApi| Ok(this.license.clone()));
+        fields.add_field_method_get("program", |_, this: &AboutApi| Ok(this.pkg_name.clone()));
+        fields.add_field_method_get("lua", |_, this: &AboutApi| Ok(this.powered_by.clone()));
+        fields.add_field_method_get("repo", |_, this: &AboutApi| Ok(this.repo.clone()));
         fields.add_field_method_get("version", |_, this: &AboutApi| {
-            Ok(format!("{}.{}.{}", this.version_major, this.version_minor, this.version_patch))
+            Ok(format!(
+                "{}.{}.{}",
+                this.version_major, this.version_minor, this.version_patch
+            ))
         });
     }
 
     fn add_methods<M: LuaUserDataMethods<Self>>(methods: &mut M) {
-        methods.add_async_meta_method("__call", |_, this: LuaUserDataRef<AboutApi>, ()| async move {
-            let about_info: String = format!(
-                "{} v{}.{}.{} - {}\n\nAuthors: {}\nRepository: {}\nDocs: {}\nLicense: {}\n",
-                this.pkg_name,
-                this.version_major,
-                this.version_minor,
-                this.version_patch,
-                this.pkg_description,
-                this.pkg_authors,
-                this.repo,
-                this.docs_link,
-                this.pkg_license,
-            );
-            Ok(about_info)
-        });
+        methods.add_async_meta_method(
+            "__call",
+            |_, this: LuaUserDataRef<AboutApi>, ()| async move {
+                let about_info: String = format!(
+                    "{} v{}.{}.{} - {}\n\nAuthors: {}\nRepository: {}\nDocs: {}\nLicense: {}\n",
+                    this.pkg_name,
+                    this.version_major,
+                    this.version_minor,
+                    this.version_patch,
+                    this.pkg_description,
+                    this.pkg_authors,
+                    this.repo,
+                    this.docs_link,
+                    this.pkg_license,
+                );
+                Ok(about_info)
+            },
+        );
     }
 }
 
@@ -117,18 +121,27 @@ impl ApiObject for AboutApi {
         let globals: LuaTable = lua.globals();
 
         // Set global info variables
-        globals.set("_VERSION", format!("{} v{}.{}.{}", self.pkg_name, self.version_major, self.version_minor, self.version_patch))?;
+        globals.set(
+            "_VERSION",
+            format!(
+                "{} v{}.{}.{}",
+                self.pkg_name, self.version_major, self.version_minor, self.version_patch
+            ),
+        )?;
         globals.set("_LICENSE", self.license.as_str())?;
         globals.set("_POWERED_BY", self.powered_by.as_str())?;
-        globals.set("_DOCS", format!(
-            "{}\n\n  {}\n\n{}\n\n  {}\n{}\n{}\n\n",
-            "To view online help, see:",
-            self.docs_link,
-            "Or, to access built-in help, call:",
-            "help()            -- View general help information",
-            "help:topics()     -- List available help topics",
-            "help 'topic_name' -- View detailed help on `topic_name`"
-        ))?;
+        globals.set(
+            "_DOCS",
+            format!(
+                "{}\n\n  {}\n\n{}\n\n  {}\n{}\n{}\n\n",
+                "To view online help, see:",
+                self.docs_link,
+                "Or, to access built-in help, call:",
+                "help()            -- View general help information",
+                "help:topics()     -- List available help topics",
+                "help 'topic_name' -- View detailed help on `topic_name`"
+            ),
+        )?;
 
         // Set the build info table
         let build_info: LuaTable = lua.create_table()?;
