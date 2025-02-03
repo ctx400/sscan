@@ -25,9 +25,13 @@ use crate::{actors::user_engine::{UserEngine, error::{Error, UserEngineResult}},
 ///
 /// ## Example
 ///
+/// For more help, see [`topics::user_engines`].
+///
+/// ```lua
+/// user_engines:register('match_hello', function(p) return (p:find('hello') ~= nil) end)
 /// ```
-/// todo!("doctest for RegisterUserEngine");
-/// ```
+///
+/// [`topics::user_engines`]: crate::userscript_api::help_system::topics::user_engines
 pub struct RegisterUserEngine {
     /// Name to associate with the userscript scan engine
     name: String,
@@ -67,9 +71,13 @@ impl RegisterUserEngine {
 ///
 /// ## Example
 ///
+/// For more help, see [`topics::user_engines`].
+///
+/// ```lua
+/// local results = user_engines:scan('blablabla-some dummy data-\x41\x42\x43\x44\x45')
 /// ```
-/// todo!("doctest for ScanBytes");
-/// ```
+///
+/// [`topics::user_engines`]: crate::userscript_api::help_system::topics::user_engines
 pub struct ScanBytes(Vec<u8>);
 
 impl Message<ScanBytes> for UserEngine {
