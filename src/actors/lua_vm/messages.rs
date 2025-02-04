@@ -230,7 +230,7 @@ impl Message<SendWarning> for LuaVM {
 /// ## Example
 ///
 /// ```
-/// # use sscan::actors::{LuaVM, messages::WaitStartup};
+/// # use sscan::actors::lua_vm::{LuaVM, messages::WaitStartup};
 /// # #[tokio::main]
 /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// let vm = LuaVM::spawn();
