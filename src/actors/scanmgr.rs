@@ -67,7 +67,7 @@ impl Actor for ScanMgr {
 
         // Register the userscript API
         let scanmgr_api: ScanMgrApi = ScanMgrApi::new(actor.downgrade());
-        lua_vm.ask(RegisterUserApi::with(scanmgr_api)).await?;
+        lua_vm.tell(RegisterUserApi::with(scanmgr_api)).await?;
         Ok(())
     }
 }

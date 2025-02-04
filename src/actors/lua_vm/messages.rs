@@ -10,10 +10,10 @@
 //!
 
 use crate::{
-    actors::lua_vm::{error::LuaVmResult, LuaVM},
+    actors::{lua_vm::{error::LuaVmResult, LuaVM}, queue::Queue, scanmgr::ScanMgr, user_engine::UserEngine, Ping},
     userscript_api::ApiObject,
 };
-use kameo::message::{Context, Message};
+use kameo::{actor::ActorRef, message::{Context, Message}};
 
 /// # Register a userscript API object with [`LuaVM`]
 ///
@@ -215,6 +215,43 @@ impl Message<SendWarning> for LuaVM {
                 self.vm.warning(msg, true);
             }
         }
+    }
+}
+
+/// # Waits until all actors have started up.
+///
+/// This should be called after [`LuaVM::spawn()`] to ensure all actors
+/// have the time to start up before any userscripts try to run.
+///
+/// ## Reply
+///
+/// Expect no reply from the virtual machine.
+///
+/// ## Example
+///
+/// ```
+/// # use sscan::actors::{LuaVM, messages::WaitStartup};
+/// # #[tokio::main]
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// let vm = LuaVM::spawn();
+/// vm.ask(WaitStartup).await?;
+/// # Ok(())
+/// # }
+/// ```
+pub struct WaitStartup;
+
+impl Message<WaitStartup> for LuaVM {
+    type Reply = ();
+
+    async fn handle(&mut self, _: WaitStartup, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+        // Get strongrefs to all actors.
+        let queue: &ActorRef<Queue> = self.queue.as_ref().expect("infallible");
+        let scanmgr: &ActorRef<ScanMgr> = self.scanmgr.as_ref().expect("infallible");
+        let user_engine: &ActorRef<UserEngine> = self.user_engine.as_ref().expect("infallible");
+
+        let _ = queue.ask(Ping).await;
+        let _ = scanmgr.ask(Ping).await;
+        let _ = user_engine.ask(Ping).await;
     }
 }
 
