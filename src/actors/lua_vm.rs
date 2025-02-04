@@ -20,14 +20,12 @@ pub mod error;
 pub mod messages;
 
 use crate::{
-    actors::queue::Queue,
+    actors::{queue::Queue, scanmgr::ScanMgr, user_engine::UserEngine},
     userscript_api::{about_api::AboutApi, help_system::HelpSystem},
 };
 use kameo::{actor::ActorRef, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
 use messages::RegisterUserApi;
-use mlua::prelude::*;
-
-use super::user_engine::UserEngine;
+use mlua::{prelude::*, AppDataRefMut};
 
 /// # An actor which hosts a Lua VM and userscript environment.
 ///
@@ -44,6 +42,9 @@ pub struct LuaVM {
 
     /// Reference to the [`UserEngine`] service
     user_engine: Option<ActorRef<UserEngine>>,
+
+    /// Reference to the [`ScanMgr`] service
+    scanmgr: Option<ActorRef<ScanMgr>>,
 }
 
 /// # [`LuaVM`] is an actor.
@@ -60,6 +61,11 @@ impl Actor for LuaVM {
         let queue: ActorRef<Queue> = Queue::spawn_with_size(lua_vm.downgrade(), 16384);
         let user_engine: ActorRef<UserEngine> =
             UserEngine::spawn_with_capacity(lua_vm.downgrade(), 128);
+        let scanmgr: ActorRef<ScanMgr> = ScanMgr::spawn(
+            lua_vm.downgrade(),
+            queue.downgrade(),
+            user_engine.downgrade(),
+        );
 
         // Register auxillary userscript APIs
         lua_vm
@@ -72,10 +78,31 @@ impl Actor for LuaVM {
         // Link all actors to self
         lua_vm.link(&queue).await;
         lua_vm.link(&user_engine).await;
+        lua_vm.link(&scanmgr).await;
 
         // Store references to the other actors
         self.queue = Some(queue);
         self.user_engine = Some(user_engine);
+        self.scanmgr = Some(scanmgr);
+
+        // Create the warning buffer
+        let warning_buffer: String = String::with_capacity(4096);
+        self.vm.set_app_data(warning_buffer);
+
+        // Set the warning function to emit warnings
+        self.vm
+            .set_warning_function(|lua: &Lua, msg: &str, incomplete: bool| {
+                // Get the warning buffer
+                let mut warning_buffer: AppDataRefMut<String> =
+                    lua.app_data_mut().expect("warning buffer should exist");
+                if incomplete {
+                    warning_buffer.push_str(msg);
+                } else {
+                    eprintln!("[WARN] {warning_buffer}{msg}");
+                    warning_buffer.clear();
+                }
+                Ok(())
+            });
         Ok(())
     }
 }
@@ -88,6 +115,7 @@ impl LuaVM {
             vm: Lua::new(),
             queue: None,
             user_engine: None,
+            scanmgr: None,
         };
         kameo::spawn(lua_vm)
     }
@@ -112,6 +140,7 @@ impl LuaVM {
             vm: Lua::unsafe_new(),
             queue: None,
             user_engine: None,
+            scanmgr: None,
         };
         kameo::spawn(lua_vm)
     }

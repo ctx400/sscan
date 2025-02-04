@@ -29,12 +29,13 @@ use crate::{macros::topics, userscript_api::ApiObject};
 use error::Error;
 use mlua::{ExternalError, UserData};
 use std::collections::HashMap;
-use topics::about;
+use topics::{about, scanmgr};
 
 // List of Userscript API Topics
 topics! {
     use HelpTopic about for "Build, version, and license information.";
     use HelpTopic queue for "Queue up files and other data for scanning.";
+    use HelpTopic scanmgr for "Start a scan of all queued data items.";
     use HelpTopic user_engines for "Register custom scan engines from userscripts.";
 }
 
@@ -185,6 +186,7 @@ impl Default for HelpSystem {
         help_system
             .topic(Box::new(about::Topic))
             .topic(Box::new(queue::Topic))
+            .topic(Box::new(scanmgr::Topic))
             .topic(Box::new(user_engines::Topic));
         help_system
     }
