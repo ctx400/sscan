@@ -20,7 +20,7 @@ pub mod error;
 pub mod messages;
 
 use crate::{
-    actors::{queue::Queue, user_engine::UserEngine},
+    actors::{queue::Queue, user_engine::UserEngine, scanmgr::ScanMgr},
     userscript_api::{about_api::AboutApi, help_system::HelpSystem},
 };
 use kameo::{actor::ActorRef, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
@@ -42,6 +42,9 @@ pub struct LuaVM {
 
     /// Reference to the [`UserEngine`] service
     user_engine: Option<ActorRef<UserEngine>>,
+
+    /// Reference to the [`ScanMgr`] service
+    scanmgr: Option<ActorRef<ScanMgr>>,
 }
 
 /// # [`LuaVM`] is an actor.
@@ -58,6 +61,7 @@ impl Actor for LuaVM {
         let queue: ActorRef<Queue> = Queue::spawn_with_size(lua_vm.downgrade(), 16384);
         let user_engine: ActorRef<UserEngine> =
             UserEngine::spawn_with_capacity(lua_vm.downgrade(), 128);
+        let scanmgr: ActorRef<ScanMgr> = ScanMgr::spawn(lua_vm.downgrade(), queue.downgrade(), user_engine.downgrade());
 
         // Register auxillary userscript APIs
         lua_vm
@@ -70,10 +74,12 @@ impl Actor for LuaVM {
         // Link all actors to self
         lua_vm.link(&queue).await;
         lua_vm.link(&user_engine).await;
+        lua_vm.link(&scanmgr).await;
 
         // Store references to the other actors
         self.queue = Some(queue);
         self.user_engine = Some(user_engine);
+        self.scanmgr = Some(scanmgr);
 
         // Create the warning buffer
         let warning_buffer: String = String::with_capacity(4096);
@@ -103,6 +109,7 @@ impl LuaVM {
             vm: Lua::new(),
             queue: None,
             user_engine: None,
+            scanmgr: None,
         };
         kameo::spawn(lua_vm)
     }
@@ -127,6 +134,7 @@ impl LuaVM {
             vm: Lua::unsafe_new(),
             queue: None,
             user_engine: None,
+            scanmgr: None,
         };
         kameo::spawn(lua_vm)
     }

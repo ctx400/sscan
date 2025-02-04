@@ -19,4 +19,5 @@
 
 pub mod lua_vm;
 pub mod queue;
+pub mod scanmgr;
 pub mod user_engine;

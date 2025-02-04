@@ -26,6 +26,7 @@
 pub mod about_api;
 pub mod help_system;
 pub mod queue_api;
+pub mod scanmgr_api;
 pub mod user_engine_api;
 pub mod include {
     //! # Useful re-exports from other crates.

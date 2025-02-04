@@ -1,0 +1,37 @@
+__Scan Manager__
+
+The scan manager handles scanning all queued data items against all
+activated scan engines, and returns an array of scan results. This API
+is a high-level way to interact with sscan without manually dequeueing
+data items and passing them to individual scan engines.
+
+__SCANMGR METHODS__
+
++----------------+---------+--------------------------------------------+
+| Method         | Returns | Description                                |
++----------------+---------+--------------------------------------------+
+| scanmgr:scan() | table   | Scan all queued data items.                |
+|                |         |                                            |
+|                |         | The scan() method will drain the global    |
+|                |         | scan queue, passing each queued data item  |
+|                |         | to all activated scan engines for analysis |
+|                |         |                                            |
+|                |         | This method returns an array of scan       |
+|                |         | results, which have the schema described   |
+|                |         | below in __Scan Results__.                 |
++----------------+---------+--------------------------------------------+
+
+__Scan Results__
+
+Each scan result item has the following schema.
+
+{
+    -- Name of the scan engine that matched the data item.
+    engine: string,
+
+    -- The data item that was matched.
+    item: {
+        name: string,
+        path: string?,
+    }
+}
