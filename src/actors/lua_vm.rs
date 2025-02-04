@@ -20,14 +20,12 @@ pub mod error;
 pub mod messages;
 
 use crate::{
-    actors::queue::Queue,
+    actors::{queue::Queue, user_engine::UserEngine},
     userscript_api::{about_api::AboutApi, help_system::HelpSystem},
 };
 use kameo::{actor::ActorRef, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
 use messages::RegisterUserApi;
-use mlua::prelude::*;
-
-use super::user_engine::UserEngine;
+use mlua::{prelude::*, AppDataRefMut};
 
 /// # An actor which hosts a Lua VM and userscript environment.
 ///
@@ -76,6 +74,23 @@ impl Actor for LuaVM {
         // Store references to the other actors
         self.queue = Some(queue);
         self.user_engine = Some(user_engine);
+
+        // Create the warning buffer
+        let warning_buffer: String = String::with_capacity(4096);
+        self.vm.set_app_data(warning_buffer);
+
+        // Set the warning function to emit warnings
+        self.vm.set_warning_function(|lua: &Lua, msg: &str, incomplete: bool| {
+            // Get the warning buffer
+            let mut warning_buffer: AppDataRefMut<String> = lua.app_data_mut().expect("warning buffer should exist");
+            if incomplete {
+                warning_buffer.push_str(msg);
+            } else {
+                eprintln!("[WARN] {warning_buffer}{msg}");
+                warning_buffer.clear();
+            }
+            Ok(())
+        });
         Ok(())
     }
 }

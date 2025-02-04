@@ -171,6 +171,53 @@ where
     }
 }
 
+/// Send a warning message to [`LuaVM`].
+///
+/// A request to send a warning message to the virtual machine. Warning
+/// messages are printed to stderr.
+///
+/// ## Reply
+///
+/// Expect no reply from the virtual machine.
+///
+/// ## Example
+///
+/// ```
+/// # use sscan::actors::lua_vm::{LuaVM, messages::SendWarning};
+/// # #[tokio::main]
+/// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// let vm = LuaVM::spawn();
+/// let warning = SendWarning::Complete("something went wrong".into());
+/// vm.tell(warning).await?;
+/// # Ok(())
+/// # }
+/// ```
+pub enum SendWarning {
+    /// Immediately flush the warning message.
+    Complete(String),
+
+    /// Buffer the warning message.
+    ///
+    /// The warning message will only be printed after another request
+    /// of type [`SendWarning::Complete`].
+    Incomplete(String),
+}
+
+impl Message<SendWarning> for LuaVM {
+    type Reply = ();
+
+    async fn handle(&mut self, msg: SendWarning, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
+        match msg {
+            SendWarning::Complete(msg) => {
+                self.vm.warning(msg, false);
+            },
+            SendWarning::Incomplete(msg) => {
+                self.vm.warning(msg, true);
+            },
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{
