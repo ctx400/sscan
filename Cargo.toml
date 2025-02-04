@@ -16,8 +16,8 @@ publish = true
 # Minimum supported Rust edition
 edition = "2021"
 
-[dependencies]
 # Error Handling
+[dependencies]
 anyhow = "1.0"
 thiserror = "2"
 
@@ -41,3 +41,8 @@ features = ["rt-multi-thread"]
 [dependencies.mlua]
 version = "0.10.2"
 features = ["lua54", "vendored", "anyhow", "send", "error-send", "async"]
+
+# Serialization
+[dependencies.serde]
+version = "1"
+features = ["derive"]
