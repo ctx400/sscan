@@ -10,10 +10,19 @@
 //!
 
 use crate::{
-    actors::{lua_vm::{error::LuaVmResult, LuaVM}, queue::Queue, scanmgr::ScanMgr, user_engine::UserEngine, Ping},
+    actors::{
+        lua_vm::{error::LuaVmResult, LuaVM},
+        queue::Queue,
+        scanmgr::ScanMgr,
+        user_engine::UserEngine,
+        Ping,
+    },
     userscript_api::ApiObject,
 };
-use kameo::{actor::ActorRef, message::{Context, Message}};
+use kameo::{
+    actor::ActorRef,
+    message::{Context, Message},
+};
 
 /// # Register a userscript API object with [`LuaVM`]
 ///

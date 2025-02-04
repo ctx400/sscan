@@ -10,7 +10,10 @@ use cli::{
     Args,
 };
 use kameo::actor::ActorRef;
-use sscan::actors::lua_vm::{messages::{ExecChunk, WaitStartup}, LuaVM};
+use sscan::actors::lua_vm::{
+    messages::{ExecChunk, WaitStartup},
+    LuaVM,
+};
 use std::path::Path;
 
 #[tokio::main]
