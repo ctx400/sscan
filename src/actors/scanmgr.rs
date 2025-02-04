@@ -63,6 +63,7 @@ impl Actor for ScanMgr {
 
 impl ScanMgr {
     /// Spawn a new [`ScanMgr`]
+    #[must_use]
     pub fn spawn(vm: WeakActorRef<LuaVM>, queue: WeakActorRef<Queue>, user_engine: WeakActorRef<UserEngine>) -> ActorRef<Self> {
         let actor: Self = Self {
             lua_ref: vm,
