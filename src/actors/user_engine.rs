@@ -51,7 +51,7 @@ impl Actor for UserEngine {
     async fn on_start(&mut self, user_engine: ActorRef<Self>) -> Result<(), BoxError> {
         if let Some(lua_vm) = self.lua_vm.upgrade() {
             let user_eng_api: UserEngineApi = UserEngineApi::new(user_engine.downgrade());
-            lua_vm.ask(RegisterUserApi::with(user_eng_api)).await?;
+            lua_vm.tell(RegisterUserApi::with(user_eng_api)).await?;
             Ok(())
         } else {
             Ok(())

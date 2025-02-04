@@ -57,7 +57,7 @@ impl Actor for Queue {
     async fn on_start(&mut self, queue: ActorRef<Self>) -> Result<(), BoxError> {
         if let Some(lua_vm) = self.lua_vm.upgrade() {
             let queue_api: QueueApi = QueueApi::new(queue.downgrade());
-            lua_vm.ask(RegisterUserApi::with(queue_api)).await?;
+            lua_vm.tell(RegisterUserApi::with(queue_api)).await?;
             Ok(())
         } else {
             Err(Box::new(QueueError::NoLuaVm))

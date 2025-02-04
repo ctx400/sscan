@@ -10,7 +10,10 @@ use cli::{
     Args,
 };
 use kameo::actor::ActorRef;
-use sscan::actors::lua_vm::{messages::ExecChunk, LuaVM};
+use sscan::actors::lua_vm::{
+    messages::{ExecChunk, WaitStartup},
+    LuaVM,
+};
 use std::path::Path;
 
 #[tokio::main]
@@ -25,6 +28,7 @@ async fn main() -> Result<()> {
         LuaVM::spawn()
     };
     vm.wait_startup().await;
+    vm.ask(WaitStartup).await?;
 
     match args.action {
         Run { script } => {

@@ -69,3 +69,17 @@ macro_rules! topics {
     };
 }
 pub(crate) use topics;
+
+/// Helper macro to impl Ping on many actors.
+macro_rules! impl_ping {
+    ($($actor:ident),+) => {
+        use kameo::message::{Context, Message};
+        $(
+            impl Message<Ping> for $actor {
+                type Reply = ();
+                async fn handle(&mut self, _: Ping, _: Context<'_, Self, Self::Reply>) -> Self::Reply {}
+            }
+        )+
+    };
+}
+pub(crate) use impl_ping;

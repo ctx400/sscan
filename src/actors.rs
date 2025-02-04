@@ -17,7 +17,27 @@
 //!
 //! [`LuaVM`]: crate::actors::lua_vm::LuaVM
 
+use crate::macros::impl_ping;
+use lua_vm::LuaVM;
+use queue::Queue;
+use scanmgr::ScanMgr;
+use user_engine::UserEngine;
+
 pub mod lua_vm;
 pub mod queue;
 pub mod scanmgr;
 pub mod user_engine;
+
+/// # Ping an actor to ensure its message loop has started.
+///
+/// This message checks whether an actor's message loop is running by
+/// awaiting a reply from the actor. It is automatically invoked by
+/// [`lua_vm::messages::WaitStartup`].
+///
+/// ## Reply
+///
+/// Expect no reply from any actor.
+pub struct Ping;
+
+// Implement Ping on all actors
+impl_ping!(LuaVM, Queue, ScanMgr, UserEngine);
