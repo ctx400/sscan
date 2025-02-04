@@ -36,6 +36,8 @@ impl LuaUserData for ScanResult {
 }
 
 /// Describes a [`DataItem`] match against a scan engine.
+///
+/// [`DataItem`]: crate::actors::queue::data_item::DataItem
 #[derive(Serialize, Debug, Clone)]
 pub struct DataItemResult {
     /// Name of the data item.
