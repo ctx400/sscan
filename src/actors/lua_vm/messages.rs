@@ -210,10 +210,10 @@ impl Message<SendWarning> for LuaVM {
         match msg {
             SendWarning::Complete(msg) => {
                 self.vm.warning(msg, false);
-            },
+            }
             SendWarning::Incomplete(msg) => {
                 self.vm.warning(msg, true);
-            },
+            }
         }
     }
 }

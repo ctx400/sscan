@@ -5,9 +5,9 @@
 //!
 //! [`ScanMgr`]: super::ScanMgr
 
-use std::path::PathBuf;
-use serde::Serialize;
 use crate::userscript_api::include::LuaUserData;
+use serde::Serialize;
+use std::path::PathBuf;
 
 /// Root return type for scan results.
 #[derive(Serialize, Debug)]
@@ -25,13 +25,8 @@ pub struct ScanResult {
 
 impl LuaUserData for ScanResult {
     fn add_fields<F: mlua::UserDataFields<Self>>(fields: &mut F) {
-        fields.add_field_method_get("engine", |_, this: &ScanResult| {
-            Ok(this.engine.clone())
-        });
-
-        fields.add_field_method_get("item", |_, this: &ScanResult| {
-            Ok(this.item.clone())
-        });
+        fields.add_field_method_get("engine", |_, this: &ScanResult| Ok(this.engine.clone()));
+        fields.add_field_method_get("item", |_, this: &ScanResult| Ok(this.item.clone()));
     }
 }
 
@@ -49,12 +44,7 @@ pub struct DataItemResult {
 
 impl LuaUserData for DataItemResult {
     fn add_fields<F: mlua::UserDataFields<Self>>(fields: &mut F) {
-        fields.add_field_method_get("name", |_, this: &DataItemResult| {
-            Ok(this.name.clone())
-        });
-
-        fields.add_field_method_get("path", |_, this: &DataItemResult| {
-            Ok(this.path.clone())
-        });
+        fields.add_field_method_get("name", |_, this: &DataItemResult| Ok(this.name.clone()));
+        fields.add_field_method_get("path", |_, this: &DataItemResult| Ok(this.path.clone()));
     }
 }

@@ -20,7 +20,7 @@ pub mod error;
 pub mod messages;
 
 use crate::{
-    actors::{queue::Queue, user_engine::UserEngine, scanmgr::ScanMgr},
+    actors::{queue::Queue, scanmgr::ScanMgr, user_engine::UserEngine},
     userscript_api::{about_api::AboutApi, help_system::HelpSystem},
 };
 use kameo::{actor::ActorRef, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
@@ -61,7 +61,11 @@ impl Actor for LuaVM {
         let queue: ActorRef<Queue> = Queue::spawn_with_size(lua_vm.downgrade(), 16384);
         let user_engine: ActorRef<UserEngine> =
             UserEngine::spawn_with_capacity(lua_vm.downgrade(), 128);
-        let scanmgr: ActorRef<ScanMgr> = ScanMgr::spawn(lua_vm.downgrade(), queue.downgrade(), user_engine.downgrade());
+        let scanmgr: ActorRef<ScanMgr> = ScanMgr::spawn(
+            lua_vm.downgrade(),
+            queue.downgrade(),
+            user_engine.downgrade(),
+        );
 
         // Register auxillary userscript APIs
         lua_vm
@@ -86,17 +90,19 @@ impl Actor for LuaVM {
         self.vm.set_app_data(warning_buffer);
 
         // Set the warning function to emit warnings
-        self.vm.set_warning_function(|lua: &Lua, msg: &str, incomplete: bool| {
-            // Get the warning buffer
-            let mut warning_buffer: AppDataRefMut<String> = lua.app_data_mut().expect("warning buffer should exist");
-            if incomplete {
-                warning_buffer.push_str(msg);
-            } else {
-                eprintln!("[WARN] {warning_buffer}{msg}");
-                warning_buffer.clear();
-            }
-            Ok(())
-        });
+        self.vm
+            .set_warning_function(|lua: &Lua, msg: &str, incomplete: bool| {
+                // Get the warning buffer
+                let mut warning_buffer: AppDataRefMut<String> =
+                    lua.app_data_mut().expect("warning buffer should exist");
+                if incomplete {
+                    warning_buffer.push_str(msg);
+                } else {
+                    eprintln!("[WARN] {warning_buffer}{msg}");
+                    warning_buffer.clear();
+                }
+                Ok(())
+            });
         Ok(())
     }
 }

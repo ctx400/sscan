@@ -18,14 +18,25 @@
 //!
 //! [`DataItem`]: crate::actors::queue::data_item::DataItem
 
+pub mod error;
 pub mod messages;
 pub mod reply;
-pub mod error;
 
-use kameo::{actor::{ActorRef, WeakActorRef}, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
-use crate::{actors::{lua_vm::LuaVM, queue::Queue, user_engine::UserEngine, scanmgr::error::Error}, userscript_api::scanmgr_api::ScanMgrApi};
-
-use super::lua_vm::messages::RegisterUserApi;
+use crate::{
+    actors::{
+        lua_vm::{messages::RegisterUserApi, LuaVM},
+        queue::Queue,
+        scanmgr::error::Error,
+        user_engine::UserEngine,
+    },
+    userscript_api::scanmgr_api::ScanMgrApi,
+};
+use kameo::{
+    actor::{ActorRef, WeakActorRef},
+    error::BoxError,
+    mailbox::unbounded::UnboundedMailbox,
+    Actor,
+};
 
 /// # The Scan Manager Service
 ///
@@ -51,7 +62,7 @@ impl Actor for ScanMgr {
     async fn on_start(&mut self, actor: ActorRef<Self>) -> Result<(), BoxError> {
         // Get a strongref to LuaVM or fail
         let Some(lua_vm) = self.lua_ref.upgrade() else {
-            return Err(Box::new(Error::NoLuaVm))
+            return Err(Box::new(Error::NoLuaVm));
         };
 
         // Register the userscript API
@@ -64,7 +75,11 @@ impl Actor for ScanMgr {
 impl ScanMgr {
     /// Spawn a new [`ScanMgr`]
     #[must_use]
-    pub fn spawn(vm: WeakActorRef<LuaVM>, queue: WeakActorRef<Queue>, user_engine: WeakActorRef<UserEngine>) -> ActorRef<Self> {
+    pub fn spawn(
+        vm: WeakActorRef<LuaVM>,
+        queue: WeakActorRef<Queue>,
+        user_engine: WeakActorRef<UserEngine>,
+    ) -> ActorRef<Self> {
         let actor: Self = Self {
             lua_ref: vm,
             queue_ref: queue,

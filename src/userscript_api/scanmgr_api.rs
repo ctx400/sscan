@@ -17,11 +17,15 @@
 //!
 //! [`topics::scanmgr`]: crate::userscript_api::help_system::topics::scanmgr
 
+use crate::{
+    actors::scanmgr::{error::Error, messages::InvokeScan, reply::ScanResult, ScanMgr},
+    userscript_api::{
+        include::{LuaExternalError, LuaUserDataRef},
+        ApiObject,
+    },
+};
 use kameo::actor::WeakActorRef;
-use mlua::{ExternalError, UserData};
-use crate::{actors::scanmgr::{error::Error, messages::InvokeScan, reply::ScanResult, ScanMgr}, userscript_api::include::{LuaExternalError, LuaUserDataRef}};
-
-use super::ApiObject;
+use mlua::UserData;
 
 /// # High-Level Scan Manager API
 ///
@@ -45,15 +49,21 @@ impl ScanMgrApi {
 
 impl UserData for ScanMgrApi {
     fn add_methods<M: mlua::UserDataMethods<Self>>(methods: &mut M) {
-        methods.add_async_method("scan", |_, this: LuaUserDataRef<ScanMgrApi>, ()| async move {
-            // Get a strongref to the scan manager
-            let Some(scanmgr) = this.0.upgrade() else {
-                return Err(Error::NoScanMgr.into_lua_err())
-            };
+        methods.add_async_method(
+            "scan",
+            |_, this: LuaUserDataRef<ScanMgrApi>, ()| async move {
+                // Get a strongref to the scan manager
+                let Some(scanmgr) = this.0.upgrade() else {
+                    return Err(Error::NoScanMgr.into_lua_err());
+                };
 
-            let results: Vec<ScanResult> = scanmgr.ask(InvokeScan).await.map_err(LuaExternalError::into_lua_err)?;
-            Ok(results)
-        });
+                let results: Vec<ScanResult> = scanmgr
+                    .ask(InvokeScan)
+                    .await
+                    .map_err(LuaExternalError::into_lua_err)?;
+                Ok(results)
+            },
+        );
     }
 }
 

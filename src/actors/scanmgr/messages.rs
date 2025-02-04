@@ -9,9 +9,18 @@
 //! manager service, like invoking a scan operation.
 //!
 
-use std::path::PathBuf;
+use crate::actors::{
+    lua_vm::messages::SendWarning,
+    queue::messages::{Dequeue, GetLength},
+    scanmgr::{
+        error::{Error, ScanMgrResult},
+        reply::{DataItemResult, ScanResult},
+        ScanMgr,
+    },
+    user_engine::messages::ScanBytes,
+};
 use kameo::message::{Context, Message};
-use crate::actors::{lua_vm::messages::SendWarning, queue::messages::{Dequeue, GetLength}, scanmgr::{error::{Error, ScanMgrResult}, reply::{DataItemResult, ScanResult}, ScanMgr}, user_engine::messages::ScanBytes};
+use std::path::PathBuf;
 
 /// # Scan all data items in the queue against all active scan engines.
 ///
@@ -36,9 +45,15 @@ impl Message<InvokeScan> for ScanMgr {
 
     async fn handle(&mut self, _: InvokeScan, _: Context<'_, Self, Self::Reply>) -> Self::Reply {
         // Get strongrefs to each dependent actor so they don't shutdown
-        let Some(lua_vm) = self.lua_ref.upgrade() else { return Err(Error::NoLuaVm) };
-        let Some(queue) = self.queue_ref.upgrade() else { return Err(Error::NoQueue) };
-        let Some(user_engine) = self.user_engine_ref.upgrade() else { return Err(Error::NoUserEngine) };
+        let Some(lua_vm) = self.lua_ref.upgrade() else {
+            return Err(Error::NoLuaVm);
+        };
+        let Some(queue) = self.queue_ref.upgrade() else {
+            return Err(Error::NoQueue);
+        };
+        let Some(user_engine) = self.user_engine_ref.upgrade() else {
+            return Err(Error::NoUserEngine);
+        };
 
         // Create a vector of ScanResult items
         let mut scan_results: Vec<ScanResult> = Vec::with_capacity(16384);
@@ -50,7 +65,10 @@ impl Message<InvokeScan> for ScanMgr {
                 Ok((name, path, content)) => (name, path, content),
                 Err(err) => {
                     let warning: String = format!("failed to load data item: {err}");
-                    lua_vm.tell(SendWarning::Complete(warning)).await.expect("should be infallible");
+                    lua_vm
+                        .tell(SendWarning::Complete(warning))
+                        .await
+                        .expect("should be infallible");
                     continue;
                 }
             };
@@ -58,7 +76,10 @@ impl Message<InvokeScan> for ScanMgr {
             // Scan the item against all user engines or raise a warning
             let Ok(results) = user_engine.ask(ScanBytes::from(content)).await else {
                 let warning: String = format!("failed to scan data item `{name}`.\n  HINT: is the path accessible?\n        {path:?}");
-                lua_vm.tell(SendWarning::Complete(warning)).await.expect("should be infallible");
+                lua_vm
+                    .tell(SendWarning::Complete(warning))
+                    .await
+                    .expect("should be infallible");
                 continue;
             };
 
