@@ -35,7 +35,7 @@ use std::path::PathBuf;
 /// # #[tokio::main]
 /// # async fn main() {
 /// // Create a new scan queue.
-/// let lua_ref = LuaVM::spawn();
+/// let lua_ref = LuaVM::spawn(None);
 /// let queue = Queue::spawn(lua_ref.downgrade());
 ///
 /// // Create a new data item for scanning
@@ -81,7 +81,7 @@ impl Enqueue {
 /// # #[tokio::main]
 /// # async fn main() {
 /// // Create a new scan queue.
-/// let lua_ref = LuaVM::spawn();
+/// let lua_ref = LuaVM::spawn(None);
 /// let queue = Queue::spawn(lua_ref.downgrade());
 ///
 /// // Create a new data item for scanning
@@ -127,7 +127,7 @@ impl Message<Dequeue> for Queue {
 /// # use sscan::actors::{queue::{Queue, messages::GetLength}, lua_vm::LuaVM};
 /// # #[tokio::main]
 /// # async fn main() {
-/// # let lua_ref = LuaVM::spawn();
+/// # let lua_ref = LuaVM::spawn(None);
 /// # let queue = Queue::spawn(lua_ref.downgrade());
 /// let length = queue.ask(GetLength).await.unwrap();
 /// # assert_eq!(length, 0usize);
