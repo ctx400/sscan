@@ -25,15 +25,15 @@
 
 pub mod error;
 
-use crate::{macros::topics, userscript_api::ApiObject};
+use crate::{macros::topics, userscript_api::{ApiObject, help_system::topics::{about, path, scanmgr, queue, user_engines}}};
 use error::Error;
 use mlua::{ExternalError, UserData};
 use std::collections::HashMap;
-use topics::{about, scanmgr};
 
 // List of Userscript API Topics
 topics! {
     use HelpTopic about for "Build, version, and license information.";
+    use HelpTopic path for "Ergonomic file path maniuplation.";
     use HelpTopic queue for "Queue up files and other data for scanning.";
     use HelpTopic scanmgr for "Start a scan of all queued data items.";
     use HelpTopic user_engines for "Register custom scan engines from userscripts.";
@@ -180,11 +180,10 @@ impl HelpSystem {
 /// Registers all built-in help topics with the new [`HelpSystem`].
 impl Default for HelpSystem {
     fn default() -> Self {
-        use topics::{queue, user_engines};
-
         let mut help_system: HelpSystem = Self::new();
         help_system
             .topic(Box::new(about::Topic))
+            .topic(Box::new(path::Topic))
             .topic(Box::new(queue::Topic))
             .topic(Box::new(scanmgr::Topic))
             .topic(Box::new(user_engines::Topic));

@@ -1,0 +1,41 @@
+_The Path Object_
+
+A path object provides a wide range of ergonomic path handling
+capabilities to Lua, such as quickly splitting and joining paths,
+getting filenames or extensions, or converting a relative path to an
+absolute path.
+
+__Creating a Path Object__
+
+To create a path object, call `fs:path(string)`, where `string` is the
+raw string path. The call will return a path object, which is much nicer
+to work with than the raw string path was.
+
+__Path Object Fields__
+
++--------+----------+--------------------------------------------------+
+| Field  | Type     | Description                                      |
++--------+----------+--------------------------------------------------+
+| path   | string   | The raw path, as a string.                       |
+| name   | string?  | Filename or directory name, or nil.              |
+| ext    | string?  | The file extension. Nil if no extension.         |
+| stem   | string?  | Filename without the extension, or nil.          |
+| parent | PathObj? | The parent path, if it exists, as a Path Object. |
+| type   | string   | One of (directory|file|symlink|unknown)          |
++--------+----------+--------------------------------------------------+
+
+__Path Object Methods__
+
++-----------------+---------+-------------------------------------------+
+| Method          | Returns | Description                               |
++-----------------+---------+-------------------------------------------+
+| path:join(      | PathObj | Join a path segment as a new Path Object. |
+|   new: string   |         |                                           |
+| )               |         |                                           |
++-----------------+---------+-------------------------------------------+
+| path:absolute() | PathObj | Returns a new, absolute Path Object.      |
++-----------------+---------+-------------------------------------------+
+
+__See Also__
+
+Learn more about the Filesystem API: see help topic 'fs'.
