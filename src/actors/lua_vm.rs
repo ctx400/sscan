@@ -66,7 +66,7 @@ impl Actor for LuaVM {
     async fn on_start(&mut self, lua_vm: ActorRef<Self>) -> Result<(), BoxError> {
         // Load the "CLI-style" args into table `arg`
         let args_table: LuaTable = self.vm.create_table()?;
-        while let Some(arg) = self.args.pop() {
+        for arg in self.args.drain(0..self.args.len()) {
             args_table.push(arg)?;
         }
         self.vm.globals().set("arg", args_table)?;
