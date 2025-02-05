@@ -23,9 +23,9 @@ async fn main() -> Result<()> {
 
     // Initialize LuaVM and auxillary services.
     let vm: ActorRef<LuaVM> = if args.unsafe_mode {
-        unsafe { LuaVM::spawn_unsafe() }
+        unsafe { LuaVM::spawn_unsafe(None) }
     } else {
-        LuaVM::spawn()
+        LuaVM::spawn(None)
     };
     vm.wait_startup().await;
     vm.ask(WaitStartup).await?;

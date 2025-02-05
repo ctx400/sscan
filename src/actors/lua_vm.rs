@@ -45,6 +45,13 @@ pub struct LuaVM {
 
     /// Reference to the [`ScanMgr`] service
     scanmgr: Option<ActorRef<ScanMgr>>,
+
+    /// Extra "CLI-style" arguments.
+    ///
+    /// On startup, [`LuaVM`] will load this into a Lua array, `arg`,
+    /// which userscripts can iterate to process their own command-line.
+    ///
+    args: Vec<String>,
 }
 
 /// # [`LuaVM`] is an actor.
@@ -57,6 +64,13 @@ impl Actor for LuaVM {
     type Mailbox = UnboundedMailbox<Self>;
 
     async fn on_start(&mut self, lua_vm: ActorRef<Self>) -> Result<(), BoxError> {
+        // Load the "CLI-style" args into table `arg`
+        let args_table: LuaTable = self.vm.create_table()?;
+        while let Some(arg) = self.args.pop() {
+            args_table.push(arg)?;
+        }
+        self.vm.globals().set("arg", args_table)?;
+
         // Spawn other actors
         let queue: ActorRef<Queue> = Queue::spawn_with_size(lua_vm.downgrade(), 16384);
         let user_engine: ActorRef<UserEngine> =
@@ -110,13 +124,23 @@ impl Actor for LuaVM {
 impl LuaVM {
     /// Spawn a new Lua virtual machine in default execution mode.
     #[must_use]
-    pub fn spawn() -> ActorRef<Self> {
-        let lua_vm: Self = Self {
+    pub fn spawn(args: Option<&[String]>) -> ActorRef<Self> {
+        // Create the VM
+        let mut lua_vm: Self = Self {
             vm: Lua::new(),
             queue: None,
             user_engine: None,
             scanmgr: None,
+            args: Vec::new(),
         };
+
+        // If "CLI-style" args were passed, insert them.
+        if let Some(args) = args {
+            lua_vm.args.reserve(args.len());
+            args.clone_into(&mut lua_vm.args);
+        }
+
+        // Spawn LuaVM
         kameo::spawn(lua_vm)
     }
 
@@ -135,13 +159,23 @@ impl LuaVM {
     /// userscripts should *never* rely on any functionality provided by
     /// unsafe mode.
     #[must_use]
-    pub unsafe fn spawn_unsafe() -> ActorRef<Self> {
-        let lua_vm: Self = Self {
+    pub unsafe fn spawn_unsafe(args: Option<&[String]>) -> ActorRef<Self> {
+        // Create the VM
+        let mut lua_vm: Self = Self {
             vm: Lua::unsafe_new(),
             queue: None,
             user_engine: None,
             scanmgr: None,
+            args: Vec::new(),
         };
+
+        // If "CLI-style" args were passed, insert them.
+        if let Some(args) = args {
+            lua_vm.args.reserve(args.len());
+            args.clone_into(&mut lua_vm.args);
+        }
+
+        // Spawn LuaVM
         kameo::spawn(lua_vm)
     }
 }
