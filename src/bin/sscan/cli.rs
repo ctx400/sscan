@@ -22,6 +22,7 @@ pub struct Args {
     #[arg(short, long)]
     pub unsafe_mode: bool,
 
+    /// The runtime action to take.
     #[command(subcommand)]
     pub action: Action,
 }
@@ -32,6 +33,12 @@ pub enum Action {
     Run {
         /// Path to the userscript sscan should run.
         script: PathBuf,
+
+        /// Arguments to pass to <SCRIPT>.
+        ///
+        /// All extra arguments are passed to Lua, and userscripts can
+        /// access them through the global `arg` array.
+        args: Vec<String>,
     },
 
     /// Start sscan in interactive mode.
@@ -43,5 +50,12 @@ pub enum Action {
         /// If set, silences the spash message on REPL startup.
         #[arg(short, long)]
         nosplash: bool,
+
+        /// Arguments to pass to the interactive environment.
+        ///
+        /// All extra arguments are passed to Lua, and are accessible
+        /// through the global `arg` array. If `--startup-script`
+        /// is passed, the script will also have access to these args.
+        args: Vec<String>,
     },
 }
