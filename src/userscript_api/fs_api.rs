@@ -60,7 +60,12 @@ impl LuaUserData for FsApi {
         //
         // ## Return Value
         // bool - True if the path is valid and readable.
-        methods.add_async_method("test", |_, _, path: PathBuf| async move {
+        methods.add_async_method("test", |_, _, path: LuaEither<PathBuf, LuaUserDataRef<PathObj>>| async move {
+            let path: PathBuf = match path {
+                LuaEither::Left(pb) => pb,
+                LuaEither::Right(po) => po.0.clone(),
+            };
+
             let Ok(path) = path.canonicalize() else { return Ok(false) };
             if path.is_dir() {
                 return Ok(path.read_dir().is_ok());
@@ -82,7 +87,12 @@ impl LuaUserData for FsApi {
         // ## Errors
         // - The provided path is not a directory.
         // - Cannot access the directory.
-        methods.add_async_method("listdir", |_, _, path: PathBuf| async move {
+        methods.add_async_method("listdir", |_, _, path: LuaEither<PathBuf, LuaUserDataRef<PathObj>>| async move {
+            let path: PathBuf = match path {
+                LuaEither::Left(pb) => pb,
+                LuaEither::Right(po) => po.0.clone(),
+            };
+
             // Stores PathObj items to return to Lua.
             let mut subpaths: Vec<PathObj> = Vec::with_capacity(1024);
 
@@ -107,7 +117,12 @@ impl LuaUserData for FsApi {
         // Because of the iterative nature of this function, there may
         // be duplicate paths. As such, the vector is sorted and deduped
         // before returning to Lua.
-        methods.add_async_method("walk", |_, _, basepath: PathBuf| async move {
+        methods.add_async_method("walk", |_, _, basepath: LuaEither<PathBuf, LuaUserDataRef<PathObj>>| async move {
+            let basepath: PathBuf = match basepath {
+                LuaEither::Left(pb) => pb,
+                LuaEither::Right(po) => po.0.clone(),
+            };
+
             let mut dirq: Vec<PathBuf> = Vec::with_capacity(16384);
             let mut path_objs: Vec<PathObj> = Vec::with_capacity(16384);
             dirq.push(basepath);

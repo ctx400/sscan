@@ -80,13 +80,48 @@ impl LuaUserData for PathObj {
 
     fn add_methods<M: LuaUserDataMethods<Self>>(methods: &mut M) {
         // Join another path to the end, creating a new PathObj
-        methods.add_async_method("join", |_, this: LuaUserDataRef<PathObj>, other: PathBuf| async move {
+        methods.add_async_method("join", |_, this: LuaUserDataRef<PathObj>, other: LuaEither<PathBuf, LuaUserDataRef<PathObj>>| async move {
+            let other: PathBuf = match other {
+                LuaEither::Left(pb) => pb,
+                LuaEither::Right(po) => po.0.clone(),
+            };
             Ok(PathObj(this.0.join(other)))
         });
 
         // Make the PathObj absolute, returning a new PathObj
         methods.add_async_method("absolute", |_, this: LuaUserDataRef<PathObj>, ()| async move {
             Ok(PathObj(this.0.canonicalize().map_err(|source| Error::InvalidPath { path: this.0.clone(), source })?))
-        })
+        });
+
+        // Same as PathObj:join, but uses concat syntax
+        methods.add_async_meta_method("__concat", |_, this: LuaUserDataRef<PathObj>, other: LuaEither<PathBuf, LuaUserDataRef<PathObj>>| async move {
+            let other: PathBuf = match other {
+                LuaEither::Left(pb) => pb,
+                LuaEither::Right(po) => po.0.clone(),
+            };
+            Ok(PathObj(this.0.join(other)))
+        });
+
+        // Equivalent to PathObj.parent, but using the unary `-` syntax.
+        methods.add_async_meta_method("__unm", |lua: Lua, this: LuaUserDataRef<PathObj>, ()| async move {
+            let Some(parent) = this.0.parent() else { return Ok(LuaNil) };
+            let parent: PathObj = PathObj(parent.to_owned());
+            Ok(parent.into_lua(&lua)?)
+        });
+
+        // Returns true if two path objects are equal
+        methods.add_async_meta_method("__eq", |_, this: LuaUserDataRef<PathObj>, other: LuaUserDataRef<PathObj>| async move {
+            Ok(*this == *other)
+        });
+
+        // Returns true if path A is lexicographically before path B.
+        methods.add_async_meta_method("__lt", |_, this: LuaUserDataRef<PathObj>, other: LuaUserDataRef<PathObj>| async move {
+            Ok(*this < *other)
+        });
+
+        // Returns true if A is lexicographically before or equal to B.
+        methods.add_async_meta_method("__le", |_, this: LuaUserDataRef<PathObj>, other: LuaUserDataRef<PathObj>| async move {
+            Ok(*this <= *other)
+        });
     }
 }
