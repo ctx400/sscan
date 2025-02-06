@@ -1,0 +1,94 @@
+
+The Filesystem API
+==================
+
+Stock Lua has no concept of filesystems or directory handling. As such,
+simple things like directory walking require clunky, non-portable
+solutions like:
+
+  2| local files = {}
+  3| do
+  4|   local handle <close> = io.popen'find . -type f'
+  5|   local output = handle:read'a'
+  6|   output:gsub(
+  7|     '[^\r\n]+',
+  8|     function(file) table.insert(files, file) end)
+  9| end
+
+The sscan filesystem API solves this by providing several ergonomic
+methods for dealing with files, paths, and directories:
+
+  1| local files = fs:walk 'C:/users/User'
+
+The filesystem API also returns paths as a PathObj, an ergonomic data
+type that enables quickly splitting, joining, and comparing paths. To
+learn more about PathObj, see help 'path'.
+
+
+Working with the Filesystem API
+*******************************
+
+Check if a Path is Readable
+---------------------------
+You can test if a file, directory, or symlink is readable with current
+permissions by using `fs:test(path)`.
+
+  1| local can_read_issue = fs:test '/etc/issue'
+  2| local can_read_shadow = fs:test '/etc/shadow'
+  3|
+  4| assert(can_read_issue == true)
+  5| assert(can_read_shadow == false)
+
+
+List a Directory
+----------------
+You can list the contents of a directory with `fs:listdir(path)`. The
+results are an array of PathObj.
+
+  1| local contents = fs:listdir 'C:/Users/User'
+
+
+Recursively List Directories
+----------------------------
+You can list the contents of all directories and subdirectories
+recursively with `fs:walk(path)`. The results are an array of PathObj.
+
+  1| local contents = fs:walk '/var/lib'
+
+
+Filesystem API Methods
+**********************
+
++-----------------+---------+-------------------------------------------+
+| Method          | Returns | Description                               |
++-----------------+---------+-------------------------------------------+
+| fs:path(        | PathObj | Create a PathObj from a raw string path.  |
+|   path: string  |         |                                           |
+| )               |         |                                           |
++-----------------+---------+-------------------------------------------+
+| fs:test(        | boolean | Returns true if the path is readable.     |
+|   path: PathObj |         |                                           |
+| )               |         | This method can take either a PathObj or  |
+|                 |         | a raw string path. It tests whether the   |
+|                 |         | specified file path is readable with      |
+|                 |         | current permissions.                      |
++-----------------+---------+-------------------------------------------+
+| fs:listdir(     | array   | List the contents of directory `dir`.     |
+|   dir: PathObj  |         |                                           |
+| )               |         | This method can take either a PathObj or  |
+|                 |         | a raw string path. It returns a directory |
+|                 |         | listing as an array of PathObj.           |
++-----------------+---------+-------------------------------------------+
+| fs:walk(        | array   | List contents of subdirectories of `dir`. |
+|   dir: PathObj  |         |                                           |
+| )               |         | This method can take either a PathObj or  |
+|                 |         | a raw string path. It traverses the       |
+|                 |         | directory tree starting with `dir`, and   |
+|                 |         | returns an array of PathObj.              |
++-----------------+---------+-------------------------------------------+
+
+
+See Also
+********
+
+Learn more about PathObj: see help topic 'path'

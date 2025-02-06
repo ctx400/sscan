@@ -27,10 +27,7 @@ pub mod error;
 
 use crate::{
     macros::topics,
-    userscript_api::{
-        help_system::topics::{about, path, queue, scanmgr, user_engines},
-        ApiObject,
-    },
+    userscript_api::ApiObject,
 };
 use error::Error;
 use mlua::{ExternalError, UserData};
@@ -39,6 +36,7 @@ use std::collections::HashMap;
 // List of Userscript API Topics
 topics! {
     use HelpTopic about for "Build, version, and license information.";
+    use HelpTopic fs for "Filesystem and directory handling methods.";
     use HelpTopic path for "Ergonomic file path maniuplation.";
     use HelpTopic queue for "Queue up files and other data for scanning.";
     use HelpTopic scanmgr for "Start a scan of all queued data items.";

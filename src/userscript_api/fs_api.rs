@@ -12,7 +12,7 @@
 //! do
 //!   local handle <close> = io.popen'find . -type f'
 //!   local output = handle:read'a'
-//!   output:gsub([^\r\n], function(file) table.insert(files, file) end)
+//!   output:gsub('[^\r\n]+', function(file) table.insert(files, file) end)
 //! end
 //! ```
 //!

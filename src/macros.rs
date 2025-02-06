@@ -102,6 +102,11 @@ macro_rules! topics {
             )+
         }
 
+        // Import all help topic modules
+        use crate::userscript_api::help_system::topics::{
+            $($topic),+
+        };
+
         /// # The Userscript Help System API
         ///
         /// The Help System API exposes a function `help 'topic'` to the Lua
