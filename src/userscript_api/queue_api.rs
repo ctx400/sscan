@@ -63,6 +63,7 @@ impl UserData for QueueApi {
         methods.add_async_method("add_file", queue_add_file);
         methods.add_async_method("dequeue", queue_dequeue);
         methods.add_async_method("len", queue_len);
+        methods.add_async_meta_method("__len", queue_len);
     }
 }
 
