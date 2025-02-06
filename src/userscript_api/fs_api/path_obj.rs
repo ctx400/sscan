@@ -123,5 +123,10 @@ impl LuaUserData for PathObj {
         methods.add_async_meta_method("__le", |_, this: LuaUserDataRef<PathObj>, other: LuaUserDataRef<PathObj>| async move {
             Ok(*this <= *other)
         });
+
+        // Converts the PathObj to a raw string path
+        methods.add_async_meta_method("__tostring", |_, this: LuaUserDataRef<PathObj>, ()| async move {
+            Ok(this.0.clone())
+        });
     }
 }
