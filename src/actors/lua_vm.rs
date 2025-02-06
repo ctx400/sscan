@@ -21,7 +21,7 @@ pub mod messages;
 
 use crate::{
     actors::{queue::Queue, scanmgr::ScanMgr, user_engine::UserEngine},
-    userscript_api::{about_api::AboutApi, help_system::HelpSystem},
+    userscript_api::{about_api::AboutApi, fs_api::FsApi, help_system::HelpSystem},
 };
 use kameo::{actor::ActorRef, error::BoxError, mailbox::unbounded::UnboundedMailbox, Actor};
 use messages::RegisterUserApi;
@@ -88,6 +88,7 @@ impl Actor for LuaVM {
         lua_vm
             .tell(RegisterUserApi::with(AboutApi::default()))
             .await?;
+        lua_vm.tell(RegisterUserApi::with(FsApi)).await?;
 
         // Link all actors to self
         lua_vm.link(&queue).await;

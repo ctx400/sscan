@@ -25,18 +25,22 @@
 
 pub mod error;
 
-use crate::{macros::topics, userscript_api::ApiObject};
+use crate::{
+    macros::topics,
+    userscript_api::ApiObject,
+};
 use error::Error;
 use mlua::{ExternalError, UserData};
 use std::collections::HashMap;
-use topics::{about, scanmgr};
 
 // List of Userscript API Topics
 topics! {
     use HelpTopic about for "Build, version, and license information.";
+    use HelpTopic fs for "Filesystem and directory handling methods.";
+    use HelpTopic path for "Ergonomic file path maniuplation.";
     use HelpTopic queue for "Queue up files and other data for scanning.";
     use HelpTopic scanmgr for "Start a scan of all queued data items.";
-    use HelpTopic user_engines for "Register custom scan engines from userscripts.";
+    use HelpTopic user_engines for "Register custom userscript scan engines.";
 }
 
 /// # A help topic for userscript APIs.
@@ -145,90 +149,4 @@ where
     /// [`include_str!`] macro, which allows the content to be stored in
     /// a separate file.
     fn content(&self) -> &'static str;
-}
-
-/// # The Userscript Help System API
-///
-/// The Help System API exposes a function `help 'topic'` to the Lua
-/// userscript environment, which can print help on various topics to
-/// stdout. It is meant for interactive use, but can also be called from
-/// userscripts.
-///
-/// Topics can be registered with [`HelpSystem::topic()`]. To create a
-/// new custom help topic, see [`HelpTopic`].
-pub struct HelpSystem {
-    /// Holds the list of topics keyed by name.
-    topics: HashMap<String, Box<dyn HelpTopic>>,
-}
-
-impl HelpSystem {
-    /// Creates a new Help System instance with no topics loaded.
-    #[must_use]
-    pub fn new() -> Self {
-        Self {
-            topics: HashMap::with_capacity(50),
-        }
-    }
-
-    /// Registers a new [`HelpTopic`] with the Help System.
-    pub fn topic(&mut self, topic: Box<dyn HelpTopic>) -> &mut Self {
-        self.topics.insert(topic.name().to_owned(), topic);
-        self
-    }
-}
-
-/// Registers all built-in help topics with the new [`HelpSystem`].
-impl Default for HelpSystem {
-    fn default() -> Self {
-        use topics::{queue, user_engines};
-
-        let mut help_system: HelpSystem = Self::new();
-        help_system
-            .topic(Box::new(about::Topic))
-            .topic(Box::new(queue::Topic))
-            .topic(Box::new(scanmgr::Topic))
-            .topic(Box::new(user_engines::Topic));
-        help_system
-    }
-}
-
-impl UserData for HelpSystem {
-    fn add_methods<M: mlua::UserDataMethods<Self>>(methods: &mut M) {
-        // Print generic help, or specific help if `topic` is specified.
-        methods.add_meta_method("__call", |_, this: &HelpSystem, topic: Option<String>| {
-            if let Some(topic) = topic {
-                if let Some(topic) = this.topics.get(topic.trim()) {
-                    let content: &str = topic.content();
-                    println!("{content}");
-                    if !content.ends_with('\n') {
-                        println!();
-                    }
-                    Ok(())
-                } else {
-                    Err(Error::topic_not_found(&topic).into_lua_err())
-                }
-            } else {
-                println!(include_str!("help_system/topics/__generic.txt"));
-                Ok(())
-            }
-        });
-
-        // List all available topics
-        methods.add_method("topics", |_, this: &HelpSystem, ()| {
-            println!("The following help topics are available:\n");
-            for (name, topic) in &this.topics {
-                let name: &str = name.trim();
-                let description: &str = topic.short_description().trim();
-                println!("{name:<16} - {description:<50}");
-            }
-            println!("\nTo get help on a particular topic, use help 'topic'\n");
-            Ok(())
-        });
-    }
-}
-
-impl ApiObject for HelpSystem {
-    fn name(&self) -> &'static str {
-        "help"
-    }
 }
