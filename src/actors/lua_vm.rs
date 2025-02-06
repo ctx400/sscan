@@ -88,9 +88,7 @@ impl Actor for LuaVM {
         lua_vm
             .tell(RegisterUserApi::with(AboutApi::default()))
             .await?;
-        lua_vm
-            .tell(RegisterUserApi::with(FsApi))
-            .await?;
+        lua_vm.tell(RegisterUserApi::with(FsApi)).await?;
 
         // Link all actors to self
         lua_vm.link(&queue).await;

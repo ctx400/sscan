@@ -7,9 +7,9 @@
 //! [`FsApi`]: super::FsApi
 //! [`PathObj`]: super::path_obj::PathObj
 
+use crate::userscript_api::include::{LuaError, LuaExternalError};
 use std::path::PathBuf;
 use thiserror::Error as ThisError;
-use crate::userscript_api::include::{LuaExternalError, LuaError};
 
 /// Comprehensive error type for [`FsApi`]
 ///

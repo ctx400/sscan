@@ -35,11 +35,15 @@
 //!
 //! [`topics::fs`]: crate::userscript_api::help_system::topics::fs
 
-pub mod path_obj;
 pub mod error;
+pub mod path_obj;
 
+use crate::userscript_api::{
+    fs_api::{error::Error, path_obj::PathObj},
+    include::{LuaEither, LuaExternalError, LuaUserData, LuaUserDataMethods, LuaUserDataRef},
+    ApiObject,
+};
 use std::path::PathBuf;
-use crate::userscript_api::{ApiObject, include::{LuaEither, LuaExternalError, LuaUserData, LuaUserDataMethods, LuaUserDataRef}, fs_api::{path_obj::PathObj, error::Error}};
 
 /// # The Filesystem Manipulation API
 ///
@@ -51,33 +55,39 @@ pub struct FsApi;
 impl LuaUserData for FsApi {
     fn add_methods<M: LuaUserDataMethods<Self>>(methods: &mut M) {
         // Create a new PathObj to make use of the PathObj methods.
-        methods.add_async_method("path", |_, _, path: PathBuf| async move {
-            Ok(PathObj(path))
-        });
+        methods.add_async_method(
+            "path",
+            |_, _, path: PathBuf| async move { Ok(PathObj(path)) },
+        );
 
         // Test if a path is readable with current permissions.
         // Does not test if writable, and shouldn't anyways (TOCTOU!)
         //
         // ## Return Value
         // bool - True if the path is valid and readable.
-        methods.add_async_method("test", |_, _, path: LuaEither<PathBuf, LuaUserDataRef<PathObj>>| async move {
-            let path: PathBuf = match path {
-                LuaEither::Left(pb) => pb,
-                LuaEither::Right(po) => po.0.clone(),
-            };
+        methods.add_async_method(
+            "test",
+            |_, _, path: LuaEither<PathBuf, LuaUserDataRef<PathObj>>| async move {
+                let path: PathBuf = match path {
+                    LuaEither::Left(pb) => pb,
+                    LuaEither::Right(po) => po.0.clone(),
+                };
 
-            let Ok(path) = path.canonicalize() else { return Ok(false) };
-            if path.is_dir() {
-                return Ok(path.read_dir().is_ok());
-            }
-            if path.is_symlink() {
-                return Ok(path.read_link().is_ok());
-            }
-            if path.is_file() {
-                return Ok(std::fs::File::open(path).is_ok());
-            }
-            Ok(true)
-        });
+                let Ok(path) = path.canonicalize() else {
+                    return Ok(false);
+                };
+                if path.is_symlink() {
+                    return Ok(path.read_link().is_ok());
+                }
+                if path.is_dir() {
+                    return Ok(path.read_dir().is_ok());
+                }
+                if path.is_file() {
+                    return Ok(std::fs::File::open(path).is_ok());
+                }
+                Ok(true)
+            },
+        );
 
         // List the contents of a directory.
         //
@@ -87,31 +97,43 @@ impl LuaUserData for FsApi {
         // ## Errors
         // - The provided path is not a directory.
         // - Cannot access the directory.
-        methods.add_async_method("listdir", |_, _, path: LuaEither<PathBuf, LuaUserDataRef<PathObj>>| async move {
-            let path: PathBuf = match path {
-                LuaEither::Left(pb) => pb,
-                LuaEither::Right(po) => po.0.clone(),
-            };
+        methods.add_async_method(
+            "listdir",
+            |_, _, path: LuaEither<PathBuf, LuaUserDataRef<PathObj>>| async move {
+                let path: PathBuf = match path {
+                    LuaEither::Left(pb) => pb,
+                    LuaEither::Right(po) => po.0.clone(),
+                };
 
-            // Validate an actual directory was passed.
-            if !path.is_dir() {
-                return Err(Error::NotADirectory { path }.into_lua_err());
-            }
+                // Validate an actual directory was passed.
+                if !path.is_dir() {
+                    return Err(Error::NotADirectory { path }.into_lua_err());
+                }
 
-            // Stores PathObj items to return to Lua.
-            let mut subpaths: Vec<PathObj> = Vec::with_capacity(1024);
+                // Stores PathObj items to return to Lua.
+                let mut subpaths: Vec<PathObj> = Vec::with_capacity(16384);
 
-            // Iterate over the directory to get a list of files.
-            let path: PathBuf = path.canonicalize().map_err(|source| error::Error::InvalidPath { path, source })?;
-            for entry in path.read_dir().map_err(|source| error::Error::ReadDirError { path: path.clone(), source })? {
-                let Ok(entry) = entry else { continue };
-                subpaths.push(PathObj(entry.path()));
-            }
+                // Iterate over the directory to get a list of files.
+                let path: PathBuf = path
+                    .canonicalize()
+                    .map_err(|source| error::Error::InvalidPath { path, source })?;
+                for entry in path
+                    .read_dir()
+                    .map_err(|source| error::Error::ReadDirError {
+                        path: path.clone(),
+                        source,
+                    })?
+                {
+                    // Skip directory entries that are unreadable.
+                    let Ok(entry) = entry else { continue };
+                    subpaths.push(PathObj(entry.path()));
+                }
 
-            // Return the PathObj items to Lua.
-            subpaths.shrink_to_fit();
-            Ok(subpaths)
-        });
+                // Return the PathObj items to Lua.
+                subpaths.shrink_to_fit();
+                Ok(subpaths)
+            },
+        );
 
         // List all filesystem objects recursively.
         //
@@ -122,53 +144,58 @@ impl LuaUserData for FsApi {
         // Because of the iterative nature of this function, there may
         // be duplicate paths. As such, the vector is sorted and deduped
         // before returning to Lua.
-        methods.add_async_method("walk", |_, _, basepath: LuaEither<PathBuf, LuaUserDataRef<PathObj>>| async move {
-            let basepath: PathBuf = match basepath {
-                LuaEither::Left(pb) => pb,
-                LuaEither::Right(po) => po.0.clone(),
-            };
+        methods.add_async_method(
+            "walk",
+            |_, _, basepath: LuaEither<PathBuf, LuaUserDataRef<PathObj>>| async move {
+                let basepath: PathBuf = match basepath {
+                    LuaEither::Left(pb) => pb,
+                    LuaEither::Right(po) => po.0.clone(),
+                };
 
-            // Validate an actual directory was passed.
-            if !basepath.is_dir() {
-                return Err(Error::NotADirectory { path: basepath }.into_lua_err());
-            }
+                // Validate an actual directory was passed.
+                if !basepath.is_dir() {
+                    return Err(Error::NotADirectory { path: basepath }.into_lua_err());
+                }
 
-            // Set up the iteration and result vectors.
-            let mut dirq: Vec<PathBuf> = Vec::with_capacity(16384);
-            let mut path_objs: Vec<PathObj> = Vec::with_capacity(16384);
-            dirq.push(basepath.canonicalize()?);
+                // Set up the iteration and result vectors.
+                let mut dirq: Vec<PathBuf> = Vec::with_capacity(16384);
+                let mut path_objs: Vec<PathObj> = Vec::with_capacity(16384);
+                dirq.push(basepath.canonicalize()?);
 
-            // Walk all subdirectories
-            while let Some(current_dir) = dirq.pop() {
-                path_objs.push(PathObj(current_dir.clone()));
+                // Walk all subdirectories
+                while let Some(current_dir) = dirq.pop() {
+                    path_objs.push(PathObj(current_dir.clone()));
 
-                // Skip directory if unreadable.
-                if let Ok(dir_reader) = current_dir.read_dir() {
-                    for entry in dir_reader {
-                        // Skip entries within a dir if they are unreadable.
-                        let Ok(entry) = entry else { continue; };
-                        let path: PathBuf = entry.path();
+                    // Skip directory if unreadable.
+                    if let Ok(dir_reader) = current_dir.read_dir() {
+                        for entry in dir_reader {
+                            // Skip directory entries if they are unreadable.
+                            let Ok(entry) = entry else {
+                                continue;
+                            };
+                            let path: PathBuf = entry.path();
 
-                        // Push new dirs onto the queue
-                        // But skip symlinks to avoid infinite loops.
-                        if !path.is_symlink() && path.is_dir() {
-                            dirq.push(path.clone());
+                            // Push new dirs onto the traversal stack
+                            // But skip symlinks to avoid infinite loops.
+                            if !path.is_symlink() && path.is_dir() {
+                                dirq.push(path.clone());
+                            }
+
+                            // Push a new PathObj into the results vec
+                            path_objs.push(PathObj(path));
                         }
-
-                        // Push a new path object into the results vec
-                        path_objs.push(PathObj(path));
                     }
                 }
-            }
 
-            // Sort and dedupe the list of path objects.
-            path_objs.sort();
-            path_objs.dedup_by(|a: &mut PathObj, b: &mut PathObj| a.0.eq(&b.0));
+                // Sort and dedupe the list of discovered path objects.
+                path_objs.sort();
+                path_objs.dedup_by(|a: &mut PathObj, b: &mut PathObj| a.0.eq(&b.0));
 
-            // Return the path objects to Lua.
-            path_objs.shrink_to_fit();
-            Ok(path_objs)
-        });
+                // Return the path objects to Lua.
+                path_objs.shrink_to_fit();
+                Ok(path_objs)
+            },
+        );
     }
 }
 

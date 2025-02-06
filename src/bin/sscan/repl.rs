@@ -74,7 +74,11 @@ fn print_result(value: Value) {
         Value::Table(t) => println!("<table@0x{:x}>", t.to_pointer() as usize),
         Value::Thread(t) => println!("<coroutine@0x{:x}>", t.to_pointer() as usize),
         Value::Function(f) => println!("<function@0x{:x}>", f.to_pointer() as usize),
-        Value::UserData(u) => println!("{}", u.to_string().unwrap_or(format!("<userdata@{:x}>", u.to_pointer() as usize))),
+        Value::UserData(u) => println!(
+            "{}",
+            u.to_string()
+                .unwrap_or(format!("<userdata@0x{:x}>", u.to_pointer() as usize))
+        ),
         Value::LightUserData(l) => println!("<lightuserdata@0x{:x}>", l.0 as usize),
         Value::Error(e) => print_error(&anyhow::Error::from(*e)),
         _ => println!("<unknown@0x{}>", value.to_pointer() as usize),
