@@ -11,7 +11,7 @@
 //! [`topics::path`]: crate::userscript_api::help_system::topics::path
 
 use std::path::PathBuf;
-use crate::userscript_api::{include::*, fs_api::error::Error};
+use crate::userscript_api::{include::{IntoLua, Lua, LuaEither, LuaNil, LuaUserData, LuaUserDataFields, LuaUserDataMethods, LuaUserDataRef, LuaValue}, fs_api::error::Error};
 
 /// Represents a Directory Entry
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
@@ -61,7 +61,7 @@ impl LuaUserData for PathObj {
         fields.add_field_method_get("parent", |lua: &Lua, this: &PathObj| {
             let Some(parent) = this.0.parent() else { return Ok(LuaNil) };
             let parent: PathObj = PathObj(parent.to_owned());
-            Ok(parent.into_lua(lua)?)
+            parent.into_lua(lua)
         });
 
         // The type of PathObj
@@ -106,7 +106,7 @@ impl LuaUserData for PathObj {
         methods.add_async_meta_method("__unm", |lua: Lua, this: LuaUserDataRef<PathObj>, ()| async move {
             let Some(parent) = this.0.parent() else { return Ok(LuaNil) };
             let parent: PathObj = PathObj(parent.to_owned());
-            Ok(parent.into_lua(&lua)?)
+            parent.into_lua(&lua)
         });
 
         // Returns true if two path objects are equal

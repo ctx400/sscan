@@ -39,7 +39,7 @@ pub mod path_obj;
 pub mod error;
 
 use std::path::PathBuf;
-use crate::userscript_api::{ApiObject, include::*, fs_api::path_obj::PathObj};
+use crate::userscript_api::{ApiObject, include::{LuaEither, LuaExternalError, LuaUserData, LuaUserDataMethods, LuaUserDataRef}, fs_api::{path_obj::PathObj, error::Error}};
 
 /// # The Filesystem Manipulation API
 ///
@@ -93,6 +93,11 @@ impl LuaUserData for FsApi {
                 LuaEither::Right(po) => po.0.clone(),
             };
 
+            // Validate an actual directory was passed.
+            if !path.is_dir() {
+                return Err(Error::NotADirectory { path }.into_lua_err());
+            }
+
             // Stores PathObj items to return to Lua.
             let mut subpaths: Vec<PathObj> = Vec::with_capacity(1024);
 
@@ -123,12 +128,18 @@ impl LuaUserData for FsApi {
                 LuaEither::Right(po) => po.0.clone(),
             };
 
+            // Validate an actual directory was passed.
+            if !basepath.is_dir() {
+                return Err(Error::NotADirectory { path: basepath }.into_lua_err());
+            }
+
+            // Set up the iteration and result vectors.
             let mut dirq: Vec<PathBuf> = Vec::with_capacity(16384);
             let mut path_objs: Vec<PathObj> = Vec::with_capacity(16384);
-            dirq.push(basepath);
+            dirq.push(basepath.canonicalize()?);
 
-            while !dirq.is_empty() {
-                let current_dir: PathBuf = dirq.pop().expect("infallible");
+            // Walk all subdirectories
+            while let Some(current_dir) = dirq.pop() {
                 path_objs.push(PathObj(current_dir.clone()));
 
                 // Skip directory if unreadable.
@@ -140,10 +151,8 @@ impl LuaUserData for FsApi {
 
                         // Push new dirs onto the queue
                         // But skip symlinks to avoid infinite loops.
-                        if !path.is_symlink() {
-                            if path.is_dir() {
-                                dirq.push(path.clone());
-                            }
+                        if !path.is_symlink() && path.is_dir() {
+                            dirq.push(path.clone());
                         }
 
                         // Push a new path object into the results vec

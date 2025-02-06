@@ -9,9 +9,11 @@
 
 use std::path::PathBuf;
 use thiserror::Error as ThisError;
-use crate::userscript_api::include::*;
+use crate::userscript_api::include::{LuaExternalError, LuaError};
 
-/// Comprehensive error type for FsApi
+/// Comprehensive error type for [`FsApi`]
+///
+/// [`FsApi`]: super::FsApi
 #[derive(ThisError, Debug)]
 pub enum Error {
     /// The provided path is invalid.
