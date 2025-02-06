@@ -25,10 +25,7 @@
 
 pub mod error;
 
-use crate::{
-    macros::topics,
-    userscript_api::ApiObject,
-};
+use crate::{macros::topics, userscript_api::ApiObject};
 use error::Error;
 use mlua::{ExternalError, UserData};
 use std::collections::HashMap;
