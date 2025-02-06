@@ -1,10 +1,14 @@
-__Userscript Scan Engines__
+
+Userscript Scan Engines
+=======================
 
 You can register custom Lua functions as scan engines. A custom scan
 engine is any Lua function that accepts a `string` payload, returning
 either `true` or `false` based on match or non-match, respectively.
 
-_USER_ENGINES METHODS_
+
+USER_ENGINES METHODS
+********************
 
 +------------------------+---------+------------------------------------+
 | Method                 | Returns | Description                        |
