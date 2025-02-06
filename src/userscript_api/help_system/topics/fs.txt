@@ -45,7 +45,11 @@ List a Directory
 You can list the contents of a directory with `fs:listdir(path)`. The
 results are an array of PathObj.
 
-  1| local contents = fs:listdir 'C:/Users/User'
+  1| local dir_contents = fs:listdir 'C:/Users/User'
+  2|
+  3| for _,file in ipairs(dir_contents) do
+  4|   print(file.type, file)
+  5| end
 
 
 Recursively List Directories
@@ -53,7 +57,11 @@ Recursively List Directories
 You can list the contents of all directories and subdirectories
 recursively with `fs:walk(path)`. The results are an array of PathObj.
 
-  1| local contents = fs:walk '/var/lib'
+  1| local tree_contents = fs:walk '/var/lib'
+  2|
+  3| for _,file in ipairs(tree_contents) do
+  4|   print(file.type, file)
+  5| end
 
 
 Filesystem API Methods
@@ -73,13 +81,13 @@ Filesystem API Methods
 |                 |         | specified file path is readable with      |
 |                 |         | current permissions.                      |
 +-----------------+---------+-------------------------------------------+
-| fs:listdir(     | array   | List the contents of directory `dir`.     |
+| fs:listdir(     | table   | List the contents of directory `dir`.     |
 |   dir: PathObj  |         |                                           |
 | )               |         | This method can take either a PathObj or  |
 |                 |         | a raw string path. It returns a directory |
 |                 |         | listing as an array of PathObj.           |
 +-----------------+---------+-------------------------------------------+
-| fs:walk(        | array   | List contents of subdirectories of `dir`. |
+| fs:walk(        | table   | List contents of subdirectories of `dir`. |
 |   dir: PathObj  |         |                                           |
 | )               |         | This method can take either a PathObj or  |
 |                 |         | a raw string path. It traverses the       |
