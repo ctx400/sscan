@@ -32,7 +32,14 @@ pub enum Error {
 
         /// Inner IO error that occurred.
         source: std::io::Error,
-    }
+    },
+
+    /// A directory operation was called on a path that is not a dir.
+    #[error("expected a directory, but got {path}")]
+    NotADirectory {
+        /// The path that was not a directory.
+        path: PathBuf,
+    },
 }
 
 impl From<Error> for LuaError {

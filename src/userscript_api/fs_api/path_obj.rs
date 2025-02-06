@@ -14,6 +14,7 @@ use std::path::PathBuf;
 use crate::userscript_api::{include::*, fs_api::error::Error};
 
 /// Represents a Directory Entry
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
 pub struct PathObj(pub PathBuf);
 
 impl LuaUserData for PathObj {

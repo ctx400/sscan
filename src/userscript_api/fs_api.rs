@@ -39,7 +39,7 @@ pub mod path_obj;
 pub mod error;
 
 use std::path::PathBuf;
-use crate::userscript_api::{ApiObject, include::*};
+use crate::userscript_api::{ApiObject, include::*, fs_api::path_obj::PathObj};
 
 /// # The Filesystem Manipulation API
 ///
@@ -52,7 +52,7 @@ impl LuaUserData for FsApi {
     fn add_methods<M: LuaUserDataMethods<Self>>(methods: &mut M) {
         // Create a new PathObj to make use of the PathObj methods.
         methods.add_async_method("path", |_, _, path: PathBuf| async move {
-            Ok(path_obj::PathObj(path))
+            Ok(PathObj(path))
         });
 
         // Test if a path is readable with current permissions.
@@ -84,18 +84,66 @@ impl LuaUserData for FsApi {
         // - Cannot access the directory.
         methods.add_async_method("listdir", |_, _, path: PathBuf| async move {
             // Stores PathObj items to return to Lua.
-            let mut subpaths: Vec<path_obj::PathObj> = Vec::with_capacity(1024);
+            let mut subpaths: Vec<PathObj> = Vec::with_capacity(1024);
 
             // Iterate over the directory to get a list of files.
             let path: PathBuf = path.canonicalize().map_err(|source| error::Error::InvalidPath { path, source })?;
             for entry in path.read_dir().map_err(|source| error::Error::ReadDirError { path: path.clone(), source })? {
                 let Ok(entry) = entry else { continue };
-                subpaths.push(path_obj::PathObj(entry.path()));
+                subpaths.push(PathObj(entry.path()));
             }
 
             // Return the PathObj items to Lua.
             subpaths.shrink_to_fit();
             Ok(subpaths)
+        });
+
+        // List all filesystem objects recursively.
+        //
+        // This function is iterative rather than recursive, due to the
+        // constraints of futures and async-await programming. It
+        // *could* be done recursively, but it's a hassle with async.
+        //
+        // Because of the iterative nature of this function, there may
+        // be duplicate paths. As such, the vector is sorted and deduped
+        // before returning to Lua.
+        methods.add_async_method("walk", |_, _, basepath: PathBuf| async move {
+            let mut dirq: Vec<PathBuf> = Vec::with_capacity(16384);
+            let mut path_objs: Vec<PathObj> = Vec::with_capacity(16384);
+            dirq.push(basepath);
+
+            while !dirq.is_empty() {
+                let current_dir: PathBuf = dirq.pop().expect("infallible");
+                path_objs.push(PathObj(current_dir.clone()));
+
+                // Skip directory if unreadable.
+                if let Ok(dir_reader) = current_dir.read_dir() {
+                    for entry in dir_reader {
+                        // Skip entries within a dir if they are unreadable.
+                        let Ok(entry) = entry else { continue; };
+                        let path: PathBuf = entry.path();
+
+                        // Push new dirs onto the queue
+                        // But skip symlinks to avoid infinite loops.
+                        if !path.is_symlink() {
+                            if path.is_dir() {
+                                dirq.push(path.clone());
+                            }
+                        }
+
+                        // Push a new path object into the results vec
+                        path_objs.push(PathObj(path));
+                    }
+                }
+            }
+
+            // Sort and dedupe the list of path objects.
+            path_objs.sort();
+            path_objs.dedup_by(|a: &mut PathObj, b: &mut PathObj| a.0.eq(&b.0));
+
+            // Return the path objects to Lua.
+            path_objs.shrink_to_fit();
+            Ok(path_objs)
         });
     }
 }
