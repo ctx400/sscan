@@ -1,11 +1,15 @@
-__Global Scan Queue__
+
+Global Scan Queue
+=================
 
 The global scan queue holds a list of all files and other data to be
 scanned by activated scan engines. Userscripts can queue files, strings,
 bytestrings, and other data types into the queue, and these queued data
 items will be passed to all running scanners for analysis.
 
-_QUEUE METHODS_
+
+QUEUE METHODS
+*************
 
 +-------------------+----------------+---------------------------------+
 | Method            | Returns        | Description                     |
@@ -26,6 +30,9 @@ _QUEUE METHODS_
 |                   |                | queue:dequeue() is called.      |
 +-------------------+----------------+---------------------------------+
 | queue:len()       | number         | Get the length of the queue.    |
+|                   |                |                                 |
+|                   |                | The shorthand #queue has the    |
+|                   |                | same effect as `queue:len()`.   |
 +-------------------+----------------+---------------------------------+
 | queue:dequeue()   | name: string,  | Dequeue a data item.            |
 |                   | path: string?, |                                 |

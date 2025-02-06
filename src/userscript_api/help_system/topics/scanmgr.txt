@@ -1,11 +1,15 @@
-__Scan Manager__
+
+Scan Manager
+============
 
 The scan manager handles scanning all queued data items against all
 activated scan engines, and returns an array of scan results. This API
 is a high-level way to interact with sscan without manually dequeueing
 data items and passing them to individual scan engines.
 
-__SCANMGR METHODS__
+
+SCANMGR METHODS
+***************
 
 +----------------+---------+--------------------------------------------+
 | Method         | Returns | Description                                |
@@ -21,7 +25,9 @@ __SCANMGR METHODS__
 |                |         | below in __Scan Results__.                 |
 +----------------+---------+--------------------------------------------+
 
-__Scan Results__
+
+Scan Results
+************
 
 Each scan result item has the following schema.
 

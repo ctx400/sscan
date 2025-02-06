@@ -160,7 +160,7 @@ macro_rules! topics {
 
                 // List all available topics
                 methods.add_method("topics", |_, this: &HelpSystem, ()| {
-                    println!("The following help topics are available:\n");
+                    println!("\nThe following help topics are available:\n");
                     for (name, topic) in &this.topics {
                         let name: &str = name.trim();
                         let description: &str = topic.short_description().trim();
