@@ -5,7 +5,7 @@
 //!
 //! [`ScanMgr`]: super::ScanMgr
 
-use crate::userscript_api::include::LuaUserData;
+use crate::userscript_api::include::{LuaUserData, LuaTable, LuaUserDataRef, LuaResult, LuaTableSequence, Lua};
 use serde::Serialize;
 use std::path::PathBuf;
 
@@ -47,4 +47,39 @@ impl LuaUserData for DataItemResult {
         fields.add_field_method_get("name", |_, this: &DataItemResult| Ok(this.name.clone()));
         fields.add_field_method_get("path", |_, this: &DataItemResult| Ok(this.path.clone()));
     }
+}
+
+/// Add a csv() method to the scan results table.
+pub(super) async fn add_csv_method(lua: &Lua, results: &LuaTable) -> LuaResult<()> {
+    let csv_method = lua.create_async_function(|_, (this, headers): (LuaTable, Option<bool>)| async move {
+        // Create an iterator over the ScanResult table.
+        let mut scan_results: LuaTableSequence<'_, LuaUserDataRef<ScanResult>> = this.sequence_values::<LuaUserDataRef<ScanResult>>();
+
+        // This vector stores the CSV rows for serialization.
+        let mut rows: Vec<String> = Vec::with_capacity(this.len()? as usize + 1);
+
+        // If headers is true, add headers.
+        if headers.is_some_and(|headers: bool| headers) {
+            let headers: String = r#""Scan Engine","Item Name","Item Path""#.to_string();
+            rows.push(headers);
+        }
+
+        // Serialize each row to CSV
+        while let Some(Ok(scan_result)) = scan_results.next() {
+            let row: String = format!(r#""{}","{}","{}""#, scan_result.engine, scan_result.item.name, scan_result.item.path.clone().unwrap_or_default().to_string_lossy());
+            rows.push(row);
+        }
+
+        // Concat the rows vector to produce the final CSV.
+        // Append a blank line at the end.
+        let mut csv: String = rows.join("\n");
+        csv.push('\n');
+
+        // Return the CSV-serialized results.
+        Ok(csv)
+    })?;
+
+    // Add the CSV method to the results table.
+    results.set("csv", csv_method)?;
+    Ok(())
 }
