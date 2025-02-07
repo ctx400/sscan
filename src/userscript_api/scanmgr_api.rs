@@ -17,11 +17,14 @@
 //!
 //! [`topics::scanmgr`]: crate::userscript_api::help_system::topics::scanmgr
 
+pub mod scanresult;
+
 use crate::{
-    actors::scanmgr::{error::Error, messages::InvokeScan, reply::ScanResult, ScanMgr},
+    actors::scanmgr::{error::Error, messages::InvokeScan, ScanMgr},
     userscript_api::{
         include::{LuaExternalError, LuaUserDataRef},
         ApiObject,
+        scanmgr_api::scanresult::ScanResult,
     },
 };
 use kameo::actor::WeakActorRef;
