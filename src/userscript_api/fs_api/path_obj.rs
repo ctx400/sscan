@@ -10,6 +10,8 @@
 //!
 //! [`topics::path`]: crate::userscript_api::help_system::topics::path
 
+use serde::Serialize;
+
 use crate::userscript_api::{
     fs_api::error::Error,
     include::{
@@ -20,7 +22,7 @@ use crate::userscript_api::{
 use std::{os::unix::fs::MetadataExt, path::PathBuf, time::UNIX_EPOCH};
 
 /// Represents a Directory Entry
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Debug, Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PathObj(pub PathBuf);
 
 impl LuaUserData for PathObj {
