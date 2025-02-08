@@ -5,9 +5,8 @@
 //!
 //! [`ScanMgr`]: super::ScanMgr
 
-use crate::userscript_api::include::{LuaUserData, LuaTable, LuaUserDataRef, LuaResult, LuaTableSequence, Lua};
+use crate::userscript_api::{fs_api::path_obj::PathObj, include::{Lua, LuaResult, LuaTable, LuaTableSequence, LuaUserData, LuaUserDataRef}};
 use serde::Serialize;
-use std::path::PathBuf;
 
 /// Root return type for scan results.
 #[derive(Serialize, Debug)]
@@ -39,7 +38,7 @@ pub struct DataItemResult {
     pub name: String,
 
     /// Path of the data item, if applicable.
-    pub path: Option<PathBuf>,
+    pub path: Option<PathObj>,
 }
 
 impl LuaUserData for DataItemResult {
@@ -66,7 +65,7 @@ pub(super) async fn add_csv_method(lua: &Lua, results: &LuaTable) -> LuaResult<(
 
         // Serialize each row to CSV
         while let Some(Ok(scan_result)) = scan_results.next() {
-            let row: String = format!(r#""{}","{}","{}""#, scan_result.engine, scan_result.item.name, scan_result.item.path.clone().unwrap_or_default().to_string_lossy());
+            let row: String = format!(r#""{}","{}","{}""#, scan_result.engine, scan_result.item.name, scan_result.item.path.clone().unwrap_or_default().0.to_string_lossy());
             rows.push(row);
         }
 

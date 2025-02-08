@@ -17,7 +17,7 @@ use crate::{actors::{
         ScanMgr,
     },
     user_engine::messages::ScanBytes,
-}, userscript_api::scanmgr_api::scanresult::{DataItemResult, ScanResult}};
+}, userscript_api::{fs_api::path_obj::PathObj, scanmgr_api::scanresult::{DataItemResult, ScanResult}}};
 use kameo::message::{Context, Message};
 use std::path::PathBuf;
 
@@ -85,7 +85,7 @@ impl Message<InvokeScan> for ScanMgr {
             // Create a ScanResult item for each user engine result
             for engine_name in results {
                 let name: String = name.clone();
-                let path: Option<PathBuf> = path.clone();
+                let path: Option<PathObj> = path.clone().map(|path: PathBuf| PathObj(path));
                 let result = ScanResult {
                     engine: engine_name,
                     item: DataItemResult { name, path },
