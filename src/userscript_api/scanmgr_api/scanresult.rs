@@ -48,14 +48,14 @@ impl LuaUserData for DataItemResult {
     }
 }
 
-/// Add a csv() method to the scan results table.
+/// Add a `csv()` method to the scan results table.
 pub(super) async fn add_csv_method(lua: &Lua, results: &LuaTable) -> LuaResult<()> {
     let csv_method: LuaFunction = lua.create_async_function(|_, (this, headers): (LuaTable, Option<bool>)| async move {
         // Create an iterator over the ScanResult table.
         let mut scan_results: LuaTableSequence<'_, LuaUserDataRef<ScanResult>> = this.sequence_values::<LuaUserDataRef<ScanResult>>();
 
         // This vector stores the CSV rows for serialization.
-        let mut rows: Vec<String> = Vec::with_capacity(this.len()? as usize + 1);
+        let mut rows: Vec<String> = Vec::with_capacity(usize::try_from(this.len()?).map_err(LuaExternalError::into_lua_err)? + 1);
 
         // If headers is true, add headers.
         if headers.is_some_and(|headers: bool| headers) {
@@ -83,13 +83,14 @@ pub(super) async fn add_csv_method(lua: &Lua, results: &LuaTable) -> LuaResult<(
     Ok(())
 }
 
+/// Add a `json()` method to the scan results table.
 pub(super) async fn add_json_method(lua: &Lua, results: &LuaTable) -> LuaResult<()> {
     let json_method: LuaFunction = lua.create_async_function(|_, (this, pretty): (LuaTable, Option<bool>)| async move {
         // Create an iterator over the ScanResult table
         let mut scan_results: LuaTableSequence<'_, LuaUserDataRef<ScanResult>> = this.sequence_values::<LuaUserDataRef<ScanResult>>();
 
         // This vector stores the JSON objects for serialization.
-        let mut rows: Vec<ScanResult> = Vec::with_capacity(this.len()? as usize);
+        let mut rows: Vec<ScanResult> = Vec::with_capacity(usize::try_from(this.len()?).map_err(LuaExternalError::into_lua_err)?);
 
         // Clone all ScanResults into the Vec
         while let Some(Ok(scan_result)) = scan_results.next() {
@@ -113,13 +114,14 @@ pub(super) async fn add_json_method(lua: &Lua, results: &LuaTable) -> LuaResult<
     Ok(())
 }
 
+/// Add a `ndjson()` method to the scan results table.
 pub(super) async fn add_ndjson_method(lua: &Lua, results: &LuaTable) -> LuaResult<()> {
     let json_method: LuaFunction = lua.create_async_function(|_, this: LuaTable| async move {
         // Create an iterator over the ScanResult table
         let mut scan_results: LuaTableSequence<'_, LuaUserDataRef<ScanResult>> = this.sequence_values::<LuaUserDataRef<ScanResult>>();
 
         // This vector stores the JSON objects for serialization.
-        let mut rows: Vec<ScanResult> = Vec::with_capacity(this.len()? as usize);
+        let mut rows: Vec<ScanResult> = Vec::with_capacity(usize::try_from(this.len()?).map_err(LuaExternalError::into_lua_err)?);
 
         // Clone all ScanResults into the Vec
         while let Some(Ok(scan_result)) = scan_results.next() {
