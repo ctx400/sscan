@@ -10,10 +10,13 @@ use cli::{
     Args,
 };
 use kameo::actor::ActorRef;
-use sscan::{actors::lua_vm::{
-    messages::{EvalChunk, ExecChunk, WaitStartup},
-    LuaVM,
-},userscript_api::include::LuaValue};
+use sscan::{
+    actors::lua_vm::{
+        messages::{EvalChunk, ExecChunk, WaitStartup},
+        LuaVM,
+    },
+    userscript_api::include::LuaValue,
+};
 use std::{path::Path, process::ExitCode};
 
 #[tokio::main]
