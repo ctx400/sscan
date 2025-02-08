@@ -22,7 +22,7 @@ anyhow = "1.0"
 thiserror = "2"
 
 # Actor Frameworks
-kameo = "0.13"
+kameo = "0.14"
 
 # Scan engines
 yara-x = "0.13.0"
