@@ -38,6 +38,7 @@ pub enum Action {
         ///
         /// All extra arguments are passed to Lua, and userscripts can
         /// access them through the global `arg` array.
+        #[arg(allow_hyphen_values(true), allow_negative_numbers(true))]
         args: Vec<String>,
     },
 
@@ -56,6 +57,7 @@ pub enum Action {
         /// All extra arguments are passed to Lua, and are accessible
         /// through the global `arg` array. If `--startup-script`
         /// is passed, the script will also have access to these args.
+        #[arg(allow_hyphen_values(true), allow_negative_numbers(true))]
         args: Vec<String>,
     },
 }
