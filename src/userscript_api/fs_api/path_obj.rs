@@ -17,7 +17,7 @@ use crate::userscript_api::{
         LuaUserDataRef, LuaValue,
     },
 };
-use std::path::PathBuf;
+use std::{os::unix::fs::MetadataExt, path::PathBuf, time::UNIX_EPOCH};
 
 /// Represents a Directory Entry
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
@@ -87,6 +87,68 @@ impl LuaUserData for PathObj {
             } else {
                 Ok("unknown")
             }
+        });
+
+        fields.add_field_method_get("size", |_, this: &PathObj| {
+            let Ok(metadata) = this.0.metadata() else {
+                return Ok(LuaNil);
+            };
+
+            // Lua integers are always i64. Cannot get around this, so
+            // we must accept the possibility of wrapping.
+            #[allow(clippy::cast_possible_wrap)]
+            Ok(LuaValue::Integer(metadata.size() as i64))
+        });
+
+        fields.add_field_method_get("atime", |_, this: &PathObj| {
+            let Ok(metadata) = this.0.metadata() else {
+                return Ok(LuaNil);
+            };
+            let Ok(atime) = metadata.accessed() else {
+                return Ok(LuaNil);
+            };
+            let Ok(atime) = atime.duration_since(UNIX_EPOCH) else {
+                return Ok(LuaNil);
+            };
+
+            // Lua integers are always i64. Cannot get around this, so
+            // we must accept the possibility of wrapping.
+            #[allow(clippy::cast_possible_wrap)]
+            Ok(LuaValue::Integer(atime.as_secs() as i64))
+        });
+
+        fields.add_field_method_get("mtime", |_, this: &PathObj| {
+            let Ok(metadata) = this.0.metadata() else {
+                return Ok(LuaNil);
+            };
+            let Ok(mtime) = metadata.modified() else {
+                return Ok(LuaNil);
+            };
+            let Ok(mtime) = mtime.duration_since(UNIX_EPOCH) else {
+                return Ok(LuaNil);
+            };
+
+            // Lua integers are always i64. Cannot get around this, so
+            // we must accept the possibility of wrapping.
+            #[allow(clippy::cast_possible_wrap)]
+            Ok(LuaValue::Integer(mtime.as_secs() as i64))
+        });
+
+        fields.add_field_method_get("ctime", |_, this: &PathObj| {
+            let Ok(metadata) = this.0.metadata() else {
+                return Ok(LuaNil);
+            };
+            let Ok(ctime) = metadata.created() else {
+                return Ok(LuaNil);
+            };
+            let Ok(ctime) = ctime.duration_since(UNIX_EPOCH) else {
+                return Ok(LuaNil);
+            };
+
+            // Lua integers are always i64. Cannot get around this, so
+            // we must accept the possibility of wrapping.
+            #[allow(clippy::cast_possible_wrap)]
+            Ok(LuaValue::Integer(ctime.as_secs() as i64))
         });
     }
 

@@ -101,6 +101,10 @@ Path Object Fields
 | stem   | string?  | Filename without the extension, or nil.          |
 | parent | PathObj? | The parent path, if it exists, as a Path Object. |
 | type   | string   | One of (directory|file|symlink|unknown)          |
+| size   | number?  | Size, in bytes, of the target file.              |
+| atime  | number?  | Last access time, seconds since UNIX epoch.      |
+| mtime  | number?  | Last modification time, seconds since UNIX epoch |
+| ctime  | number?  | Creation time, seconds since UNIX epoch.         |
 +--------+----------+--------------------------------------------------+
 
 
