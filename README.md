@@ -54,6 +54,19 @@ help 'topic_name' -- To view detailed help on a topic.
 
 Finally, you can get even more help from [the docs](https://docs.rs/sscan/latest/sscan).
 
+## Example Userscripts
+
+The [examples/](examples/) directory provides a range of example
+userscripts to showcase some of sscan's features. These are provided in
+hopes that they will help new users learn how to write userscripts, but
+they are not guaranteed to be perfect or 100% error-proof.
+
+To try out an example, run:
+
+```bash
+sscan run examples/<example_name>.lua
+```
+
 ## Free and Open-Source Software
 
 sscan is made free and open-source to the public in accordance with
