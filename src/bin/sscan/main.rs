@@ -27,7 +27,7 @@ async fn main() -> Result<ExitCode> {
             let exec_request: EvalChunk = load_script(script)?.into();
             let return_val: LuaValue = vm.ask(exec_request).await?;
 
-            #[allow(clippy::cast_possible_truncation)]
+            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
             let exit_code: ExitCode = match return_val {
                 LuaValue::Integer(rc) => ExitCode::from(rc as u8),
                 LuaValue::Number(rc) => ExitCode::from(rc as u8),
