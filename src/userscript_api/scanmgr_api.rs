@@ -22,9 +22,9 @@ pub mod scanresult;
 use crate::{
     actors::scanmgr::{error::Error, messages::InvokeScan, ScanMgr},
     userscript_api::{
-        include::{LuaExternalError, LuaUserDataRef, LuaTable, Lua},
+        include::{Lua, LuaExternalError, LuaTable, LuaUserDataRef},
+        scanmgr_api::scanresult::{add_csv_method, ScanResult},
         ApiObject,
-        scanmgr_api::scanresult::{ScanResult, add_csv_method},
     },
 };
 use kameo::actor::WeakActorRef;

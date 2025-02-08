@@ -9,15 +9,21 @@
 //! manager service, like invoking a scan operation.
 //!
 
-use crate::{actors::{
-    lua_vm::messages::SendWarning,
-    queue::messages::{Dequeue, GetLength},
-    scanmgr::{
-        error::{Error, ScanMgrResult},
-        ScanMgr,
+use crate::{
+    actors::{
+        lua_vm::messages::SendWarning,
+        queue::messages::{Dequeue, GetLength},
+        scanmgr::{
+            error::{Error, ScanMgrResult},
+            ScanMgr,
+        },
+        user_engine::messages::ScanBytes,
     },
-    user_engine::messages::ScanBytes,
-}, userscript_api::{fs_api::path_obj::PathObj, scanmgr_api::scanresult::{DataItemResult, ScanResult}}};
+    userscript_api::{
+        fs_api::path_obj::PathObj,
+        scanmgr_api::scanresult::{DataItemResult, ScanResult},
+    },
+};
 use kameo::message::{Context, Message};
 use std::path::PathBuf;
 

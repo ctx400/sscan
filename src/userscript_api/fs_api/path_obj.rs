@@ -22,8 +22,7 @@ use crate::userscript_api::{
 use std::path::PathBuf;
 
 /// Represents a Directory Entry
-#[derive(Serialize, Debug, Clone, Default)]
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Debug, Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PathObj(pub PathBuf);
 
 impl LuaUserData for PathObj {
