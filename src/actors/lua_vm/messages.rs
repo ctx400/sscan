@@ -52,7 +52,7 @@ use kameo::{
 /// #   }
 /// # }
 /// // Start LuaVM and register a userscript API
-/// let vm: ActorRef<LuaVM> = LuaVM::spawn();
+/// let vm: ActorRef<LuaVM> = LuaVM::spawn(None);
 /// vm.ask(RegisterUserApi::with(MyApi)).await.unwrap();
 /// # }
 /// ```
@@ -103,7 +103,7 @@ where
 /// # #[tokio::main]
 /// # async fn main() {
 /// // Spawn a new LuaVM actor
-/// let vm = LuaVM::spawn();
+/// let vm = LuaVM::spawn(None);
 ///
 /// // Execute a chunk of Lua in the VM
 /// let exec_request: ExecChunk = r#"
@@ -151,7 +151,7 @@ where
 /// # #[tokio::main]
 /// # async fn main() {
 /// // Spawn a new LuaVM actor
-/// let vm = LuaVM::spawn();
+/// let vm = LuaVM::spawn(None);
 ///
 /// // Evaluate a Lua expression in the VM
 /// let exec_request: EvalChunk = r#"
@@ -195,7 +195,7 @@ where
 /// # use sscan::actors::lua_vm::{LuaVM, messages::SendWarning};
 /// # #[tokio::main]
 /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// let vm = LuaVM::spawn();
+/// let vm = LuaVM::spawn(None);
 /// let warning = SendWarning::Complete("something went wrong".into());
 /// vm.tell(warning).await?;
 /// # Ok(())
@@ -229,7 +229,7 @@ impl Message<SendWarning> for LuaVM {
 
 /// # Waits until all actors have started up.
 ///
-/// This should be called after [`LuaVM::spawn()`] to ensure all actors
+/// This should be called after [`LuaVM::spawn(None)`] to ensure all actors
 /// have the time to start up before any userscripts try to run.
 ///
 /// ## Reply
@@ -242,7 +242,7 @@ impl Message<SendWarning> for LuaVM {
 /// # use sscan::actors::lua_vm::{LuaVM, messages::WaitStartup};
 /// # #[tokio::main]
 /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// let vm = LuaVM::spawn();
+/// let vm = LuaVM::spawn(None);
 /// vm.ask(WaitStartup).await?;
 /// # Ok(())
 /// # }
@@ -293,7 +293,7 @@ mod tests {
         }
 
         // Register the API with LuaVM
-        let vm: ActorRef<LuaVM> = LuaVM::spawn();
+        let vm: ActorRef<LuaVM> = LuaVM::spawn(None);
         vm.ask(RegisterUserApi::with(MyApi)).await.unwrap();
     }
 
@@ -301,7 +301,7 @@ mod tests {
     #[tokio::test]
     async fn should_exec_successfully() {
         // Create a LuaVM actor
-        let vm: ActorRef<LuaVM> = LuaVM::spawn();
+        let vm: ActorRef<LuaVM> = LuaVM::spawn(None);
 
         // Create a chunk and execute it.
         let exec_request: ExecChunk = r#"
@@ -316,7 +316,7 @@ mod tests {
     #[should_panic]
     async fn should_fail_exec() {
         // Create a LuaVM actor
-        let vm: ActorRef<LuaVM> = LuaVM::spawn();
+        let vm: ActorRef<LuaVM> = LuaVM::spawn(None);
 
         // Create a chunk and execute it.
         let exec_request: ExecChunk = r#"
@@ -330,7 +330,7 @@ mod tests {
     #[tokio::test]
     async fn should_return_eval_result() {
         // Create a LuaVM actor
-        let vm: ActorRef<LuaVM> = LuaVM::spawn();
+        let vm: ActorRef<LuaVM> = LuaVM::spawn(None);
 
         // Create an expression and execute it.
         let expr_request: EvalChunk = r#"
@@ -346,7 +346,7 @@ mod tests {
     #[should_panic]
     async fn should_error_on_invalid_expr() {
         // Create a LuaVM actor
-        let vm: ActorRef<LuaVM> = LuaVM::spawn();
+        let vm: ActorRef<LuaVM> = LuaVM::spawn(None);
 
         // Create an expression and execute it.
         // The table and key don't exist, so this should error.

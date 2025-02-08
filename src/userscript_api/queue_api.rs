@@ -25,7 +25,11 @@ use crate::{
         messages::{Dequeue, Enqueue, GetLength},
         Queue,
     },
-    userscript_api::ApiObject,
+    userscript_api::{
+        fs_api::path_obj::PathObj,
+        include::{LuaEither, LuaUserDataRef},
+        ApiObject,
+    },
 };
 use kameo::actor::WeakActorRef;
 use mlua::{ExternalError, Lua, UserData, UserDataRef};
@@ -63,6 +67,7 @@ impl UserData for QueueApi {
         methods.add_async_method("add_file", queue_add_file);
         methods.add_async_method("dequeue", queue_dequeue);
         methods.add_async_method("len", queue_len);
+        methods.add_async_meta_method("__len", queue_len);
     }
 }
 
@@ -91,8 +96,16 @@ async fn queue_add_raw(
 }
 
 /// Userscript function `queue:add_file(path)`
-async fn queue_add_file(_: Lua, this: UserDataRef<QueueApi>, path: PathBuf) -> mlua::Result<()> {
+async fn queue_add_file(
+    _: Lua,
+    this: UserDataRef<QueueApi>,
+    path: LuaEither<PathBuf, LuaUserDataRef<PathObj>>,
+) -> mlua::Result<()> {
     if let Some(queue) = this.0.upgrade() {
+        let path: PathBuf = match path {
+            LuaEither::Left(pb) => pb,
+            LuaEither::Right(po) => po.0.clone(),
+        };
         let data_item: Box<FileDatum> = FileDatum::new(path);
         if queue.ask(Enqueue::item(data_item)).await.is_err() {
             Err(QueueError::SendError.into_lua_err())

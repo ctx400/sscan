@@ -14,7 +14,7 @@ use sscan::actors::lua_vm::{
 #[tokio::test]
 async fn should_register_user_engines() {
     // Spawn the virtual machine
-    let vm: ActorRef<LuaVM> = LuaVM::spawn();
+    let vm: ActorRef<LuaVM> = LuaVM::spawn(None);
 
     // Load some userscript scan engines the quick and dirty way
     let exec_request: ExecChunk = concat!(

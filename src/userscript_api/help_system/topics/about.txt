@@ -1,10 +1,14 @@
-__Program and License Information__
+
+Program and License Information
+===============================
 
 sscan exposes its program, build, and license information through the
 userscript API. This allows for programmatic access to build-time
 information.
 
-_GLOBAL VARIABLES_
+
+GLOBAL VARIABLES
+****************
 
 +-------------+--------+-----------------------------------+
 | Variable    | Type   | Description                       |
@@ -21,7 +25,9 @@ _GLOBAL VARIABLES_
 | _VERSION    | string | Program name and version.         |
 +-------------+--------+-----------------------------------+
 
-_ABOUT METHODS_
+
+ABOUT METHODS
+*************
 
 +---------+---------+------------------------------------------------+
 | Method  | Returns | Description                                    |
@@ -29,7 +35,9 @@ _ABOUT METHODS_
 | about() | string  | Brief summary of the info this module exposes. |
 +---------+---------+------------------------------------------------+
 
-_ABOUT FIELDS_
+
+ABOUT FIELDS
+************
 
 All about.* fields are strings.
 

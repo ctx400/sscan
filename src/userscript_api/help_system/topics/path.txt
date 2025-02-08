@@ -1,0 +1,128 @@
+
+The Path Object
+===============
+
+A path object provides a wide range of ergonomic path handling
+capabilities to Lua, such as quickly splitting and joining paths,
+getting filenames or extensions, or converting a relative path to an
+absolute path.
+
+
+Creating a Path Object
+**********************
+
+To create a path object, call `fs:path(string)`, where `string` is the
+raw string path. The call will return a path object, which is much nicer
+to work with than the raw string path was.
+
+
+Working with Path Objects
+*************************
+
+Creating Path Objects
+---------------------
+A path object can be created on demand, if desired, using `fs:path(str)`.
+The filesystem API accepts both PathObj and raw string paths, but
+PathObj is preferred as it is much more ergonomic.
+
+All methods in the filesystem API return PathObj. A PathObj can be
+kept as PathObj for ergonomic manipulation, or they can be transformed
+back to a raw string path using `PathObj.path` or `tostring(PathObj)`
+
+
+Join Paths
+----------
+Two path objects can be joined using the concat syntax (A..B). The
+behavior is identical to calling `path:join(other)`. Example:
+
+  1| path1 = fs:path '/usr/bin'
+  2| path2 = fs:path 'bash'
+  3|
+  4| joined = path1 .. path2
+  5| assert(joined.path == '/usr/bin/bash')
+
+
+Get Parent Path
+---------------
+You can get a PathObj's parent path with `PathObj.parent`. This returns
+a new PathObj. As a shorthand, you can also use the unary minus `-`
+operator.
+
+  1| full_path = fs:path 'C:/Windows/System32/ntdll.dll'
+  2|
+  3| parent = -full_path
+  4| assert(parent.path == 'C:/Windows/System32')
+
+
+Convert Relative Path to Absolute
+---------------------------------
+A relative PathObj can easily be converted to an absolute path via
+the `PathObj:absolute()` method.
+
+  1| relpath = fs:path 'bash'
+  2|
+  3| abspath = relpath:absolute()
+  4| assert(abspath.path == '/usr/bin/bash')
+
+
+Check Path Objects for Equality
+-------------------------------
+You can test if a PathObj is equal to another PathObj using the
+equality `==` and inequality `~=` operators.
+
+  1| path1 = fs:path '/usr/bin/bash'
+  2| path2 = fs:path '/usr/bin/zsh'
+  3| path3 = fs:path '/usr/bin/bash'
+  4|
+  5| assert(path1 ~= path2)
+  6| assert(path1 == path3)
+
+
+Sort Path Objects Lexicographically
+-----------------------------------
+Path objects can be sorted lexicographically with the ordering
+operators, which includes `<`, `<=`, `>=`, and `>`.
+
+  1| path1 = fs:path '/usr/bin/bash'
+  2| path2 = fs:path '/usr/bin/zsh'
+  3|
+  4| assert(path1 < path2)
+
+
+Path Object Fields
+******************
+
++--------+----------+--------------------------------------------------+
+| Field  | Type     | Description                                      |
++--------+----------+--------------------------------------------------+
+| path   | string   | The raw path, as a string.                       |
+| name   | string?  | Filename or directory name, or nil.              |
+| ext    | string?  | The file extension. Nil if no extension.         |
+| stem   | string?  | Filename without the extension, or nil.          |
+| parent | PathObj? | The parent path, if it exists, as a Path Object. |
+| type   | string   | One of (directory|file|symlink|unknown)          |
+| size   | number?  | Size, in bytes, of the target file.              |
+| atime  | number?  | Last access time, seconds since UNIX epoch.      |
+| mtime  | number?  | Last modification time, seconds since UNIX epoch |
+| ctime  | number?  | Creation time, seconds since UNIX epoch.         |
++--------+----------+--------------------------------------------------+
+
+
+Path Object Methods
+*******************
+
++-----------------+---------+-------------------------------------------+
+| Method          | Returns | Description                               |
++-----------------+---------+-------------------------------------------+
+| path:join(      | PathObj | Join a path segment as a new Path Object. |
+|   new: string   |         |                                           |
+| )               |         |                                           |
++-----------------+---------+-------------------------------------------+
+| path:absolute() | PathObj | Returns a new, absolute Path Object.      |
++-----------------+---------+-------------------------------------------+
+
+
+See Also
+********
+
+Learn more about the Filesystem API: see help topic 'fs'.

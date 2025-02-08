@@ -17,15 +17,19 @@
 //!
 //! [`topics::scanmgr`]: crate::userscript_api::help_system::topics::scanmgr
 
+pub mod scanresult;
+
 use crate::{
-    actors::scanmgr::{error::Error, messages::InvokeScan, reply::ScanResult, ScanMgr},
+    actors::scanmgr::{error::Error, messages::InvokeScan, ScanMgr},
     userscript_api::{
-        include::{LuaExternalError, LuaUserDataRef},
+        include::{Lua, LuaExternalError, LuaTable, LuaUserDataRef},
+        scanmgr_api::scanresult::{add_csv_method, ScanResult},
         ApiObject,
     },
 };
 use kameo::actor::WeakActorRef;
 use mlua::UserData;
+use scanresult::{add_json_method, add_ndjson_method};
 
 /// # High-Level Scan Manager API
 ///
@@ -51,17 +55,31 @@ impl UserData for ScanMgrApi {
     fn add_methods<M: mlua::UserDataMethods<Self>>(methods: &mut M) {
         methods.add_async_method(
             "scan",
-            |_, this: LuaUserDataRef<ScanMgrApi>, ()| async move {
+            |lua: Lua, this: LuaUserDataRef<ScanMgrApi>, ()| async move {
                 // Get a strongref to the scan manager
                 let Some(scanmgr) = this.0.upgrade() else {
                     return Err(Error::NoScanMgr.into_lua_err());
                 };
 
-                let results: Vec<ScanResult> = scanmgr
+                // Collect scan results.
+                let raw_results: Vec<ScanResult> = scanmgr
                     .ask(InvokeScan)
                     .await
                     .map_err(LuaExternalError::into_lua_err)?;
-                Ok(results)
+
+                // Convert to a Lua table
+                let results_table: LuaTable = lua.create_table()?;
+                for result in raw_results {
+                    results_table.push(result)?;
+                }
+
+                // Register result formatting methods
+                add_csv_method(&lua, &results_table).await?;
+                add_json_method(&lua, &results_table).await?;
+                add_ndjson_method(&lua, &results_table).await?;
+
+                // Return the results table
+                Ok(results_table)
             },
         );
     }

@@ -22,10 +22,10 @@ anyhow = "1.0"
 thiserror = "2"
 
 # Actor Frameworks
-kameo = "0.13"
+kameo = "0.14"
 
 # Scan engines
-yara-x = "0.12.0"
+yara-x = "0.13.0"
 
 # Command-line Interfaces
 [dependencies.clap]
@@ -46,3 +46,6 @@ features = ["lua54", "vendored", "anyhow", "send", "error-send", "async"]
 [dependencies.serde]
 version = "1"
 features = ["derive"]
+
+[dependencies.serde_json]
+version = "1.0"
