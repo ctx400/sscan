@@ -91,6 +91,10 @@ impl LuaUserData for PathObj {
 
         fields.add_field_method_get("size", |_, this: &PathObj| {
             let Ok(metadata) = this.0.metadata() else { return Ok(LuaNil) };
+
+            // Lua integers are always i64. Cannot get around this, so
+            // we must accept the possibility of wrapping.
+            #[allow(clippy::cast_possible_wrap)]
             Ok(LuaValue::Integer(metadata.size() as i64))
         });
 
@@ -98,6 +102,10 @@ impl LuaUserData for PathObj {
             let Ok(metadata) = this.0.metadata() else { return Ok(LuaNil) };
             let Ok(atime) = metadata.accessed() else { return Ok(LuaNil) };
             let Ok(atime) = atime.duration_since(UNIX_EPOCH) else { return Ok(LuaNil) };
+
+            // Lua integers are always i64. Cannot get around this, so
+            // we must accept the possibility of wrapping.
+            #[allow(clippy::cast_possible_wrap)]
             Ok(LuaValue::Integer(atime.as_secs() as i64))
         });
 
@@ -105,6 +113,10 @@ impl LuaUserData for PathObj {
             let Ok(metadata) = this.0.metadata() else { return Ok(LuaNil) };
             let Ok(mtime) = metadata.modified() else { return Ok(LuaNil) };
             let Ok(mtime) = mtime.duration_since(UNIX_EPOCH) else { return Ok(LuaNil) };
+
+            // Lua integers are always i64. Cannot get around this, so
+            // we must accept the possibility of wrapping.
+            #[allow(clippy::cast_possible_wrap)]
             Ok(LuaValue::Integer(mtime.as_secs() as i64))
         });
 
@@ -112,6 +124,10 @@ impl LuaUserData for PathObj {
             let Ok(metadata) = this.0.metadata() else { return Ok(LuaNil) };
             let Ok(ctime) = metadata.created() else { return Ok(LuaNil) };
             let Ok(ctime) = ctime.duration_since(UNIX_EPOCH) else { return Ok(LuaNil) };
+
+            // Lua integers are always i64. Cannot get around this, so
+            // we must accept the possibility of wrapping.
+            #[allow(clippy::cast_possible_wrap)]
             Ok(LuaValue::Integer(ctime.as_secs() as i64))
         });
     }
