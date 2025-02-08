@@ -29,6 +29,7 @@ use crate::{
 };
 use kameo::actor::WeakActorRef;
 use mlua::UserData;
+use scanresult::{add_json_method, add_ndjson_method};
 
 /// # High-Level Scan Manager API
 ///
@@ -74,6 +75,8 @@ impl UserData for ScanMgrApi {
 
                 // Register result formatting methods
                 add_csv_method(&lua, &results_table).await?;
+                add_json_method(&lua, &results_table).await?;
+                add_ndjson_method(&lua, &results_table).await?;
 
                 // Return the results table
                 Ok(results_table)
