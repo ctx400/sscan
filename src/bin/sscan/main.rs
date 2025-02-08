@@ -10,23 +10,30 @@ use cli::{
     Args,
 };
 use kameo::actor::ActorRef;
-use sscan::actors::lua_vm::{
-    messages::{ExecChunk, WaitStartup},
+use sscan::{actors::lua_vm::{
+    messages::{EvalChunk, ExecChunk, WaitStartup},
     LuaVM,
-};
-use std::path::Path;
+},userscript_api::include::LuaValue};
+use std::{path::Path, process::ExitCode};
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> Result<ExitCode> {
     // Parse commandline arguments
     let cli_args: Args = Args::parse();
 
-    let vm: ActorRef<LuaVM> = match cli_args.action {
+    let (vm, exit_code): (ActorRef<LuaVM>, ExitCode) = match cli_args.action {
         Run { script, args } => {
             let vm: ActorRef<LuaVM> = init_vm(cli_args.unsafe_mode, &args).await?;
-            let exec_request: ExecChunk = load_script(script)?.into();
-            vm.ask(exec_request).await?;
-            vm
+            let exec_request: EvalChunk = load_script(script)?.into();
+            let return_val: LuaValue = vm.ask(exec_request).await?;
+
+            #[allow(clippy::cast_possible_truncation)]
+            let exit_code: ExitCode = match return_val {
+                LuaValue::Integer(rc) => ExitCode::from(rc as u8),
+                LuaValue::Number(rc) => ExitCode::from(rc as u8),
+                _ => ExitCode::SUCCESS,
+            };
+            (vm, exit_code)
         }
         Interactive {
             startup_script,
@@ -39,14 +46,14 @@ async fn main() -> Result<()> {
                 vm.ask(exec_request).await?;
             }
             repl::invoke(&vm, nosplash).await;
-            vm
+            (vm, ExitCode::SUCCESS)
         }
     };
 
     // Shut down all services
     vm.stop_gracefully().await?;
     vm.wait_for_stop().await;
-    Ok(())
+    Ok(exit_code)
 }
 
 /// Initialize the Lua virtual machine.
