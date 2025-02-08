@@ -46,3 +46,6 @@ features = ["lua54", "vendored", "anyhow", "send", "error-send", "async"]
 [dependencies.serde]
 version = "1"
 features = ["derive"]
+
+[dependencies.serde_json]
+version = "1.0"
