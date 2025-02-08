@@ -25,7 +25,11 @@ use crate::{
         messages::{Dequeue, Enqueue, GetLength},
         Queue,
     },
-    userscript_api::{ApiObject, include::{LuaEither, LuaUserDataRef}, fs_api::path_obj::PathObj},
+    userscript_api::{
+        fs_api::path_obj::PathObj,
+        include::{LuaEither, LuaUserDataRef},
+        ApiObject,
+    },
 };
 use kameo::actor::WeakActorRef;
 use mlua::{ExternalError, Lua, UserData, UserDataRef};
@@ -92,7 +96,11 @@ async fn queue_add_raw(
 }
 
 /// Userscript function `queue:add_file(path)`
-async fn queue_add_file(_: Lua, this: UserDataRef<QueueApi>, path: LuaEither<PathBuf, LuaUserDataRef<PathObj>>) -> mlua::Result<()> {
+async fn queue_add_file(
+    _: Lua,
+    this: UserDataRef<QueueApi>,
+    path: LuaEither<PathBuf, LuaUserDataRef<PathObj>>,
+) -> mlua::Result<()> {
     if let Some(queue) = this.0.upgrade() {
         let path: PathBuf = match path {
             LuaEither::Left(pb) => pb,
