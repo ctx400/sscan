@@ -17,7 +17,7 @@ local usage = function()
 end
 
 -- Check if the correct number of arguments was passed.
-if #arg ~= 2 then usage() return end
+if #arg ~= 2 then usage() return 1 end
 local scan_pattern = arg[1]
 local scan_folder = arg[2]
 
@@ -31,6 +31,7 @@ if not fs:test(scan_folder) and scan_folder.type == 'directory' then
     local err_msg = string.format(
         'Error: expected directory, got %s\n', scan_folder.type)
     io.write(err_msg)
+    return 1
 end
 
 -- Queue all files under scan_folder/ for scanning
