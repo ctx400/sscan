@@ -27,7 +27,7 @@ use crate::{
     },
     userscript_api::{
         fs_api::path_obj::PathObj,
-        include::{LuaEither, LuaUserDataRef},
+        include::{LuaEither, LuaUserDataRef, LuaString},
         ApiObject,
     },
 };
@@ -81,10 +81,11 @@ impl ApiObject for QueueApi {
 async fn queue_add_raw(
     _: Lua,
     this: UserDataRef<QueueApi>,
-    (name, content): (String, String),
+    (name, content): (String, LuaString),
 ) -> mlua::Result<()> {
     if let Some(queue) = this.0.upgrade() {
-        let data_item: Box<RawDatum> = RawDatum::new(&name, content.as_bytes().to_vec());
+        let content: Vec<u8> = content.as_bytes().to_vec();
+        let data_item: Box<RawDatum> = RawDatum::new(&name, content);
         if queue.ask(Enqueue::item(data_item)).await.is_err() {
             Err(QueueError::SendError.into_lua_err())
         } else {
