@@ -12,7 +12,9 @@
 //!
 
 use crate::userscript_api::{
-    include::{LuaTable, LuaUserData, LuaUserDataMethods, LuaUserDataRef, LuaNil, Lua, LuaValue, LuaString},
+    include::{
+        Lua, LuaNil, LuaString, LuaTable, LuaUserData, LuaUserDataMethods, LuaUserDataRef, LuaValue,
+    },
     ApiObject,
 };
 
@@ -130,10 +132,7 @@ impl ApiObject for AboutApi {
         )?;
         globals.set("_LICENSE", self.license.as_str())?;
         globals.set("_POWERED_BY", self.powered_by.as_str())?;
-        globals.set(
-            "_DOCS",
-            self.docs_link.clone(),
-        )?;
+        globals.set("_DOCS", self.docs_link.clone())?;
 
         // Set the build info table
         let build_info: LuaTable = lua.create_table()?;
@@ -142,13 +141,23 @@ impl ApiObject for AboutApi {
         build_info.set("patch", self.version_patch)?;
 
         let build_info_mt: LuaTable = lua.create_table()?;
-        build_info_mt.set("__tostring", lua.create_function(|lua: &Lua, this: LuaTable| {
-            let Ok(major) = this.get::<u16>("major") else { return Ok(LuaNil) };
-            let Ok(minor) = this.get::<u16>("minor") else { return Ok(LuaNil) };
-            let Ok(patch) = this.get::<u16>("patch") else { return Ok(LuaNil) };
-            let version: LuaString = lua.create_string(format!("{major}.{minor}.{patch}"))?;
-            Ok(LuaValue::String(version))
-        })?)?;
+        build_info_mt.set(
+            "__tostring",
+            lua.create_function(|lua: &Lua, this: LuaTable| {
+                let Ok(major) = this.get::<u16>("major") else {
+                    return Ok(LuaNil);
+                };
+                let Ok(minor) = this.get::<u16>("minor") else {
+                    return Ok(LuaNil);
+                };
+                let Ok(patch) = this.get::<u16>("patch") else {
+                    return Ok(LuaNil);
+                };
+
+                let version: LuaString = lua.create_string(format!("{major}.{minor}.{patch}"))?;
+                Ok(LuaValue::String(version))
+            })?,
+        )?;
         build_info.set_metatable(Some(build_info_mt));
         globals.set("_BUILD", build_info)?;
         Ok(())

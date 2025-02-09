@@ -27,7 +27,7 @@ use crate::{
     },
     userscript_api::{
         fs_api::path_obj::PathObj,
-        include::{LuaEither, LuaUserDataRef, LuaString},
+        include::{LuaEither, LuaString, LuaUserDataRef},
         ApiObject,
     },
 };
