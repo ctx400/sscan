@@ -104,7 +104,7 @@ Path Object Fields
 | size   | number?  | Size, in bytes, of the target file.              |
 | atime  | number?  | Last access time, seconds since UNIX epoch.      |
 | mtime  | number?  | Last modification time, seconds since UNIX epoch |
-| ctime  | number?  | Creation time, seconds since UNIX epoch.         |
+| btime  | number?  | Creation (birth) time, seconds since UNIX epoch. |
 +--------+----------+--------------------------------------------------+
 
 
