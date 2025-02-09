@@ -12,7 +12,7 @@
 //!
 
 use crate::userscript_api::{
-    include::{LuaTable, LuaUserData, LuaUserDataMethods, LuaUserDataRef},
+    include::{LuaTable, LuaUserData, LuaUserDataMethods, LuaUserDataRef, LuaNil, Lua, LuaValue, LuaString},
     ApiObject,
 };
 
@@ -140,6 +140,16 @@ impl ApiObject for AboutApi {
         build_info.set("major", self.version_major)?;
         build_info.set("minor", self.version_minor)?;
         build_info.set("patch", self.version_patch)?;
+
+        let build_info_mt: LuaTable = lua.create_table()?;
+        build_info_mt.set("__tostring", lua.create_function(|lua: &Lua, this: LuaTable| {
+            let Ok(major) = this.get::<u16>("major") else { return Ok(LuaNil) };
+            let Ok(minor) = this.get::<u16>("minor") else { return Ok(LuaNil) };
+            let Ok(patch) = this.get::<u16>("patch") else { return Ok(LuaNil) };
+            let version: LuaString = lua.create_string(format!("{major}.{minor}.{patch}"))?;
+            Ok(LuaValue::String(version))
+        })?)?;
+        build_info.set_metatable(Some(build_info_mt));
         globals.set("_BUILD", build_info)?;
         Ok(())
     }
