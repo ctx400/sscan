@@ -52,7 +52,7 @@ impl Default for AboutApi {
         let license: String = include_str!("../../LICENSE.md").to_owned();
         let license: String = format!("\n{license}\n{LICENSE_EXT}\nSee {repo} for more info.\n");
         let powered_by: String = format!(
-            "{} ({})\nSource: {}",
+            "{} ({}) ({})",
             "Lua 5.4", "Copyright (c) 1994–2024 Lua.org, PUC-Rio.", "https://lua.org"
         );
         let version_major: u16 = env!("CARGO_PKG_VERSION_MAJOR").parse::<u16>().unwrap();
