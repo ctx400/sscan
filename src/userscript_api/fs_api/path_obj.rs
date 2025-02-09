@@ -136,7 +136,7 @@ impl LuaUserData for PathObj {
             Ok(LuaValue::Integer(mtime.as_secs() as i64))
         });
 
-        fields.add_field_method_get("ctime", |_, this: &PathObj| {
+        fields.add_field_method_get("btime", |_, this: &PathObj| {
             let Ok(metadata) = this.0.metadata() else {
                 return Ok(LuaNil);
             };

@@ -4,10 +4,10 @@
 //! Its high level of configurability is powered by userscripts which run in
 //! an embeded [Lua](https://www.lua.org/) virtual machine.
 //!
-//! Currently, scanning is provided by the
-//! [YARA-X](https://virustotal.github.io/yara-x/) scan engine. YARA-X is a
-//! Rust implementation of the original YARA scan engine. Additional scan
-//! engines may be implemented or integrated in the future.
+//! Scanning is provided via both custom, user-defined scan engines, as well
+//! as a built-in YARA scan engine (provided by YARA-X, currently WIP.)
+//! A global scan queue is implemented to automatically distribute files and
+//! other scannable data to all activated scan engines.
 //!
 //! The embedded Lua virtual machine is made possible by the
 //! [mlua](https://crates.io/crates/mlua) crate.
@@ -29,12 +29,23 @@
 //! Or, if you've already created a Lua userscript, run:
 //!
 //! ```bash
-//! sscan run myscript.lua
+//! sscan run myscript.lua [ARGS]...
 //! ```
 //!
-//! The commandline arguments can be abbreviated, as long as they are
+//! The CLI arguments can be abbreviated, as long as they are
 //! unambiguous. For example, `sscan int` or `sscan i` will start an
-//! interactive session, just like the full command.
+//! interactive session, just like the full command. For all CLI
+//! options, run:
+//!
+//! ```bash
+//! sscan help
+//! ```
+//!
+//! For help on a specific command, run:
+//!
+//! ```bash
+//! sscan help <COMMAND>
+//! ```
 //!
 //! ## Getting Help
 //!

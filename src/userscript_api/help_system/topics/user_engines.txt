@@ -7,6 +7,26 @@ engine is any Lua function that accepts a `string` payload, returning
 either `true` or `false` based on match or non-match, respectively.
 
 
+Working with Userscript Scan Engines
+************************************
+
+Register a Scan Engine
+----------------------
+You can register a custom scan engine using `user_engines:register()`.
+A userscript scan engine is any Lua function that accepts a string
+payload and returns a boolean.
+
+  1| function match_hello(payload)
+  2|   if string.find(payload, 'hello') ~= nil then
+  3|     return true
+  4|   else
+  5|     return false
+  6|   end
+  7| end
+  8|
+  9| user_engines:register('match_hello', match_hello)
+
+
 USER_ENGINES METHODS
 ********************
 

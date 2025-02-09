@@ -12,7 +12,7 @@
 //!
 
 use crate::userscript_api::{
-    include::{LuaTable, LuaUserData, LuaUserDataMethods, LuaUserDataRef},
+    include::{LuaTable, LuaUserData, LuaUserDataMethods, LuaUserDataRef, LuaNil, Lua, LuaValue, LuaString},
     ApiObject,
 };
 
@@ -50,9 +50,9 @@ impl Default for AboutApi {
         let repo: String = env!("CARGO_PKG_REPOSITORY").to_owned();
         let docs_link: String = format!("https://docs.rs/{pkg_name}/latest/{pkg_name}");
         let license: String = include_str!("../../LICENSE.md").to_owned();
-        let license: String = format!("{license}\n{LICENSE_EXT}\n{repo}");
+        let license: String = format!("\n{license}\n{LICENSE_EXT}\nSee {repo} for more info.\n");
         let powered_by: String = format!(
-            "{} ({})\nSource: {}",
+            "{} ({}) ({})",
             "Lua 5.4", "Copyright (c) 1994–2024 Lua.org, PUC-Rio.", "https://lua.org"
         );
         let version_major: u16 = env!("CARGO_PKG_VERSION_MAJOR").parse::<u16>().unwrap();
@@ -95,7 +95,7 @@ impl LuaUserData for AboutApi {
             "__call",
             |_, this: LuaUserDataRef<AboutApi>, ()| async move {
                 let about_info: String = format!(
-                    "{} v{}.{}.{} - {}\n\nAuthors: {}\nRepository: {}\nDocs: {}\nLicense: {}\n",
+                    "\n{} v{}.{}.{} - {}\n\nAuthors: {}\nRepository: {}\nDocs: {}\nLicense: {}\n",
                     this.pkg_name,
                     this.version_major,
                     this.version_minor,
@@ -132,15 +132,7 @@ impl ApiObject for AboutApi {
         globals.set("_POWERED_BY", self.powered_by.as_str())?;
         globals.set(
             "_DOCS",
-            format!(
-                "{}\n\n  {}\n\n{}\n\n  {}\n{}\n{}\n\n",
-                "To view online help, see:",
-                self.docs_link,
-                "Or, to access built-in help, call:",
-                "help()            -- View general help information",
-                "help:topics()     -- List available help topics",
-                "help 'topic_name' -- View detailed help on `topic_name`"
-            ),
+            format!("{}", self.docs_link),
         )?;
 
         // Set the build info table
@@ -148,6 +140,16 @@ impl ApiObject for AboutApi {
         build_info.set("major", self.version_major)?;
         build_info.set("minor", self.version_minor)?;
         build_info.set("patch", self.version_patch)?;
+
+        let build_info_mt: LuaTable = lua.create_table()?;
+        build_info_mt.set("__tostring", lua.create_function(|lua: &Lua, this: LuaTable| {
+            let Ok(major) = this.get::<u16>("major") else { return Ok(LuaNil) };
+            let Ok(minor) = this.get::<u16>("minor") else { return Ok(LuaNil) };
+            let Ok(patch) = this.get::<u16>("patch") else { return Ok(LuaNil) };
+            let version: LuaString = lua.create_string(format!("{major}.{minor}.{patch}"))?;
+            Ok(LuaValue::String(version))
+        })?)?;
+        build_info.set_metatable(Some(build_info_mt));
         globals.set("_BUILD", build_info)?;
         Ok(())
     }

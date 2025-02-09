@@ -6,14 +6,14 @@ Stock Lua has no concept of filesystems or directory handling. As such,
 simple things like directory walking require clunky, non-portable
 solutions like:
 
-  2| local files = {}
-  3| do
-  4|   local handle <close> = io.popen'find . -type f'
-  5|   local output = handle:read'a'
-  6|   output:gsub(
-  7|     '[^\r\n]+',
-  8|     function(file) table.insert(files, file) end)
-  9| end
+  1| local files = {}
+  2| do
+  3|   local handle <close> = io.popen'find . -type f'
+  4|   local output = handle:read'a'
+  5|   output:gsub(
+  6|     '[^\r\n]+',
+  7|     function(file) table.insert(files, file) end)
+  8| end
 
 The sscan filesystem API solves this by providing several ergonomic
 methods for dealing with files, paths, and directories:
@@ -99,4 +99,4 @@ Filesystem API Methods
 See Also
 ********
 
-Learn more about PathObj: see help topic 'path'
+Learn more about PathObj: see help 'path'
