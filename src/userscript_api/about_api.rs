@@ -132,7 +132,7 @@ impl ApiObject for AboutApi {
         globals.set("_POWERED_BY", self.powered_by.as_str())?;
         globals.set(
             "_DOCS",
-            format!("{}", self.docs_link),
+            self.docs_link.clone(),
         )?;
 
         // Set the build info table
