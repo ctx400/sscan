@@ -1,6 +1,9 @@
-__sscan - A scriptable file/process/network scanner__
 
-_Basic Commands_
+sscan - A scriptable file/process/network scanner
+=================================================
+
+Basic Commands
+**************
 
 +-------------------+-------------------------------------------+
 | Command           | Description                               |
@@ -10,12 +13,18 @@ _Basic Commands_
 | help 'topic'      | View detailed help on 'topic'.            |
 +-------------------+-------------------------------------------+
 
-_Interactive Mode_
+
+Interactive Mode
+****************
 
 In interactive mode, sscan provides a REPL which accepts multiline Lua
 input terminated by a semicolon.
 
-_More Help_
+To exit interactive mode, use exit;
+
+
+More Help
+*********
 
 - To get detailed help on a topic, use `help 'topic'`
 - To list all topics, use `help:topics()`
