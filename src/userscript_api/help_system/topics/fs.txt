@@ -99,4 +99,4 @@ Filesystem API Methods
 See Also
 ********
 
-Learn more about PathObj: see help topic 'path'
+Learn more about PathObj: see help 'path'
