@@ -95,7 +95,7 @@ impl LuaUserData for AboutApi {
             "__call",
             |_, this: LuaUserDataRef<AboutApi>, ()| async move {
                 let about_info: String = format!(
-                    "{} v{}.{}.{} - {}\n\nAuthors: {}\nRepository: {}\nDocs: {}\nLicense: {}\n",
+                    "\n{} v{}.{}.{} - {}\n\nAuthors: {}\nRepository: {}\nDocs: {}\nLicense: {}\n",
                     this.pkg_name,
                     this.version_major,
                     this.version_minor,
