@@ -125,4 +125,4 @@ Path Object Methods
 See Also
 ********
 
-Learn more about the Filesystem API: see help topic 'fs'.
+Learn more about the Filesystem API: see help 'fs'.
