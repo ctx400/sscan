@@ -50,7 +50,7 @@ impl Default for AboutApi {
         let repo: String = env!("CARGO_PKG_REPOSITORY").to_owned();
         let docs_link: String = format!("https://docs.rs/{pkg_name}/latest/{pkg_name}");
         let license: String = include_str!("../../LICENSE.md").to_owned();
-        let license: String = format!("{license}\n{LICENSE_EXT}\n{repo}");
+        let license: String = format!("\n{license}\n{LICENSE_EXT}\nSee {repo} for more info.\n");
         let powered_by: String = format!(
             "{} ({})\nSource: {}",
             "Lua 5.4", "Copyright (c) 1994–2024 Lua.org, PUC-Rio.", "https://lua.org"
