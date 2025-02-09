@@ -132,15 +132,7 @@ impl ApiObject for AboutApi {
         globals.set("_POWERED_BY", self.powered_by.as_str())?;
         globals.set(
             "_DOCS",
-            format!(
-                "{}\n\n  {}\n\n{}\n\n  {}\n{}\n{}\n\n",
-                "To view online help, see:",
-                self.docs_link,
-                "Or, to access built-in help, call:",
-                "help()            -- View general help information",
-                "help:topics()     -- List available help topics",
-                "help 'topic_name' -- View detailed help on `topic_name`"
-            ),
+            format!("{}", self.docs_link),
         )?;
 
         // Set the build info table
