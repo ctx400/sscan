@@ -8,6 +8,45 @@ bytestrings, and other data types into the queue, and these queued data
 items will be passed to all running scanners for analysis.
 
 
+Working with the Global Scan Queue
+**********************************
+
+Queue Arbitrary Data
+--------------------
+You can enqueue arbitrary data for scanning with `queue:add_raw()`.
+
+  1| queue:add_raw('my_data', 'lorem ipsum dolor sit amet')
+
+
+Queue a File
+------------
+You can add a file to the queue for scanning with `queue:add_file()`.
+
+  1| queue:add_file 'C:/users/User/myfile.txt'
+
+
+Queue all files in subdirectories
+---------------------------------
+You can quickly queue all files in a directory with `queue:add_file()`
+and the sscan Filesystem API.
+
+  1| local entries = fs:walk '/usr/share'
+  2|
+  3| for _,entry in ipairs(entries) do
+  4|   if entry.type == 'file' then
+  5|     queue:add_file(entry)
+  6|   end
+  7| end
+
+
+Check how many items are queued
+-------------------------------
+You can quickly check how many items are queued for scanning with the
+`queue:len()` function. As a shorthand, you can use the `#` operator.
+
+  1| print('The queue length is: ' .. #queue)
+
+
 QUEUE METHODS
 *************
 
