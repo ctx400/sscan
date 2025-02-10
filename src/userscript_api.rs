@@ -26,6 +26,7 @@
 pub mod about_api;
 pub mod fs_api;
 pub mod help_system;
+pub mod process_api;
 pub mod queue_api;
 pub mod scanmgr_api;
 pub mod user_engine_api;
