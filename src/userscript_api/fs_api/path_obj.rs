@@ -10,8 +10,6 @@
 //!
 //! [`topics::path`]: crate::userscript_api::help_system::topics::path
 
-use serde::Serialize;
-
 use crate::userscript_api::{
     fs_api::error::Error,
     include::{
@@ -19,7 +17,8 @@ use crate::userscript_api::{
         LuaUserDataRef, LuaValue,
     },
 };
-use std::{os::unix::fs::MetadataExt, path::PathBuf, time::UNIX_EPOCH};
+use serde::Serialize;
+use std::{path::PathBuf, time::UNIX_EPOCH};
 
 /// Represents a Directory Entry
 #[derive(Serialize, Debug, Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
@@ -99,7 +98,7 @@ impl LuaUserData for PathObj {
             // Lua integers are always i64. Cannot get around this, so
             // we must accept the possibility of wrapping.
             #[allow(clippy::cast_possible_wrap)]
-            Ok(LuaValue::Integer(metadata.size() as i64))
+            Ok(LuaValue::Integer(metadata.len() as i64))
         });
 
         fields.add_field_method_get("atime", |_, this: &PathObj| {
