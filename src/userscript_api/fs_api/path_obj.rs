@@ -10,8 +10,6 @@
 //!
 //! [`topics::path`]: crate::userscript_api::help_system::topics::path
 
-use serde::Serialize;
-
 use crate::userscript_api::{
     fs_api::error::Error,
     include::{
@@ -19,6 +17,7 @@ use crate::userscript_api::{
         LuaUserDataRef, LuaValue,
     },
 };
+use serde::Serialize;
 use std::{path::PathBuf, time::UNIX_EPOCH};
 
 /// Represents a Directory Entry
